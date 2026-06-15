@@ -2,7 +2,8 @@
 
 A comprehensive, interactive study dashboard designed for Manual Testing QA professionals. This repository contains a complete 12-part reference manual covering every dimension of manual testing—from core SDLC/STLC fundamentals and test design to JIRA workflow execution and modern QA methodologies.
 
-> 🚀 **Live demo:** [Open the guide in a new tab](https://ghanendra-sdet.github.io/Comprehensive-Manual-Testing-Guide/){:target="_blank"}  
+> 🚀 **Live demo:** <a href="https://ghanendra-sdet.github.io/Comprehensive-Manual-Testing-Guide/" target="_blank" rel="noopener noreferrer">View the interactive Manual Testing guide</a>
+> 
 > Save it to your bookmarks for future learning.
 
 This dashboard converts standard Markdown source files into a premium, responsive single-page web application client-side, making it highly portable and ready to be hosted directly on **GitHub Pages**.
