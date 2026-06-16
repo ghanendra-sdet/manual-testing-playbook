@@ -624,7 +624,7 @@ flowchart TD
 
 ### When to Use
 
-- ✅ Project is **large, complex, and high-risk** (budget > $1M; timeline > 1 year)
+- ✅ Project is **large, complex, and high-risk** (budget > ₹1M; timeline > 1 year)
 - ✅ **Requirements are not well-understood** and will evolve
 - ✅ **Prototyping is important** — need to validate concepts before full development
 - ✅ **Risk management** is a top priority (mission-critical, safety-critical)
@@ -638,7 +638,7 @@ flowchart TD
 **Why Spiral was chosen:**
 1. Extremely high risk — system failure could cause loss of life
 2. Requirements evolve based on FAA regulatory changes and new flight technologies (drones, Urban Air Mobility)
-3. Budget is $200M+ over 5 years — risk management is essential
+3. Budget is ₹200M+ over 5 years — risk management is essential
 4. Multiple unknowns in technology (new radar systems, AI-based conflict detection)
 5. Prototyping is needed to validate concepts before committing to full development
 
@@ -1262,7 +1262,7 @@ The Spiral Model, proposed by Barry Boehm, is a risk-driven process model that c
 **Key characteristic:** Before any significant development investment, risks are formally identified and mitigated. If a risk cannot be mitigated, the project can be terminated early.
 
 **When to use it:**
-- Large, complex, high-risk projects (budget > $1M)
+- Large, complex, high-risk projects (budget > ₹1M)
 - Projects with significant technical uncertainty (new technology, complex integrations)
 - Mission-critical or safety-critical systems (aerospace, defense)
 - Projects where prototyping is needed to validate concepts

@@ -67,9 +67,9 @@ For **QA and testing professionals**, JIRA serves as:
 
 | Plan | Users | Price (Per User/Month) | Key Features |
 |------|-------|----------------------|--------------|
-| **Free** | Up to 10 users | $0 | Basic Scrum/Kanban boards, backlog, 2 GB storage |
-| **Standard** | Up to 50,000 users | ~$8.15/user/month | Audit logs, 250 GB storage, project roles, advanced permissions |
-| **Premium** | Up to 50,000 users | ~$16/user/month | Advanced roadmaps, sandbox environment, unlimited storage, IP allow-listing, SLA guarantee (99.9%) |
+| **Free** | Up to 10 users | ₹0 | Basic Scrum/Kanban boards, backlog, 2 GB storage |
+| **Standard** | Up to 50,000 users | ~₹8.15/user/month | Audit logs, 250 GB storage, project roles, advanced permissions |
+| **Premium** | Up to 50,000 users | ~₹16/user/month | Advanced roadmaps, sandbox environment, unlimited storage, IP allow-listing, SLA guarantee (99.9%) |
 | **Enterprise** | Unlimited | Custom pricing | Unlimited sites, Atlassian Intelligence, advanced security (SAML SSO, SCIM), data residency, 24/7 support |
 
 > [!NOTE]
@@ -1151,7 +1151,7 @@ Zephyr is one of the oldest and most popular test management plugins for JIRA. I
 | **Test Case Versioning** | ✅ Yes | ✅ Yes | ❌ No |
 | **Reusable Test Cases** | ✅ Yes | ✅ Yes | ❌ No |
 | **Learning Curve** | Moderate (JIRA-native feel) | Moderate (separate UI) | Low (using existing JIRA features) |
-| **Pricing (Cloud, per user/month)** | ~$10-30 (tiered) | ~$10-30 (tiered) | $0 (included with JIRA) |
+| **Pricing (Cloud, per user/month)** | ~₹10-30 (tiered) | ~₹10-30 (tiered) | ₹0 (included with JIRA) |
 | **Best For** | Teams wanting test management fully integrated as JIRA issues | Teams wanting a dedicated test repository with advanced features | Very small teams or teams just starting with test management |
 
 > [!TIP]

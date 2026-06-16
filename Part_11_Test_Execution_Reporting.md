@@ -252,7 +252,7 @@ STEPS TO REPRODUCE:
 6. Click "Place Order"
 
 EXPECTED RESULT:
-Order should be placed successfully with $0.00 total,
+Order should be placed successfully with ₹0.00 total,
 and order confirmation page should display.
 
 ACTUAL RESULT:
@@ -267,7 +267,7 @@ ATTACHMENTS:
 - Network Trace: network_trace.har
 
 ROOT CAUSE (If Known):
-Possible null pointer exception when payment amount is $0.00
+Possible null pointer exception when payment amount is ₹0.00
 after applying 100% discount.
 ─────────────────────────────────────────
 ```
@@ -1444,7 +1444,7 @@ Below is an example layout for a testing metrics dashboard that can be presented
 
 | # | ❌ Bad Title | ✅ Good Title |
 |---|-------------|--------------|
-| 1 | Cart is broken | Shopping cart total shows $0.00 when adding items with quantity > 99 |
+| 1 | Cart is broken | Shopping cart total shows ₹0.00 when adding items with quantity > 99 |
 | 2 | Login doesn't work | Login fails with "Invalid credentials" error for valid SSO/Google accounts |
 | 3 | Payment issue | Stripe payment returns "card_declined" error for all test cards in staging |
 | 4 | Page looks wrong | Product detail page images overlap product description on iPad Safari (768px) |
@@ -1484,10 +1484,10 @@ STEPS TO REPRODUCE:
 10. Observe the cart total
 
 EXPECTED RESULT:
-Cart total should update to $34,990.00 (100 × $349.90)
+Cart total should update to ₹34,990.00 (100 × ₹349.90)
 
 ACTUAL RESULT:
-Cart total displays "$0.00" and the quantity field resets to "1"
+Cart total displays "₹0.00" and the quantity field resets to "1"
 
 FREQUENCY: Reproducible every time (10/10 attempts)
 ```

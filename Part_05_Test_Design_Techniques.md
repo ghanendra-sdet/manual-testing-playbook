@@ -232,34 +232,34 @@ Step 5: Verify Coverage
 
 | Purchase Amount | Discount |
 |----------------|----------|
-| $0 - $49.99 | 0% (No discount) |
-| $50 - $99.99 | 5% |
-| $100 - $499.99 | 10% |
-| $500 - $999.99 | 15% |
-| $1000 and above | 20% |
+| ₹0 - ₹49.99 | 0% (No discount) |
+| ₹50 - ₹99.99 | 5% |
+| ₹100 - ₹499.99 | 10% |
+| ₹500 - ₹999.99 | 15% |
+| ₹1000 and above | 20% |
 
 **Equivalence Partitions:**
 
 | Partition ID | Type | Range | Discount | Representative Value |
 |-------------|------|-------|----------|---------------------|
-| EP1 | Invalid | < $0 (negative) | Error | -$10.00 |
-| EP2 | Valid | $0 - $49.99 | 0% | $25.00 |
-| EP3 | Valid | $50 - $99.99 | 5% | $75.00 |
-| EP4 | Valid | $100 - $499.99 | 10% | $250.00 |
-| EP5 | Valid | $500 - $999.99 | 15% | $750.00 |
-| EP6 | Valid | $1000+ | 20% | $1500.00 |
+| EP1 | Invalid | < ₹0 (negative) | Error | -₹10.00 |
+| EP2 | Valid | ₹0 - ₹49.99 | 0% | ₹25.00 |
+| EP3 | Valid | ₹50 - ₹99.99 | 5% | ₹75.00 |
+| EP4 | Valid | ₹100 - ₹499.99 | 10% | ₹250.00 |
+| EP5 | Valid | ₹500 - ₹999.99 | 15% | ₹750.00 |
+| EP6 | Valid | ₹1000+ | 20% | ₹1500.00 |
 | EP7 | Invalid | Non-numeric | Error | "abc" |
 
 **Test Cases:**
 
 | TC# | Input Amount | Partition | Expected Discount | Expected Result |
 |-----|-------------|-----------|-------------------|-----------------|
-| TC1 | -$10.00 | EP1 | N/A | Error: "Invalid amount" |
-| TC2 | $25.00 | EP2 | 0% | Total: $25.00 |
-| TC3 | $75.00 | EP3 | 5% | Total: $71.25 |
-| TC4 | $250.00 | EP4 | 10% | Total: $225.00 |
-| TC5 | $750.00 | EP5 | 15% | Total: $637.50 |
-| TC6 | $1500.00 | EP6 | 20% | Total: $1200.00 |
+| TC1 | -₹10.00 | EP1 | N/A | Error: "Invalid amount" |
+| TC2 | ₹25.00 | EP2 | 0% | Total: ₹25.00 |
+| TC3 | ₹75.00 | EP3 | 5% | Total: ₹71.25 |
+| TC4 | ₹250.00 | EP4 | 10% | Total: ₹225.00 |
+| TC5 | ₹750.00 | EP5 | 15% | Total: ₹637.50 |
+| TC6 | ₹1500.00 | EP6 | 20% | Total: ₹1200.00 |
 | TC7 | "abc" | EP7 | N/A | Error: "Enter a valid amount" |
 
 ### Number of Test Cases Formula
@@ -476,37 +476,37 @@ graph LR
 ### Combined EP + BVA Example
 
 **Specification:** A tax calculation system charges:
-- 0% for income $0 – $10,000
-- 10% for income $10,001 – $40,000
-- 20% for income $40,001 – $100,000
-- 30% for income above $100,000
+- 0% for income ₹0 – ₹10,000
+- 10% for income ₹10,001 – ₹40,000
+- 20% for income ₹40,001 – ₹100,000
+- 30% for income above ₹100,000
 
 **EP Partitions:**
 
 | Partition | Range | Tax Rate |
 |-----------|-------|----------|
-| EP1 (Invalid) | < $0 | Error |
-| EP2 (Valid) | $0 – $10,000 | 0% |
-| EP3 (Valid) | $10,001 – $40,000 | 10% |
-| EP4 (Valid) | $40,001 – $100,000 | 20% |
-| EP5 (Valid) | > $100,000 | 30% |
+| EP1 (Invalid) | < ₹0 | Error |
+| EP2 (Valid) | ₹0 – ₹10,000 | 0% |
+| EP3 (Valid) | ₹10,001 – ₹40,000 | 10% |
+| EP4 (Valid) | ₹40,001 – ₹100,000 | 20% |
+| EP5 (Valid) | > ₹100,000 | 30% |
 
 **Combined EP + BVA Test Cases:**
 
 | TC# | Input | Technique | Partition | Expected Tax |
 |-----|-------|-----------|-----------|-------------|
-| TC1 | -$100 | EP | EP1 (Invalid) | Error |
-| TC2 | $0 | BVA | EP2 boundary (min) | $0 (0%) |
-| TC3 | $5,000 | EP | EP2 (middle) | $0 (0%) |
-| TC4 | $10,000 | BVA | EP2/EP3 boundary | $0 (0%) |
-| TC5 | $10,001 | BVA | EP3 boundary (min) | $1,000.10 (10%) |
-| TC6 | $25,000 | EP | EP3 (middle) | $2,500 (10%) |
-| TC7 | $40,000 | BVA | EP3/EP4 boundary | $4,000 (10%) |
-| TC8 | $40,001 | BVA | EP4 boundary (min) | $8,000.20 (20%) |
-| TC9 | $70,000 | EP | EP4 (middle) | $14,000 (20%) |
-| TC10 | $100,000 | BVA | EP4/EP5 boundary | $20,000 (20%) |
-| TC11 | $100,001 | BVA | EP5 boundary (min) | $30,000.30 (30%) |
-| TC12 | $200,000 | EP | EP5 (middle) | $60,000 (30%) |
+| TC1 | -₹100 | EP | EP1 (Invalid) | Error |
+| TC2 | ₹0 | BVA | EP2 boundary (min) | ₹0 (0%) |
+| TC3 | ₹5,000 | EP | EP2 (middle) | ₹0 (0%) |
+| TC4 | ₹10,000 | BVA | EP2/EP3 boundary | ₹0 (0%) |
+| TC5 | ₹10,001 | BVA | EP3 boundary (min) | ₹1,000.10 (10%) |
+| TC6 | ₹25,000 | EP | EP3 (middle) | ₹2,500 (10%) |
+| TC7 | ₹40,000 | BVA | EP3/EP4 boundary | ₹4,000 (10%) |
+| TC8 | ₹40,001 | BVA | EP4 boundary (min) | ₹8,000.20 (20%) |
+| TC9 | ₹70,000 | EP | EP4 (middle) | ₹14,000 (20%) |
+| TC10 | ₹100,000 | BVA | EP4/EP5 boundary | ₹20,000 (20%) |
+| TC11 | ₹100,001 | BVA | EP5 boundary (min) | ₹30,000.30 (30%) |
+| TC12 | ₹200,000 | EP | EP5 (middle) | ₹60,000 (30%) |
 
 ### Advantages and Limitations
 
@@ -544,7 +544,7 @@ Decision tables are particularly valuable when:
 | Scenario | Example |
 |----------|---------|
 | Multiple conditions affect a single outcome | Loan approval based on credit score, income, and employment status |
-| Business rules with AND/OR logic | Discount applies if customer is a member AND order > $100 OR has a coupon |
+| Business rules with AND/OR logic | Discount applies if customer is a member AND order > ₹100 OR has a coupon |
 | Permission/access control rules | User access based on role, department, and security clearance |
 | Error handling depends on combination of factors | Different error messages based on which fields are invalid |
 | Pricing rules with multiple tiers | Insurance premium based on age, smoker status, and pre-existing conditions |
@@ -647,18 +647,18 @@ Here, `-` means "don't care" — the condition doesn't matter for that rule's ou
 
 **Specification:** An online store applies discounts based on:
 - C1: Customer is a Premium Member (Yes/No)
-- C2: Order Amount > $100 (Yes/No)
+- C2: Order Amount > ₹100 (Yes/No)
 - C3: Valid Coupon Code Applied (Yes/No)
 
 **Discount Rules:**
-- Premium members with orders > $100 and a coupon: 25% discount
-- Premium members with orders > $100, no coupon: 15% discount
-- Premium members with orders ≤ $100 and a coupon: 12% discount
-- Premium members with orders ≤ $100, no coupon: 8% discount
-- Non-premium with orders > $100 and a coupon: 10% discount
-- Non-premium with orders > $100, no coupon: 5% discount
-- Non-premium with orders ≤ $100 and a coupon: 5% discount
-- Non-premium with orders ≤ $100, no coupon: 0% discount
+- Premium members with orders > ₹100 and a coupon: 25% discount
+- Premium members with orders > ₹100, no coupon: 15% discount
+- Premium members with orders ≤ ₹100 and a coupon: 12% discount
+- Premium members with orders ≤ ₹100, no coupon: 8% discount
+- Non-premium with orders > ₹100 and a coupon: 10% discount
+- Non-premium with orders > ₹100, no coupon: 5% discount
+- Non-premium with orders ≤ ₹100 and a coupon: 5% discount
+- Non-premium with orders ≤ ₹100, no coupon: 0% discount
 
 **Full Decision Table:**
 
@@ -666,7 +666,7 @@ Here, `-` means "don't care" — the condition doesn't matter for that rule's ou
 |---|---|---|---|---|---|---|---|---|
 | **Conditions** | | | | | | | | |
 | C1: Premium Member | Y | Y | Y | Y | N | N | N | N |
-| C2: Order > $100 | Y | Y | N | N | Y | Y | N | N |
+| C2: Order > ₹100 | Y | Y | N | N | Y | Y | N | N |
 | C3: Valid Coupon | Y | N | Y | N | Y | N | Y | N |
 | **Actions** | | | | | | | | |
 | Discount Applied | 25% | 15% | 12% | 8% | 10% | 5% | 5% | 0% |
@@ -677,14 +677,14 @@ Here, `-` means "don't care" — the condition doesn't matter for that rule's ou
 
 | TC# | Member? | Order Amount | Coupon? | Expected Discount | Free Shipping? | Bonus 2x? |
 |-----|---------|-------------|---------|-------------------|---------------|-----------|
-| TC1 | Yes | $150 | Valid123 | 25% ($37.50 off) | Yes | Yes |
-| TC2 | Yes | $200 | None | 15% ($30 off) | Yes | Yes |
-| TC3 | Yes | $80 | SAVE10 | 12% ($9.60 off) | Yes | No |
-| TC4 | Yes | $50 | None | 8% ($4.00 off) | Yes | No |
-| TC5 | No | $120 | DEAL5 | 10% ($12.00 off) | Yes | No |
-| TC6 | No | $175 | None | 5% ($8.75 off) | No | No |
-| TC7 | No | $45 | FIRST | 5% ($2.25 off) | No | No |
-| TC8 | No | $30 | None | 0% ($0.00 off) | No | No |
+| TC1 | Yes | ₹150 | Valid123 | 25% (₹37.50 off) | Yes | Yes |
+| TC2 | Yes | ₹200 | None | 15% (₹30 off) | Yes | Yes |
+| TC3 | Yes | ₹80 | SAVE10 | 12% (₹9.60 off) | Yes | No |
+| TC4 | Yes | ₹50 | None | 8% (₹4.00 off) | Yes | No |
+| TC5 | No | ₹120 | DEAL5 | 10% (₹12.00 off) | Yes | No |
+| TC6 | No | ₹175 | None | 5% (₹8.75 off) | No | No |
+| TC7 | No | ₹45 | FIRST | 5% (₹2.25 off) | No | No |
+| TC8 | No | ₹30 | None | 0% (₹0.00 off) | No | No |
 
 ### Example 3: ATM Withdrawal
 
@@ -1171,7 +1171,7 @@ stateDiagram-v2
 | 8 | Double-click pay button | Only one charge processed |
 | 9 | Browser refresh during payment | No duplicate charges |
 | 10 | Currency conversion edge cases | Verify rounding, no penny errors |
-| 11 | Maximum transaction amount | System handles $999,999.99 |
+| 11 | Maximum transaction amount | System handles ₹999,999.99 |
 | 12 | Zero amount payment | Error: "Amount must be greater than 0" |
 | 13 | Negative amount payment | Error: "Invalid amount" |
 | 14 | Payment with stolen card | Fraud detection triggers |
@@ -1239,7 +1239,7 @@ Every use case follows a standard structure:
 | **Alternate Flows** | Valid variations of the main flow | Use coupon, choose different shipping |
 | **Exception Flows** | Error scenarios | Payment declined, item out of stock |
 | **Postconditions** | What must be true after the use case completes | Order is placed, confirmation email sent |
-| **Business Rules** | Rules that apply | Minimum order $10, max 99 items |
+| **Business Rules** | Rules that apply | Minimum order ₹10, max 99 items |
 
 ### Step-by-Step Process
 

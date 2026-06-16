@@ -49,7 +49,7 @@ The Waterfall model follows a strict sequential flow: Requirements → Design �
 
 **Real-World Example: The FBI's Virtual Case File (VCF) Project**
 
-One of the most cited Waterfall failures is the FBI's Virtual Case File project. Initiated in 2001 with a $170 million budget, the project followed a strict Waterfall approach. After three years, the system was abandoned as unusable. The requirements had changed significantly after 9/11, but the rigid Waterfall process couldn't accommodate those changes. The FBI eventually restarted with a more iterative approach (Sentinel), which was delivered successfully.
+One of the most cited Waterfall failures is the FBI's Virtual Case File project. Initiated in 2001 with a ₹170 million budget, the project followed a strict Waterfall approach. After three years, the system was abandoned as unusable. The requirements had changed significantly after 9/11, but the rigid Waterfall process couldn't accommodate those changes. The FBI eventually restarted with a more iterative approach (Sentinel), which was delivered successfully.
 
 ---
 
@@ -388,7 +388,7 @@ quadrantChart
 
 **Real-World Example:**
 For an e-commerce application, Q1 tests include:
-- Unit test: `calculateDiscount()` correctly applies a 20% discount to orders over $100
+- Unit test: `calculateDiscount()` correctly applies a 20% discount to orders over ₹100
 - Component test: The CartService correctly adds, removes, and updates items
 - Integration test: The OrderService correctly communicates with the PaymentGateway service via REST API
 
@@ -420,16 +420,16 @@ For a banking application's fund transfer feature:
 Feature: Fund Transfer
 
   Scenario: Successful transfer between own accounts
-    Given the user has a savings account with balance $5,000
-    And the user has a checking account with balance $2,000
-    When the user transfers $1,000 from savings to checking
-    Then the savings account balance should be $4,000
-    And the checking account balance should be $3,000
+    Given the user has a savings account with balance ₹5,000
+    And the user has a checking account with balance ₹2,000
+    When the user transfers ₹1,000 from savings to checking
+    Then the savings account balance should be ₹4,000
+    And the checking account balance should be ₹3,000
     And a transaction receipt should be generated
 
   Scenario: Transfer with insufficient funds
-    Given the user has a savings account with balance $500
-    When the user tries to transfer $1,000 from savings to checking
+    Given the user has a savings account with balance ₹500
+    When the user tries to transfer ₹1,000 from savings to checking
     Then the transfer should be declined
     And the error message "Insufficient funds" should be displayed
     And no balance changes should occur
@@ -885,7 +885,7 @@ User stories are not detailed requirements — they are **placeholders for conve
 |-----------|-------------|---------|
 | **Card** | The story written on a card (physical or digital) | "As a customer, I want to filter products by price range so that I can find items within my budget" |
 | **Conversation** | The discussion that clarifies the story | "Should the filter show a slider or min/max input fields? Should it filter in real-time or require a button click?" |
-| **Confirmation** | The acceptance criteria that define "done" | "Given a price range of $10–$50, only products within that range should be displayed" |
+| **Confirmation** | The acceptance criteria that define "done" | "Given a price range of ₹10–₹50, only products within that range should be displayed" |
 
 ### INVEST Criteria for User Stories
 
@@ -955,7 +955,7 @@ A well-written user story should meet the **INVEST** criteria:
 
 **Acceptance Criteria:**
 1. User can select a biller from a list of registered billers
-2. User can enter the bill amount (minimum $1, maximum $10,000)
+2. User can enter the bill amount (minimum ₹1, maximum ₹10,000)
 3. Payment is deducted from the selected account
 4. User receives a confirmation with transaction ID
 5. Transaction appears in account history within 5 minutes
@@ -965,13 +965,13 @@ A well-written user story should meet the **INVEST** criteria:
 
 | # | Test Scenario | Test Data | Expected Result |
 |---|--------------|-----------|-----------------|
-| 1 | Pay bill with valid amount from account with sufficient balance | Amount: $150, Balance: $5,000 | Payment successful, confirmation shown |
-| 2 | Pay bill with insufficient balance | Amount: $5,000, Balance: $100 | Error: "Insufficient balance" |
-| 3 | Pay minimum amount | Amount: $1.00 | Payment successful |
-| 4 | Pay below minimum | Amount: $0.50 | Error: "Minimum payment is $1.00" |
-| 5 | Pay maximum amount | Amount: $10,000.00 | Payment successful (if balance allows) |
-| 6 | Pay above maximum | Amount: $10,001.00 | Error: "Maximum payment is $10,000" |
-| 7 | Pay with decimal amounts | Amount: $99.99 | Payment successful with correct deduction |
+| 1 | Pay bill with valid amount from account with sufficient balance | Amount: ₹150, Balance: ₹5,000 | Payment successful, confirmation shown |
+| 2 | Pay bill with insufficient balance | Amount: ₹5,000, Balance: ₹100 | Error: "Insufficient balance" |
+| 3 | Pay minimum amount | Amount: ₹1.00 | Payment successful |
+| 4 | Pay below minimum | Amount: ₹0.50 | Error: "Minimum payment is ₹1.00" |
+| 5 | Pay maximum amount | Amount: ₹10,000.00 | Payment successful (if balance allows) |
+| 6 | Pay above maximum | Amount: ₹10,001.00 | Error: "Maximum payment is ₹10,000" |
+| 7 | Pay with decimal amounts | Amount: ₹99.99 | Payment successful with correct deduction |
 | 8 | Schedule payment for future date | Date: 7 days from now | Scheduled payment confirmed, not yet deducted |
 | 9 | Schedule payment for past date | Date: yesterday | Error: "Cannot schedule payment for past date" |
 | 10 | Duplicate payment prevention | Same biller, same amount, within 5 minutes | Warning: "A similar payment was recently made" |
@@ -1299,7 +1299,7 @@ graph TD
 | **Tools** | JUnit, NUnit, pytest, Mocha | Cucumber, SpecFlow, Behave | FitNesse, Robot Framework |
 | **Driven by** | Technical requirements | Business requirements | Acceptance criteria |
 | **Primary audience** | Developers | All team members (PO, tester, developer) | PO and testers |
-| **Example** | `assert calculate_tax(100) == 7.5` | `Given income is $100, Then tax should be $7.50` | `Verify that tax calculation for $100 income equals $7.50` |
+| **Example** | `assert calculate_tax(100) == 7.5` | `Given income is ₹100, Then tax should be ₹7.50` | `Verify that tax calculation for ₹100 income equals ₹7.50` |
 
 ### Example: TDD for a Calculator Function
 
@@ -1436,39 +1436,39 @@ Feature: Online Shopping Cart
     Given the product "Wireless Headphones" is in stock
     When the user clicks "Add to Cart" for "Wireless Headphones"
     Then the cart should contain 1 item
-    And the cart total should be $79.99
+    And the cart total should be ₹79.99
     And a notification should display "Wireless Headphones added to cart"
 
   Scenario: Add multiple quantities of same item
     Given the product "USB-C Cable" is in stock with 50 units
     When the user adds 3 units of "USB-C Cable" to cart
     Then the cart should contain 3 items
-    And the cart total should be $29.97
+    And the cart total should be ₹29.97
 
   Scenario: Remove item from cart
     Given the cart contains "Wireless Headphones" with quantity 1
     When the user removes "Wireless Headphones" from the cart
     Then the cart should be empty
-    And the cart total should be $0.00
+    And the cart total should be ₹0.00
 
   Scenario: Apply discount coupon
-    Given the cart contains items totaling $100.00
+    Given the cart contains items totaling ₹100.00
     When the user applies coupon code "SAVE20"
     Then a 20% discount should be applied
-    And the cart total should be $80.00
-    And a message should display "Coupon SAVE20 applied: -$20.00"
+    And the cart total should be ₹80.00
+    And a message should display "Coupon SAVE20 applied: -₹20.00"
 
   Scenario Outline: Invalid coupon codes
-    Given the cart contains items totaling $100.00
+    Given the cart contains items totaling ₹100.00
     When the user applies coupon code "<code>"
     Then the error message "<error_message>" should be displayed
-    And the cart total should remain $100.00
+    And the cart total should remain ₹100.00
 
     Examples:
       | code       | error_message                    |
       | EXPIRED01  | This coupon has expired          |
       | INVALID99  | Invalid coupon code              |
-      | MINORDER   | Minimum order of $200 required   |
+      | MINORDER   | Minimum order of ₹200 required   |
       |            | Please enter a coupon code       |
 ```
 
@@ -1520,11 +1520,11 @@ Feature: Stock Market Order Placement
   Scenario: Place a market buy order during trading hours
     Given the user has a verified trading account
     And the trading session is active (9:30 AM - 4:00 PM EST)
-    And the user has $10,000 available balance
-    When the user places a market buy order for 10 shares of "AAPL" at market price $150
+    And the user has ₹10,000 available balance
+    When the user places a market buy order for 10 shares of "AAPL" at market price ₹150
     Then the order should be executed immediately
     And 10 shares of "AAPL" should appear in the portfolio
-    And the available balance should decrease by approximately $1,500
+    And the available balance should decrease by approximately ₹1,500
     And an order confirmation should display with the execution price
 
   Scenario: Attempt to place order outside trading hours
@@ -1867,10 +1867,10 @@ BDD scenarios are written in Gherkin syntax and serve as both documentation and 
 
 Example:
 ```
-Given the user has an account with $5,000 balance
-When the user transfers $1,000 to another account
-Then the sender's balance should be $4,000
-And the recipient's balance should increase by $1,000
+Given the user has an account with ₹5,000 balance
+When the user transfers ₹1,000 to another account
+Then the sender's balance should be ₹4,000
+And the recipient's balance should increase by ₹1,000
 ```
 
 As a tester, I actively participate in BDD by:

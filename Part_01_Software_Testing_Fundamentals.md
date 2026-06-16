@@ -69,7 +69,7 @@ Software testing is not optional — it is a business-critical necessity. Here a
 #### 1. To Prevent Financial Loss
 
 **Real-World Example — Knight Capital Group (2012):**
-A software defect in Knight Capital's trading algorithm caused the firm to lose **$440 million in just 45 minutes**. A deployment error activated obsolete code that executed millions of unintended trades. Adequate testing of the deployment process and the trading logic could have prevented this catastrophic loss.
+A software defect in Knight Capital's trading algorithm caused the firm to lose **₹440 million in just 45 minutes**. A deployment error activated obsolete code that executed millions of unintended trades. Adequate testing of the deployment process and the trading logic could have prevented this catastrophic loss.
 
 #### 2. To Ensure User Safety
 
@@ -79,12 +79,12 @@ A software race condition in the Therac-25 medical radiation therapy machine del
 #### 3. To Maintain Brand Reputation
 
 **Real-World Example — Samsung Galaxy Note 7 (2016):**
-While primarily a hardware issue, the software battery management system failed to detect and prevent overheating. Samsung recalled 2.5 million phones, costing the company an estimated **$5.3 billion**. The brand damage took years to repair.
+While primarily a hardware issue, the software battery management system failed to detect and prevent overheating. Samsung recalled 2.5 million phones, costing the company an estimated **₹5.3 billion**. The brand damage took years to repair.
 
 #### 4. To Meet Legal and Regulatory Requirements
 
 **Real-World Example — Healthcare (HIPAA):**
-A healthcare application that leaks patient data due to a security vulnerability violates HIPAA regulations, resulting in fines of up to **$1.5 million per violation category per year**. Security testing is not a luxury — it is a legal requirement.
+A healthcare application that leaks patient data due to a security vulnerability violates HIPAA regulations, resulting in fines of up to **₹1.5 million per violation category per year**. Security testing is not a luxury — it is a legal requirement.
 
 #### 5. To Deliver a Quality User Experience
 
@@ -99,19 +99,19 @@ One of the most important economic principles in software testing is the exponen
 Cost to Fix a Defect at Each Stage
 ═══════════════════════════════════════════════════════════════
 
-Requirements:    █ $1 (1x)
+Requirements:    █ ₹1 (1x)
                  ↓
-Design:          ██████ $5-6 (5-6x)
+Design:          ██████ ₹5-6 (5-6x)
                  ↓
-Coding:          ██████████ $10 (10x)
+Coding:          ██████████ ₹10 (10x)
                  ↓
-Unit Testing:    ███████████████ $15 (15x)
+Unit Testing:    ███████████████ ₹15 (15x)
                  ↓
-Integration:     ██████████████████████ $22 (22x)
+Integration:     ██████████████████████ ₹22 (22x)
                  ↓
-System Testing:  ██████████████████████████████████████ $50 (50x)
+System Testing:  ██████████████████████████████████████ ₹50 (50x)
                  ↓
-Production:      ██████████████████████████████████████████████████████████████ $100+ (100x+)
+Production:      ██████████████████████████████████████████████████████████████ ₹100+ (100x+)
 ```
 
 #### The Rule Explained
@@ -133,12 +133,12 @@ Consider a bug where the tax calculation is incorrect for orders shipped to Cana
 
 | Discovery Phase | Estimated Cost | What's Involved |
 |----------------|:--------------:|-----------------|
-| Requirements Review | **$100** | Update the requirements document to specify Canadian tax rules |
-| Design Phase | **$500** | Revise the tax calculation module design |
-| Coding Phase | **$1,000** | Rewrite tax calculation logic, update unit tests |
-| QA Testing | **$5,000** | Fix code, regression test checkout flow, re-deploy to staging |
-| Production (Day 1) | **$15,000** | Emergency hotfix, refund affected customers, test and deploy |
-| Production (Month 3) | **$100,000+** | Thousands of incorrect orders, mass refunds, CRA audit, customer trust eroded |
+| Requirements Review | **₹100** | Update the requirements document to specify Canadian tax rules |
+| Design Phase | **₹500** | Revise the tax calculation module design |
+| Coding Phase | **₹1,000** | Rewrite tax calculation logic, update unit tests |
+| QA Testing | **₹5,000** | Fix code, regression test checkout flow, re-deploy to staging |
+| Production (Day 1) | **₹15,000** | Emergency hotfix, refund affected customers, test and deploy |
+| Production (Month 3) | **₹100,000+** | Thousands of incorrect orders, mass refunds, CRA audit, customer trust eroded |
 
 ### The Testing Paradox
 
@@ -416,7 +416,7 @@ from being introduced                   before release
 |----------|----------|-----|
 | The QA lead establishes a requirement that all financial calculations must be peer-reviewed | **QA** | Defines a process to prevent calculation errors |
 | A developer reviews a colleague's interest rate calculation code and finds a rounding error | **QC** | Inspects a product artifact (code) for defects |
-| A tester verifies that transferring $500 from savings to checking correctly updates both balances | **Testing** | Executes the software to verify correctness |
+| A tester verifies that transferring ₹500 from savings to checking correctly updates both balances | **Testing** | Executes the software to verify correctness |
 | After three production incidents related to session timeouts, the QA team implements a mandatory session management testing checklist | **QA** | Uses defect data to improve the process |
 
 #### Example 3: Hospital Management System
@@ -476,11 +476,11 @@ Verification ensures that the product is being **built correctly** according to 
 
 #### Real-World Verification Example — Banking App
 
-A banking application has a requirement: *"The system shall prevent transfers exceeding the daily transfer limit of $10,000."*
+A banking application has a requirement: *"The system shall prevent transfers exceeding the daily transfer limit of ₹10,000."*
 
 **Verification Activities:**
 
-1. **Requirements Review:** A tester asks: "Is the $10,000 limit per transaction or per day cumulative? Does it include pending transfers? Does it apply to all account types?"
+1. **Requirements Review:** A tester asks: "Is the ₹10,000 limit per transaction or per day cumulative? Does it include pending transfers? Does it apply to all account types?"
 
 2. **Design Review:** The reviewer checks that the transfer service design includes a `DailyLimitChecker` component that queries the daily transfer history before processing a new transfer.
 
@@ -509,11 +509,11 @@ An e-commerce platform has a requirement: *"Users shall be able to filter produc
 
 **Validation Activities:**
 
-1. **Functional Testing:** A tester selects size "M", color "Blue", and price range "$20-$50" and verifies that only matching products are displayed.
+1. **Functional Testing:** A tester selects size "M", color "Blue", and price range "₹20-₹50" and verifies that only matching products are displayed.
 
 2. **Usability Testing:** Users struggle to find the filter options because they are hidden behind a "More Options" dropdown. The feature works correctly but doesn't meet user expectations for discoverability.
 
-3. **UAT:** A business user discovers that the "price range" filter doesn't account for sale prices — a product originally $60 on sale for $40 doesn't appear in the "$20-$50" range. The feature was built to spec, but the spec didn't capture this business need.
+3. **UAT:** A business user discovers that the "price range" filter doesn't account for sale prices — a product originally ₹60 on sale for ₹40 doesn't appear in the "₹20-₹50" range. The feature was built to spec, but the spec didn't capture this business need.
 
 ### Static vs. Dynamic Testing
 
@@ -700,7 +700,7 @@ graph LR
 |------|--------------|----------|
 | **Error** | A developer misreads the requirement and thinks "10% discount" means "subtract 10 from the price" instead of "multiply price by 0.90" | Human mistake |
 | **Defect** | The code reads: `discountedPrice = price - 10` instead of `discountedPrice = price * 0.90` | Flaw in the code |
-| **Failure** | A customer buying a $500 item sees a price of $490 (a $10 discount) instead of $450 (a 10% discount). A customer buying a $5 item sees a price of -$5 | Observable incorrect behavior |
+| **Failure** | A customer buying a ₹500 item sees a price of ₹490 (a ₹10 discount) instead of ₹450 (a 10% discount). A customer buying a ₹5 item sees a price of -₹5 | Observable incorrect behavior |
 
 #### Example 2: Banking App Session Timeout
 
@@ -923,9 +923,9 @@ The earlier a defect is found, the cheaper and easier it is to fix. This princip
 5. **Impact:** 2-hour requirements review prevents 3 weeks of rework.
 
 ```
-Cost Without Early Testing:    $50,000 (rework + delayed release)
-Cost With Early Testing:       $500 (2-hour review session)
-Savings:                       $49,500 (99% cost reduction)
+Cost Without Early Testing:    ₹50,000 (rework + delayed release)
+Cost With Early Testing:       ₹500 (2-hour review session)
+Savings:                       ₹49,500 (99% cost reduction)
 ```
 
 ---
@@ -1245,13 +1245,13 @@ Testers are inherently bearers of "bad news" — they find and report problems w
 
 **Good Bug Report (Constructive):**
 > Title: "Payment failure when applying 100% discount coupon during checkout"
-> Description: "When a 100% discount coupon is applied and the order total becomes $0.00, clicking 'Complete Order' displays a '500 Internal Server Error' instead of processing the order."
+> Description: "When a 100% discount coupon is applied and the order total becomes ₹0.00, clicking 'Complete Order' displays a '500 Internal Server Error' instead of processing the order."
 > Steps to Reproduce:
 > 1. Add any item to the cart
 > 2. Apply coupon code "FULLOFF100"
-> 3. Verify cart total is $0.00
+> 3. Verify cart total is ₹0.00
 > 4. Click "Complete Order"
-> Expected: Order is placed successfully with $0.00 charge
+> Expected: Order is placed successfully with ₹0.00 charge
 > Actual: 500 Internal Server Error displayed
 > Environment: Chrome 120, Windows 11, Staging
 > Severity: High | Priority: High
@@ -1265,7 +1265,7 @@ Testers are inherently bearers of "bad news" — they find and report problems w
 | **Provide complete information** | Include steps, environment, expected vs. actual | Include screenshots, logs, and steps to reproduce |
 | **Suggest severity, don't demand priority** | Testers assess severity; product owners set priority | "I've classified this as Severity: High based on the customer impact. The priority is for the product team to decide." |
 | **Acknowledge what works** | Mention positive findings, not just defects | "The new search feature works great overall. I found one issue with special character handling." |
-| **Use "I observed" language** | Frame observations, not accusations | "I observed that the total is $95 instead of the expected $100" NOT "The total is wrong" |
+| **Use "I observed" language** | Frame observations, not accusations | "I observed that the total is ₹95 instead of the expected ₹100" NOT "The total is wrong" |
 
 #### Communication With Different Stakeholders
 
@@ -1320,7 +1320,7 @@ The most effective testers are those who:
 "Software testing is a systematic process of evaluating a software application to find defects, verify it meets requirements, and validate that it satisfies user needs. According to ISTQB, it's a set of activities to discover defects and evaluate the quality of software artifacts.
 
 Testing is necessary for several reasons:
-1. **Preventing financial loss** — like the Knight Capital incident where a software defect caused a $440 million loss in 45 minutes.
+1. **Preventing financial loss** — like the Knight Capital incident where a software defect caused a ₹440 million loss in 45 minutes.
 2. **Ensuring user safety** — in critical domains like healthcare and aviation, untested software can endanger lives.
 3. **Maintaining brand reputation** — production defects erode customer trust, which is expensive to rebuild.
 4. **Regulatory compliance** — industries like banking (PCI-DSS), healthcare (HIPAA), and aviation (DO-178C) mandate testing.
@@ -1332,13 +1332,13 @@ Testing is necessary for several reasons:
 
 **Model Answer:**
 
-"The 1-10-100 rule states that the cost of fixing a defect grows exponentially as it moves through the SDLC. A defect that costs $1 to fix during requirements will cost $10 during development and $100 or more in production.
+"The 1-10-100 rule states that the cost of fixing a defect grows exponentially as it moves through the SDLC. A defect that costs ₹1 to fix during requirements will cost ₹10 during development and ₹100 or more in production.
 
 For example, in an e-commerce application, a requirement states: 'Prices should be displayed in the user's local currency.' If during requirements review, a tester asks 'What about exchange rate refresh frequency?' — fixing this ambiguity costs a few minutes of discussion.
 
-If this gap is caught during system testing, the team must redesign the currency conversion module, rewrite the code, and retest — costing perhaps $5,000.
+If this gap is caught during system testing, the team must redesign the currency conversion module, rewrite the code, and retest — costing perhaps ₹5,000.
 
-If it reaches production and customers see stale exchange rates resulting in incorrect charges, the company faces refunds, customer complaints, potential legal issues, and emergency patches — costing $50,000+.
+If it reaches production and customers see stale exchange rates resulting in incorrect charges, the company faces refunds, customer complaints, potential legal issues, and emergency patches — costing ₹50,000+.
 
 This is why early testing and shift-left practices are so valuable."
 
@@ -1372,7 +1372,7 @@ Validation asks 'Are we building the right product?' — it checks that the prod
 
 Example from a banking app:
 - **Verification:** A code reviewer checks that the interest rate calculation function uses the correct formula from the design document. This is done by reading the code, not executing it.
-- **Validation:** A tester deposits $10,000 at 5% annual interest and verifies that the calculated interest after one year is $500. This requires executing the software.
+- **Validation:** A tester deposits ₹10,000 at 5% annual interest and verifies that the calculated interest after one year is ₹500. This requires executing the software.
 
 Verification can catch defects before code exists — for example, finding an ambiguous requirement during review. Validation catches defects during and after coding — confirming the running software produces correct results.
 
@@ -1390,7 +1390,7 @@ Both are essential. Verification without validation means you might build the wr
 
 2. **Defect (Bug/Fault):** The manifestation of an error in a software artifact. It exists in code, design, or documentation. Example: The code says `price - 10` instead of `price * 0.90`.
 
-3. **Failure:** The observable, incorrect behavior when a defect is triggered during execution. It's what the user sees. Example: A $500 item shows a discounted price of $490 instead of $450.
+3. **Failure:** The observable, incorrect behavior when a defect is triggered during execution. It's what the user sees. Example: A ₹500 item shows a discounted price of ₹490 instead of ₹450.
 
 The chain is: Error → Defect → Failure.
 
@@ -1503,7 +1503,7 @@ Key Shift-Left practices:
 4. **Static analysis in CI/CD:** Running code quality checks on every commit catches issues immediately.
 5. **Pair testing with developers:** Testers work alongside developers during coding to catch issues in real-time.
 
-The benefits are significant — based on the 1-10-100 rule, a defect found in requirements costs $1 to fix versus $100+ in production. In my experience, implementing shift-left on a project reduced our production defect rate by 40% in the first quarter because we were catching ambiguities and logical errors during sprint planning instead of finding them during system testing."
+The benefits are significant — based on the 1-10-100 rule, a defect found in requirements costs ₹1 to fix versus ₹100+ in production. In my experience, implementing shift-left on a project reduced our production defect rate by 40% in the first quarter because we were catching ambiguities and logical errors during sprint planning instead of finding them during system testing."
 
 ---
 
@@ -1539,7 +1539,7 @@ Greater independence reduces confirmation bias and 'author's blindness' — just
 
 4. **Improved requirements quality:** Testers ask questions developers don't think to ask. 'What happens if the user does X?' 'What's the expected behavior when the network is down?' 'How should the system handle concurrent modifications?'
 
-The cost benefit is clear: catching a requirement defect costs 1x; catching it in production costs 100x. In my experience, I once found during a requirements review that a payment system specification didn't define behavior for partial refunds. If this had been caught in production, it would have required a hotfix, database migration, and customer communication — estimated cost $25,000. Finding it during review cost the team 30 minutes of discussion."
+The cost benefit is clear: catching a requirement defect costs 1x; catching it in production costs 100x. In my experience, I once found during a requirements review that a payment system specification didn't define behavior for partial refunds. If this had been caught in production, it would have required a hotfix, database migration, and customer communication — estimated cost ₹25,000. Finding it during review cost the team 30 minutes of discussion."
 
 ---
 

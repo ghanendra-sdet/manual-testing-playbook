@@ -70,7 +70,7 @@ flowchart LR
 
 ### Benefits of Shift-Left Testing
 
-1. **Reduced cost of quality.** The cost to fix a defect increases exponentially the later it is found. A requirements defect found during review costs ~$100 to fix. The same defect found in production can cost $10,000+ including development, regression testing, deployment, and customer impact.
+1. **Reduced cost of quality.** The cost to fix a defect increases exponentially the later it is found. A requirements defect found during review costs ~₹100 to fix. The same defect found in production can cost ₹10,000+ including development, regression testing, deployment, and customer impact.
 
 2. **Faster time-to-market.** By catching issues early, there are fewer late-stage surprises that cause delays. Regression cycles are shorter because there are fewer defects.
 
@@ -113,7 +113,7 @@ Testers participate in requirements review meetings to identify:
 |-----------|---------|---------------------|
 | **Ambiguity** | "The system should respond quickly" — what is "quickly"? | Developer implements arbitrary timeout; fails UAT |
 | **Incompleteness** | No mention of error handling for payment failures | Missing error handling in production |
-| **Inconsistency** | Requirement A says "free shipping over $50" but B says "$75" | Conflicting behavior in different modules |
+| **Inconsistency** | Requirement A says "free shipping over ₹50" but B says "₹75" | Conflicting behavior in different modules |
 | **Testability** | "The system should be user-friendly" — how do you test this? | No measurable acceptance criteria |
 | **Missing edge cases** | No requirement for what happens when cart has 1000+ items | Performance issues in production |
 
@@ -152,7 +152,7 @@ Testers participate in requirements review meetings to identify:
 - Average defect discovery: during system testing (late)
 - Average release cycle: 8 weeks
 - Production defects per release: 12-15
-- Cost per production defect: ~$15,000 (support, hotfix, regression)
+- Cost per production defect: ~₹15,000 (support, hotfix, regression)
 
 **Shift-Left Implementation:**
 1. QA joined sprint planning — identified 30+ ambiguous requirements in first 3 sprints
@@ -166,7 +166,7 @@ Testers participate in requirements review meetings to identify:
 - Average defect discovery: during unit testing or code review (early)
 - Average release cycle: 3 weeks
 - Production defects per release: 2-3
-- Cost savings: ~$180,000/year in reduced production defect costs
+- Cost savings: ~₹180,000/year in reduced production defect costs
 - Team satisfaction improved — less firefighting, more proactive quality
 
 ### ROI of Shift-Left Testing
@@ -177,12 +177,12 @@ Testers participate in requirements review meetings to identify:
 | Defects found in development | 15% | 35% | +133% |
 | Defects found in testing | 60% | 35% | -42% |
 | Defects found in production | 20% | 5% | -75% |
-| Average cost per defect | $8,500 | $2,100 | -75% |
+| Average cost per defect | ₹8,500 | ₹2,100 | -75% |
 | Release cycle time | 8 weeks | 3 weeks | -62% |
 | Customer-reported bugs/release | 15 | 3 | -80% |
 
 > [!TIP]
-> The industry rule of thumb is the **1:10:100 Rule** — a defect that costs $1 to fix in requirements will cost $10 to fix in development and $100 to fix in production. Shift-left pushes defect detection toward the $1 end.
+> The industry rule of thumb is the **1:10:100 Rule** — a defect that costs ₹1 to fix in requirements will cost ₹10 to fix in development and ₹100 to fix in production. Shift-left pushes defect detection toward the ₹1 end.
 
 ### Challenges and Solutions
 
@@ -488,10 +488,10 @@ TIME BREAKDOWN:
 
 BUGS FOUND: 3
 ├── BUG-2560 (Major): Tax calculated incorrectly when cart 
-│   has items from 3+ tax zones — off by $0.03-$0.15
+│   has items from 3+ tax zones — off by ₹0.03-₹0.15
 ├── BUG-2561 (Minor): "Out of Stock" error appears after 
 │   placing order, not during cart addition
-└── BUG-2562 (Minor): Digital products show "Shipping: $0.00" 
+└── BUG-2562 (Minor): Digital products show "Shipping: ₹0.00" 
     instead of "Shipping: N/A"
 
 ISSUES/QUESTIONS: 2
@@ -499,7 +499,7 @@ ISSUES/QUESTIONS: 2
 │   out of stock while it's in a user's cart? 
 │   (No requirement found)
 └── Q2: Should digital products be included in the "free 
-    shipping over $50" calculation?
+    shipping over ₹50" calculation?
 
 OBSERVATIONS:
 - Checkout performance degrades noticeably with 30+ items 
@@ -981,7 +981,7 @@ NLP tools allow testers to write tests in plain English, which are then converte
 Natural Language:
 "Login with username admin@example.com and password Admin123,
  navigate to the Products page, search for 'Wireless Headphones',
- and verify the product is displayed with price $349.90"
+ and verify the product is displayed with price ₹349.90"
 
 Generated Automation (pseudocode):
 1. navigate("https://app.example.com/login")
@@ -992,7 +992,7 @@ Generated Automation (pseudocode):
 6. fill("search_box", "Wireless Headphones")
 7. click("search_button")
 8. assert_visible("product_title", "Wireless Headphones")
-9. assert_text("product_price", "$349.90")
+9. assert_text("product_price", "₹349.90")
 ```
 
 ### AI Testing Tools Landscape (2025)
@@ -1434,7 +1434,7 @@ Test these payloads in:
 | Tool | Type | Cost | Best For |
 |------|------|------|---------|
 | **OWASP ZAP** | Web application scanner | Free/Open-source | Automated vulnerability scanning |
-| **Burp Suite** | Web application testing | Community (free) / Pro ($449/yr) | Manual & automated security testing |
+| **Burp Suite** | Web application testing | Community (free) / Pro (₹449/yr) | Manual & automated security testing |
 | **Nikto** | Web server scanner | Free/Open-source | Server configuration testing |
 | **SQLMap** | SQL injection tool | Free/Open-source | Automated SQL injection testing |
 | **Nmap** | Network scanner | Free/Open-source | Network discovery and port scanning |
@@ -1491,13 +1491,13 @@ flowchart TD
 
 | Certification | Organization | Level | Duration | Cost (approx.) |
 |--------------|-------------|-------|----------|----------------|
-| **ISTQB Foundation Level (CTFL)** | ISTQB | Entry | 40 hours study | $250 |
-| **ISTQB Advanced - Test Manager** | ISTQB | Advanced | 80 hours study | $350 |
-| **ISTQB Advanced - Test Analyst** | ISTQB | Advanced | 80 hours study | $350 |
-| **ISTQB Agile Tester** | ISTQB | Extension | 30 hours study | $250 |
-| **CSTE (Certified Software Tester)** | QAI Global | Professional | 100 hours study | $400 |
-| **CSQA (Certified Software Quality Analyst)** | QAI Global | Professional | 100 hours study | $400 |
-| **AWS Cloud Practitioner** | Amazon | Foundation | 30 hours study | $100 |
+| **ISTQB Foundation Level (CTFL)** | ISTQB | Entry | 40 hours study | ₹250 |
+| **ISTQB Advanced - Test Manager** | ISTQB | Advanced | 80 hours study | ₹350 |
+| **ISTQB Advanced - Test Analyst** | ISTQB | Advanced | 80 hours study | ₹350 |
+| **ISTQB Agile Tester** | ISTQB | Extension | 30 hours study | ₹250 |
+| **CSTE (Certified Software Tester)** | QAI Global | Professional | 100 hours study | ₹400 |
+| **CSQA (Certified Software Quality Analyst)** | QAI Global | Professional | 100 hours study | ₹400 |
+| **AWS Cloud Practitioner** | Amazon | Foundation | 30 hours study | ₹100 |
 | **Postman API Fundamentals** | Postman | Entry | 10 hours | Free |
 
 ### Building a QA Portfolio

@@ -128,22 +128,22 @@ The system accepts ages from 18 to 65 for a standard life insurance policy.
 
 **Real-World Example — E-Commerce Shipping Logic:**
 
-"Free shipping is offered if the order total is over $50 AND the customer is a premium member, OR if the order total is over $100 regardless of membership."
+"Free shipping is offered if the order total is over ₹50 AND the customer is a premium member, OR if the order total is over ₹100 regardless of membership."
 
 | Condition | Rule 1 | Rule 2 | Rule 3 | Rule 4 |
 |-----------|:------:|:------:|:------:|:------:|
-| Order > $100 | Y | Y | N | N |
+| Order > ₹100 | Y | Y | N | N |
 | Premium Member | Y | N | Y | N |
 | **Action** | | | | |
 | Free Shipping | ✅ | ✅ | ✅ | ❌ |
 | Standard Rate | ❌ | ❌ | ❌ | ✅ |
 
-**Expanded with the $50 threshold:**
+**Expanded with the ₹50 threshold:**
 
 | Condition | R1 | R2 | R3 | R4 | R5 | R6 |
 |-----------|:--:|:--:|:--:|:--:|:--:|:--:|
-| Order > $100 | Y | Y | N | N | N | N |
-| Order > $50 | — | — | Y | Y | N | N |
+| Order > ₹100 | Y | Y | N | N | N | N |
+| Order > ₹50 | — | — | Y | Y | N | N |
 | Premium Member | Y | N | Y | N | Y | N |
 | **Free Shipping** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 
@@ -692,8 +692,8 @@ A small internal tool with 5 modules (UI, Auth, Database, Reports, Notifications
 
 | # | Test Area | Test Scenario | Expected Result |
 |---|-----------|--------------|-----------------|
-| 1 | Account Management | Create a new savings account, deposit $1,000, verify balance | Balance shows $1,000.00 |
-| 2 | Fund Transfer | Transfer $500 from savings to checking | Savings: -$500, Checking: +$500, total unchanged |
+| 1 | Account Management | Create a new savings account, deposit ₹1,000, verify balance | Balance shows ₹1,000.00 |
+| 2 | Fund Transfer | Transfer ₹500 from savings to checking | Savings: -₹500, Checking: +₹500, total unchanged |
 | 3 | Bill Payment | Schedule a recurring utility bill payment | Payment processed on scheduled date, confirmation sent |
 | 4 | Statements | Generate monthly statement for January 2026 | PDF with all transactions, correct opening/closing balances |
 | 5 | Security | Attempt login with incorrect password 5 times | Account locked after 5 attempts, unlock email sent |
@@ -968,7 +968,7 @@ The term "sanity" implies a quick check to determine if the system is "sane" eno
 
 #### Real-World Example
 
-**Bug Reported:** "Applying a 20% discount coupon on the checkout page calculates the discount incorrectly — $100 order with 20% coupon shows $82 instead of $80."
+**Bug Reported:** "Applying a 20% discount coupon on the checkout page calculates the discount incorrectly — ₹100 order with 20% coupon shows ₹82 instead of ₹80."
 
 **Fix Deployed:** Developer fixes the discount calculation formula.
 
@@ -976,10 +976,10 @@ The term "sanity" implies a quick check to determine if the system is "sane" eno
 
 | # | Test Case | Area | Expected Result |
 |---|-----------|------|-----------------|
-| 1 | Apply 20% coupon to $100 order | Direct fix | Total = $80.00 ✓ |
-| 2 | Apply 20% coupon to $50 order | Same area | Total = $40.00 ✓ |
-| 3 | Apply 10% coupon to $100 order | Related area | Total = $90.00 ✓ |
-| 4 | Apply 50% coupon to $200 order | Related area | Total = $100.00 ✓ |
+| 1 | Apply 20% coupon to ₹100 order | Direct fix | Total = ₹80.00 ✓ |
+| 2 | Apply 20% coupon to ₹50 order | Same area | Total = ₹40.00 ✓ |
+| 3 | Apply 10% coupon to ₹100 order | Related area | Total = ₹90.00 ✓ |
+| 4 | Apply 50% coupon to ₹200 order | Related area | Total = ₹100.00 ✓ |
 | 5 | Stack two coupons (if allowed) | Related area | Correct cumulative discount ✓ |
 | 6 | Order without any coupon | Related area | Full price charged ✓ |
 
@@ -1361,7 +1361,7 @@ The **Open Web Application Security Project (OWASP)** defines the top 10 most cr
 |------|--------------|---------|
 | **Translations** | All UI text correctly translated | "Add to Cart" → "Ajouter au panier" (French) |
 | **Date Formats** | Correct date format for locale | US: MM/DD/YYYY, UK: DD/MM/YYYY, Japan: YYYY/MM/DD |
-| **Currency** | Correct currency symbol and formatting | US: $1,234.56, Germany: 1.234,56 €, Japan: ¥1,234 |
+| **Currency** | Correct currency symbol and formatting | US: ₹1,234.56, Germany: 1.234,56 €, Japan: ¥1,234 |
 | **Number Formats** | Correct decimal and thousand separators | US: 1,000.50, Germany: 1.000,50, India: 1,00,000.50 |
 | **Phone Numbers** | Correct format for locale | US: (555) 123-4567, UK: 020 7123 4567 |
 | **Addresses** | Correct address format | US: Street, City, State, ZIP. Japan: Postal, Prefecture, City, Block |
@@ -1641,7 +1641,7 @@ All Users ──────────┤                                     
 | **Change** | Single-page checkout | Multi-step checkout |
 | **Users** | 50,000 | 50,000 |
 | **Conversions** | 2,500 (5.0%) | 2,750 (5.5%) |
-| **Revenue** | $125,000 | $137,500 |
+| **Revenue** | ₹125,000 | ₹137,500 |
 | **Statistical Significance** | — | p = 0.03 (significant) |
 | **Decision** | — | **Implement Version B** |
 

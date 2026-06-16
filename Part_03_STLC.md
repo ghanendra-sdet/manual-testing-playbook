@@ -163,7 +163,7 @@ The **Requirement Traceability Matrix (RTM)** is a document that maps requiremen
 | REQ-LOGIN-002 | System shall lock account after 5 failed login attempts | High | *(To be filled in Phase 3)* | — | — |
 | REQ-LOGIN-003 | System shall display "Forgot Password" link on login page | Medium | *(To be filled in Phase 3)* | — | — |
 | REQ-TRANS-001 | User shall be able to transfer funds between own accounts | High | *(To be filled in Phase 3)* | — | — |
-| REQ-TRANS-002 | System shall enforce daily transfer limit of $10,000 | High | *(To be filled in Phase 3)* | — | — |
+| REQ-TRANS-002 | System shall enforce daily transfer limit of ₹10,000 | High | *(To be filled in Phase 3)* | — | — |
 | REQ-PERF-001 | Login page shall load within 2 seconds | Medium | *(To be filled in Phase 3)* | — | — |
 
 #### 5. Automation Feasibility Analysis

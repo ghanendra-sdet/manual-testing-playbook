@@ -35,7 +35,7 @@ A logistics company developed a fleet management system without a formal test pl
 - GPS integration was never tested because no one was assigned to it
 - Performance testing was skipped because the load testing tool wasn't procured
 - UAT was scheduled for 1 week, but 150+ test scenarios needed execution — an impossible timeline
-- The release was delayed by 2 months, costing the company $500,000 in delayed ROI
+- The release was delayed by 2 months, costing the company ₹500,000 in delayed ROI
 
 ### Who Creates the Test Plan?
 
@@ -443,10 +443,10 @@ Testing will resume when:
 | Elasticsearch | 8.x | Search engine | Free (basic tier) |
 | Cypress | 13.x | UI test automation | Free |
 | JMeter | 5.6 | Performance testing | Free |
-| Postman | Latest | API testing | Team plan ($12/user/month) |
+| Postman | Latest | API testing | Team plan (₹12/user/month) |
 | OWASP ZAP | Latest | Security testing | Free |
-| BrowserStack | Cloud plan | Cross-browser/device testing | Enterprise ($249/month) |
-| TestRail | Cloud | Test case management | Professional ($36/user/month) |
+| BrowserStack | Cloud plan | Cross-browser/device testing | Enterprise (₹249/month) |
+| TestRail | Cloud | Test case management | Professional (₹36/user/month) |
 | JIRA | Cloud | Defect tracking and project management | Premium |
 | SonarQube | Community | Code quality analysis | Free |
 
@@ -1239,15 +1239,15 @@ A general guideline for test team sizing:
 
 | Category | Items | Estimated Cost |
 |----------|-------|---------------|
-| **Personnel** | 5 QA team members × 5 months × avg salary | $150,000 |
-| **Tools - Testing** | TestRail ($36/user/month × 5 users × 5 months) | $900 |
-| **Tools - Automation** | BrowserStack ($249/month × 5 months) | $1,245 |
-| **Tools - Performance** | JMeter (open source) | $0 |
-| **Tools - Security** | External penetration testing (vendor) | $15,000 |
-| **Infrastructure** | QA servers (cloud) × 5 months | $3,000 |
-| **Training** | Cypress training, security training | $5,000 |
-| **Contingency** (10%) | | $17,515 |
-| **Total** | | **$192,660** |
+| **Personnel** | 5 QA team members × 5 months × avg salary | ₹150,000 |
+| **Tools - Testing** | TestRail (₹36/user/month × 5 users × 5 months) | ₹900 |
+| **Tools - Automation** | BrowserStack (₹249/month × 5 months) | ₹1,245 |
+| **Tools - Performance** | JMeter (open source) | ₹0 |
+| **Tools - Security** | External penetration testing (vendor) | ₹15,000 |
+| **Infrastructure** | QA servers (cloud) × 5 months | ₹3,000 |
+| **Training** | Cypress training, security training | ₹5,000 |
+| **Contingency** (10%) | | ₹17,515 |
+| **Total** | | **₹192,660** |
 
 ---
 

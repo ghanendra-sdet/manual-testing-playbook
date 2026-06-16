@@ -20,7 +20,7 @@ A **defect** (also commonly called a **bug**) is any deviation or variance betwe
 |---|----------|-------------------|-----------------|------|
 | 1 | User clicks "Add to Cart" on an e-commerce site | Item is added to cart with correct quantity | Item is added twice or not at all | Functional Defect |
 | 2 | Login page on mobile device (iPhone 15) | Login form fits screen with proper alignment | Username field overlaps with password field | UI/Layout Defect |
-| 3 | Bank transfer of $500 | $500 debited from sender, $500 credited to recipient | $500 debited from sender, $50 credited to recipient (decimal error) | Data/Calculation Defect |
+| 3 | Bank transfer of ₹500 | ₹500 debited from sender, ₹500 credited to recipient | ₹500 debited from sender, ₹50 credited to recipient (decimal error) | Data/Calculation Defect |
 | 4 | Page load on 4G network | Page loads within 3 seconds (SLA) | Page takes 18 seconds to load | Performance Defect |
 | 5 | User enters `<script>alert('hack')</script>` in search bar | Input is sanitized, no script execution | JavaScript alert box appears — XSS vulnerability | Security Defect |
 
@@ -35,7 +35,7 @@ These terms are often used interchangeably in casual conversation, but they have
 | **Error (Mistake)** | A human action that produces an incorrect result. It's a mistake in coding, logic, or requirements understanding. | Developer, Business Analyst, Designer | During development/design | A developer writes `if (balance > 0)` instead of `if (balance >= 0)`, misunderstanding the business rule that zero balance should be allowed. |
 | **Defect (Bug)** | A flaw in the software product — a deviation from the requirement or specification. It exists in the code whether or not it has been discovered. | Introduced by the Error | Exists in the product (code/design) | The code has incorrect validation logic that prevents users with zero balance from proceeding, even though the requirement says they should be able to. |
 | **Fault** | The manifestation of an error in the software. It is essentially the incorrect step, process, or data definition in the code. | Present in code | In the code itself | The specific line of code `if (balance > 0)` is the fault — the exact location of the problem. |
-| **Failure** | The inability of a software system to perform its required function. A failure occurs when a defect is **executed** and causes the system to produce incorrect results. | Triggered when defect is executed | During execution/runtime | A user with $0.00 balance tries to view their account summary and gets an "Insufficient funds" error page instead. |
+| **Failure** | The inability of a software system to perform its required function. A failure occurs when a defect is **executed** and causes the system to produce incorrect results. | Triggered when defect is executed | During execution/runtime | A user with ₹0.00 balance tries to view their account summary and gets an "Insufficient funds" error page instead. |
 
 > [!IMPORTANT]
 > **The Chain of Events:** An **Error** (human mistake) leads to a **Defect** (flaw in code) which, when executed, causes a **Failure** (incorrect system behavior). Not all defects lead to failures — some defects exist in code paths that are rarely or never executed.
@@ -64,7 +64,7 @@ Defect management is not just about logging bugs — it's a **systematic process
 
 **2. Customer Trust & Brand Reputation**
 - A single critical defect in production (e.g., data breach, payment failure) can destroy years of brand building.
-- Example: In 2014, a healthcare.gov launch was plagued with defects that prevented millions from enrolling, causing massive public backlash and costing over $2 billion in fixes.
+- Example: In 2014, a healthcare.gov launch was plagued with defects that prevented millions from enrolling, causing massive public backlash and costing over ₹2 billion in fixes.
 
 **3. Team Efficiency**
 - Without structured defect management, teams waste time on duplicate bugs, miscommunication, and lost fixes.
@@ -83,32 +83,32 @@ Defect management is not just about logging bugs — it's a **systematic process
 
 The **Boehm Curve** (Barry Boehm, 1981) and subsequent research by IBM, NIST, and the Standish Group have consistently shown that defect cost grows exponentially across SDLC phases:
 
-| SDLC Phase | Relative Cost to Fix | Example Cost (If Requirements = $1) | Example Scenario |
+| SDLC Phase | Relative Cost to Fix | Example Cost (If Requirements = ₹1) | Example Scenario |
 |-----------|---------------------|-------------------------------------|------------------|
-| **Requirements** | 1x | $1 | BA identifies that the "free shipping" requirement lacks a minimum order threshold. Fix: Update the requirement document. |
-| **Design** | 3–6x | $5 | Architect realizes the database schema doesn't support multi-currency. Fix: Revise the design document and schema. |
-| **Coding/Development** | 10x | $10 | Developer finds a null pointer exception during unit testing. Fix: Add a null check and update the unit test. |
-| **Unit Testing** | 15x | $15 | A unit test catches an off-by-one error in pagination logic. Fix: Modify the loop boundary and regression test. |
-| **Integration/System Testing** | 30–40x | $35 | QA finds that the payment module sends incorrect tax calculations to the billing module. Fix: Debug across modules, fix, rebuild, and retest. |
-| **UAT (User Acceptance Testing)** | 50–70x | $60 | Business users discover that the discount code applies to excluded products. Fix: Requires requirement clarification, code change, testing, and re-UAT. |
-| **Production** | 100–150x | $100+ | Customers report that their credit cards are being charged twice. Fix: Emergency hotfix, customer refunds, PR damage control, potential legal implications, and root cause analysis. |
+| **Requirements** | 1x | ₹1 | BA identifies that the "free shipping" requirement lacks a minimum order threshold. Fix: Update the requirement document. |
+| **Design** | 3–6x | ₹5 | Architect realizes the database schema doesn't support multi-currency. Fix: Revise the design document and schema. |
+| **Coding/Development** | 10x | ₹10 | Developer finds a null pointer exception during unit testing. Fix: Add a null check and update the unit test. |
+| **Unit Testing** | 15x | ₹15 | A unit test catches an off-by-one error in pagination logic. Fix: Modify the loop boundary and regression test. |
+| **Integration/System Testing** | 30–40x | ₹35 | QA finds that the payment module sends incorrect tax calculations to the billing module. Fix: Debug across modules, fix, rebuild, and retest. |
+| **UAT (User Acceptance Testing)** | 50–70x | ₹60 | Business users discover that the discount code applies to excluded products. Fix: Requires requirement clarification, code change, testing, and re-UAT. |
+| **Production** | 100–150x | ₹100+ | Customers report that their credit cards are being charged twice. Fix: Emergency hotfix, customer refunds, PR damage control, potential legal implications, and root cause analysis. |
 
 ```
 Cost of Defect Fix (Relative Scale)
 │
 │                                                          ████ Production
-│                                                    ████ ($100+)
+│                                                    ████ (₹100+)
 │                                               ████
 │                                          ████
 │                                    ████  UAT
-│                              ████  ($60)
+│                              ████  (₹60)
 │                         ████
 │                    ████  System Test
-│               ████  ($35)
+│               ████  (₹35)
 │          ████
-│     ████  Dev/Unit Test ($10-15)
-│ ████  Design ($5)
-│█ Requirements ($1)
+│     ████  Dev/Unit Test (₹10-15)
+│ ████  Design (₹5)
+│█ Requirements (₹1)
 └──────────────────────────────────────────────────────────────
   Requirements  Design  Coding  Unit Test  System Test  UAT  Production
                               SDLC Phase →
@@ -826,7 +826,7 @@ flowchart TD
 
 | Level | Name | Description | Impact | Example |
 |-------|------|-------------|--------|---------|
-| **S1** | **Critical / Blocker** | The defect causes complete system failure, data loss, or blocks all testing. There is no workaround. | System is unusable; complete showstopper | **E-commerce:** Clicking "Place Order" deletes all items from the cart and charges the customer $0.00, but marks the order as "Completed" — data integrity is completely broken. |
+| **S1** | **Critical / Blocker** | The defect causes complete system failure, data loss, or blocks all testing. There is no workaround. | System is unusable; complete showstopper | **E-commerce:** Clicking "Place Order" deletes all items from the cart and charges the customer ₹0.00, but marks the order as "Completed" — data integrity is completely broken. |
 | **S2** | **Major / High** | The defect severely impacts a major feature/functionality. A workaround may exist but is not practical for end users. | Major feature broken; significant user impact | **Banking App:** Fund transfer works but the confirmation email shows the wrong recipient name and account number, causing customer confusion and potential fraud reports. |
 | **S3** | **Medium / Moderate** | The defect impacts a feature but a reasonable workaround exists. The system is still usable for most functions. | Feature partially broken; acceptable workaround available | **E-commerce:** The "Sort by Price" filter on the search results page sorts in ascending order when "High to Low" is selected. Workaround: Users can manually browse through pages. |
 | **S4** | **Minor / Low** | The defect is a minor issue that doesn't significantly impact functionality. It's a cosmetic or usability issue. | Minor inconvenience; no real functional impact | **Social Media App:** When a user uploads a profile picture larger than 5MB, the upload progress bar shows 0% until it jumps to 100% at the end (no incremental progress). |
@@ -840,7 +840,7 @@ flowchart TD
 
 | Level | Name | Description | Fix Timeline | Example |
 |-------|------|-------------|-------------|---------|
-| **P1** | **Urgent / Immediate** | Must be fixed immediately. The defect is blocking critical business operations, users, or testing. Typically requires a **hotfix**. | Within hours (same day) | **Payment Gateway:** All credit card transactions are failing since the morning deployment. Revenue loss is $50,000/hour. Hotfix required immediately. |
+| **P1** | **Urgent / Immediate** | Must be fixed immediately. The defect is blocking critical business operations, users, or testing. Typically requires a **hotfix**. | Within hours (same day) | **Payment Gateway:** All credit card transactions are failing since the morning deployment. Revenue loss is ₹50,000/hour. Hotfix required immediately. |
 | **P2** | **High** | Must be fixed in the current sprint/release. The defect significantly impacts business or user experience. | Within 1-3 days; current sprint | **E-commerce:** The promotional banner on the homepage shows "50% OFF" but clicking it leads to a 404 error page. Marketing campaign launches tomorrow. |
 | **P3** | **Medium** | Should be fixed soon but can wait for the next sprint/release. The defect impacts a secondary feature or has a viable workaround. | Next sprint / next release | **HR Portal:** The "Export to PDF" feature in the employee reports section generates a PDF with incorrect formatting (columns overlap). Workaround: Export to Excel instead. |
 | **P4** | **Low** | Fix when time permits. The defect is minor and has negligible impact on business or users. | Backlog; no specific timeline | **Internal Tool:** The "Last Updated" timestamp on the admin dashboard shows time in UTC instead of the local timezone. |
@@ -879,7 +879,7 @@ flowchart TD
 |-----------|-------|
 | **Scenario** | The company logo on the login page is stretched and pixelated (S5 - Trivial/Cosmetic) |
 | **Why Low Severity** | It's a purely cosmetic issue — no functional impact |
-| **Why High Priority** | The CEO is presenting a demo to the company's largest potential client tomorrow. The distorted logo looks unprofessional and could impact a $2M deal. |
+| **Why High Priority** | The CEO is presenting a demo to the company's largest potential client tomorrow. The distorted logo looks unprofessional and could impact a ₹2M deal. |
 | **Decision** | Fix immediately — replace the logo image file. Quick fix, high business impact. |
 
 **3. High Severity, High Priority — "Critical and Urgent"**
@@ -1039,17 +1039,17 @@ On iPhone 14 and iPhone 15 devices in **portrait mode**, the "Add to Cart" butto
 3. Search for "Wireless Headphones" in the search bar
 4. Tap on the first search result ("Sony WH-1000XM5 Wireless Headphones")
 5. Scroll down to the price and "Add to Cart" section
-6. **Observe:** The "Add to Cart" button overlaps with the price text "$349.99"
+6. **Observe:** The "Add to Cart" button overlaps with the price text "₹349.99"
 
 **Expected Result:**
-- The price text "$349.99" should be fully visible with adequate spacing (at least 16px) below it
+- The price text "₹349.99" should be fully visible with adequate spacing (at least 16px) below it
 - The "Add to Cart" button should be positioned below the price with proper margin/padding
 - Both elements should be fully readable and tappable without overlap
 
 **Actual Result:**
-- The price text "$349.99" is partially covered by the "Add to Cart" button
+- The price text "₹349.99" is partially covered by the "Add to Cart" button
 - The top ~8px of the "Add to Cart" button overlaps with the bottom portion of the price
-- The price appears as "$349" with ".99" hidden behind the button
+- The price appears as "₹349" with ".99" hidden behind the button
 - The "Add to Cart" button is still functional (tappable)
 - The issue is purely visual/layout but affects readability
 
@@ -1133,7 +1133,7 @@ During the multi-step checkout process, when a user completes the Shipping Addre
 **Impact Assessment:**
 - This affects 100% of users who navigate back during checkout
 - Cart abandonment analytics show a 23% increase in drop-off at the Shipping step since Build #2841
-- Estimated revenue impact: ~$12,000/day based on average order value and drop-off rate
+- Estimated revenue impact: ~₹12,000/day based on average order value and drop-off rate
 
 **Attachments:**
 - `checkout_data_loss_recording.mp4` — Full screen recording showing the complete checkout flow and data loss
@@ -1165,7 +1165,7 @@ The title should be specific enough that anyone can understand the issue without
 | ❌ Bad Title | ✅ Good Title |
 |-------------|---------------|
 | "Login not working" | "Login fails with valid credentials when MFA is disabled on Chrome v124" |
-| "Page is broken" | "Product listing page returns 500 error when price filter exceeds $10,000" |
+| "Page is broken" | "Product listing page returns 500 error when price filter exceeds ₹10,000" |
 | "Button issue" | "Submit Order button is unresponsive after applying discount code on mobile Safari" |
 | "Error message" | "Incorrect error message 'File not found' displayed when uploading invalid file type (.exe)" |
 | "Slow" | "Search results page takes 15+ seconds to load when query returns more than 500 results" |
@@ -1837,7 +1837,7 @@ For management, I'd present:
 
 7. **Best practices** include: reproduce before reporting, one defect per report, write descriptive titles, provide exact STR, include environment details, attach visual evidence, and check for duplicates before logging.
 
-8. **Cost of defects increases exponentially** across SDLC phases. A defect caught in requirements costs $1; the same defect in production costs $100+. This is why **Shift Left Testing** is critical.
+8. **Cost of defects increases exponentially** across SDLC phases. A defect caught in requirements costs ₹1; the same defect in production costs ₹100+. This is why **Shift Left Testing** is critical.
 
 9. **Never close a defect without retesting.** The developer's "Fixed" status means they *believe* they've fixed it. QA must verify independently before the defect can be verified and closed.
 

@@ -184,19 +184,19 @@ A well-structured naming convention makes test cases easy to find and organize:
 | **Test Scenario** | Verify that a user can add a product to the shopping cart |
 | **Description** | This test case verifies that when a logged-in user clicks "Add to Cart" on a product page, the product is successfully added to the cart with the correct quantity, price, and product details. |
 | **Prerequisites** | 1. User is logged in as john.doe@email.com<br/>2. Product "Wireless Bluetooth Headphones" (SKU: WBH-2024) exists and is in stock<br/>3. Shopping cart is empty<br/>4. Browser: Chrome v120+ |
-| **Test Data** | Product: Wireless Bluetooth Headphones (SKU: WBH-2024)<br/>Price: $79.99<br/>Quantity: 1 (default) |
+| **Test Data** | Product: Wireless Bluetooth Headphones (SKU: WBH-2024)<br/>Price: ₹79.99<br/>Quantity: 1 (default) |
 
 **Test Steps:**
 
 | Step # | Action | Expected Result |
 |--------|--------|-----------------|
-| 1 | Navigate to https://staging.app.com/products/WBH-2024 | Product page is displayed showing "Wireless Bluetooth Headphones", price $79.99, "In Stock" badge |
+| 1 | Navigate to https://staging.app.com/products/WBH-2024 | Product page is displayed showing "Wireless Bluetooth Headphones", price ₹79.99, "In Stock" badge |
 | 2 | Verify the quantity selector shows "1" as default | Quantity field shows value "1" |
 | 3 | Click the "Add to Cart" button | Success notification appears: "Wireless Bluetooth Headphones added to cart" |
 | 4 | Observe the cart icon in the navigation header | Cart icon shows badge with number "1" |
 | 5 | Click the cart icon to navigate to the cart page | Cart page is displayed at https://staging.app.com/cart |
-| 6 | Verify the product is listed in the cart | Product name "Wireless Bluetooth Headphones", SKU "WBH-2024", Quantity "1", Price "$79.99" are displayed |
-| 7 | Verify the cart subtotal | Subtotal shows "$79.99" |
+| 6 | Verify the product is listed in the cart | Product name "Wireless Bluetooth Headphones", SKU "WBH-2024", Quantity "1", Price "₹79.99" are displayed |
+| 7 | Verify the cart subtotal | Subtotal shows "₹79.99" |
 | 8 | Verify the product image thumbnail | Product thumbnail image is displayed next to the product name |
 
 | Field | Details |
@@ -486,7 +486,7 @@ Preconditions should specify **everything** that must be true before the test ca
 | ❌ Vague Precondition | ✓ Specific Precondition |
 |---|---|
 | "User must be logged in" | "User 'john.doe@email.com' is logged in with password 'Pass@1234' on Chrome v120+ in the QA environment" |
-| "Product should exist" | "Product 'Wireless Headphones' (SKU: WBH-2024, Price: $79.99) exists in catalog and is marked 'In Stock'" |
+| "Product should exist" | "Product 'Wireless Headphones' (SKU: WBH-2024, Price: ₹79.99) exists in catalog and is marked 'In Stock'" |
 
 #### 9. Use Specific, Verifiable Test Data
 
@@ -604,7 +604,7 @@ Test data directly affects the quality of testing — if the data doesn't cover 
 | **Nulling** | Replace sensitive data with null/empty values | Phone: null |
 | **Truncation** | Remove portions of data | "123-45-6789" → "***-**-6789" |
 | **Date Aging** | Shift dates by a consistent offset | All dates shifted forward by 6 months |
-| **Number Variance** | Add random variance to numeric values | Salary $50,000 → $52,347 (within ±10%) |
+| **Number Variance** | Add random variance to numeric values | Salary ₹50,000 → ₹52,347 (within ±10%) |
 
 **Compliance Requirements by Regulation:**
 
