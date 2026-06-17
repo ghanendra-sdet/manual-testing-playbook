@@ -64,6 +64,7 @@ This guide is structured as a **complete reference manual** covering every aspec
 |------|-------|------------|------|
 | **11** | [Test Execution & Reporting](Part_11_Test_Execution_Reporting.md) | Execution process, Status reports, Test Summary Report, Metrics & KPIs, Go/No-Go decision, Closure activities | ~82 KB |
 | **12** | [QA Best Practices & Modern Trends (2025)](Part_12_QA_Best_Practices_Modern_Trends.md) | Shift-Left/Right, SBTM, AI in Testing, API/Performance/Security basics, DevOps testing, Career growth | ~96 KB |
+| **13** | [Tools & Resources (India-focused)](Resources.md) | Quick reference of popular tools: project, test, CI, performance, security | ~8 KB |
 
 ---
 

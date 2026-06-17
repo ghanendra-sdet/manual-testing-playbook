@@ -42,7 +42,8 @@ This dashboard converts standard Markdown source files into a premium, responsiv
 ├── Part_09_Agile_Testing.md                 # Scrum, Sprint, Agile QA
 ├── Part_10_Test_Planning_Documentation.md   # IEEE 829 Test Plans
 ├── Part_11_Test_Execution_Reporting.md      # Metrics, Execution, TSR
-└── Part_12_QA_Best_Practices_Modern_Trends.md # Shift-Left, AI, Careers
+├── Part_12_QA_Best_Practices_Modern_Trends.md # Shift-Left, AI, Careers
+└── Resources.md                             # Tools & resources for testers (free/premium/enterprise)
 ```
 
 ---
