@@ -194,6 +194,13 @@ body {
   align-items: center;
   gap: 12px;
   color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.logo-area:hover {
+  opacity: 0.8;
 }
 
 .logo-icon {
