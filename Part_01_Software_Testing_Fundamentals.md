@@ -72,7 +72,9 @@ Software testing is not optional — it is a business-critical necessity. Here a
 **Real-World Example — Knight Capital Group (2012):**
 A software defect in Knight Capital's trading algorithm caused the firm to lose **₹440 million in just 45 minutes**. A deployment error activated obsolete code that executed millions of unintended trades. Adequate testing of the deployment process and the trading logic could have prevented this catastrophic loss.
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): a regression run surfaced **BUG-COL-1042**, filed **Critical** — "Ledger debit entry missing for commercial fee on successful UPI collection." A merchant collects ₹1,000 with a 2% commercial fee. The settlement amount correctly deducts the ₹20 fee, but the ledger never records the matching debit entry — only the gross credit shows up. On paper this looks like a cosmetic reporting gap. In practice it means the settlement total and the ledger total will never reconcile, which is exactly the kind of discrepancy a financial audit is designed to catch. Root cause: an async ledger-write step wasn't triggered by the same event as the settlement calculation — no Knight-Capital-scale headline, but the same underlying category of risk (money moving without an accurate paper trail behind it).
+> Picture a routine regression pass on a UPI collection flow: a merchant collects ₹1,000 with a 2% commercial fee. The settlement amount correctly deducts the ₹20 fee — but the ledger never records the matching debit entry, only the gross credit shows up. On paper that looks like a cosmetic reporting gap. In practice it means the settlement total and the ledger total will never reconcile, which is exactly the kind of discrepancy a financial audit is designed to catch. The root cause: an async ledger-write step wasn't wired to fire from the same event as the settlement calculation — no Knight-Capital-scale headline, but the same underlying category of risk: money moving without an accurate paper trail behind it. It's filed as **BUG-COL-1042**, Critical — "Ledger debit entry missing for commercial fee on successful UPI collection."
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 #### 2. To Ensure User Safety
 
@@ -89,14 +91,18 @@ While primarily a hardware issue, the software battery management system failed 
 **Real-World Example — Healthcare (HIPAA):**
 A healthcare application that leaks patient data due to a security vulnerability violates HIPAA regulations, resulting in fines of up to **₹1.5 million per violation category per year**. Security testing is not a luxury — it is a legal requirement.
 
-> → Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform): this SaaS claims platform spans **four entity types** — Provider, Payer, Employer, and Member — each with its own portal viewing the same underlying claim. Regulatory correctness here isn't abstract: a claim's PHI (protected health information) and its **Final / Need Review / Rejected** status have to match, byte for byte, across all four portals, or the platform is one cache-refresh bug away from a compliance incident. That's why the QA approach explicitly included **data-level testing** (validating claim status directly against the database, not just what a screen displays) and a maintained **Requirement Traceability Matrix (RTM)** — every regulatory requirement has to trace to a specific test, on the record, not just "we probably covered that."
+> Picture a health insurance claim that a Member can see marked **Final** in their portal, while the Payer who's supposed to be paying it still shows the same claim sitting at **Need Review** — because the claims platform behind both screens spans four entity types (Provider, Payer, Employer, Member), each with its own portal viewing the same underlying record, and one of those views cached a status update instead of reading it fresh. That mismatch isn't cosmetic — PHI and claim status have to match byte for byte across every portal, or the platform is one cache-refresh bug away from a compliance incident. That's why the real QA approach for a platform like this leans on **data-level testing** (checking claim status directly against the database, not just what a screen renders) and a maintained **Requirement Traceability Matrix (RTM)**, so every regulatory requirement traces to a specific test on the record — not just "we probably covered that."
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 #### 5. To Deliver a Quality User Experience
 
 **Real-World Example — Healthcare.gov Launch (2013):**
 The U.S. government's healthcare marketplace website crashed on launch day, unable to handle the traffic. Only **6 out of 248 people** who attempted enrollment on day one were successful. Insufficient load testing and integration testing were key contributing factors.
 
-> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): a booking marketplace resells flight/hotel inventory it doesn't own, sourced live from third-party supplier APIs (GDS/hotel systems) whose price and availability can change at any moment. The Healthcare.gov failure mode — a system that can't hold up when many users hit it (and dependent systems) at once — is exactly what the fare-lock and concurrency test strategy here is built to catch: k6-driven concurrency tests simulate many travelers racing to book the *same* last seat or room, verifying that only one booking wins and that the price charged at payment always matches the price quoted at fare-lock, even under supplier timeouts and stale-price conditions.
+> Picture launch-day traffic hitting a flight and hotel booking marketplace that doesn't own any of its own inventory — every price and every seat comes live from third-party supplier APIs (GDS systems, hotel inventory feeds) that can change availability at any moment. Now picture fifty travelers all racing to lock the very last hotel room in a city at the exact same millisecond, while one of those supplier APIs is having a slow day. That's the Healthcare.gov failure mode in miniature — a system that can't hold up when many users and many dependent systems collide at once — and it's exactly what a fare-lock and concurrency test strategy has to catch before launch: k6-driven concurrency tests simulating that same race, verifying only one booking wins the room, and confirming the price charged at payment always matches the price quoted at fare-lock, even when a supplier times out or returns a stale price mid-booking.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Drake Hotline Bling**
@@ -155,9 +161,9 @@ Consider a bug where the tax calculation is incorrect for orders shipped to Cana
 
 #### The Same Curve, Real Data: GST Rounding Mismatch (Fintech Collection Engine)
 
-The generic tax-bug walkthrough above maps almost exactly onto a real defect theme from the
-[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) portfolio project —
-**BUG-COL-1078**, a GST rounding mismatch between the transaction UI and the downloaded settlement report (₹3.06 shown on-screen vs. ₹3.10 in the export, because the two services rounded differently).
+The generic tax-bug walkthrough above maps almost exactly onto a real defect theme: a merchant opens their transaction dashboard and sees a GST amount of ₹3.06 on a collection — then downloads the settlement report for the same transaction and finds ₹3.10 sitting in the export instead. Nothing crashed, no error appeared; two services simply rounded the same fractional GST value differently. That four-paise gap is **BUG-COL-1078**, a GST rounding mismatch between the transaction UI and the downloaded settlement report.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 | Discovery Phase | What It Would Have Taken | Relative Cost |
 |----------------|--------------------------|:--------------:|
@@ -242,7 +248,9 @@ A tester discovers that searching for "women's shoes" with an apostrophe causes 
 - Running boundary value tests to check edge cases
 - Testing error handling and negative scenarios
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): **BUG-COL-1131**, "Transaction Search status filter returns stale results after a status change" (Major). A tester filters Transaction Search by status `DEEMED`, watches that same transaction resolve to `SUCCESS` in another session, then refreshes the original search — and the resolved transaction is still sitting there under `DEEMED`. Nothing crashed; the defect only surfaces because a tester deliberately re-checked a result set after the underlying data changed, exactly the kind of state-consistency defect that a single "does the search work" pass would never catch.
+> Picture a tester filtering a Transaction Search screen by status `DEEMED`, then — in a second browser session — watching that very transaction resolve to `SUCCESS`. They flip back to the original search and refresh it, and the now-resolved transaction is still sitting there filed under `DEEMED`. Nothing crashed, nothing threw an error; the defect only surfaces because someone deliberately re-checked a result set after the underlying data changed underneath it — exactly the kind of state-consistency bug a single "does the search work" pass would never catch. It's filed as **BUG-COL-1131**, Major — "Transaction Search status filter returns stale results after a status change."
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 #### 2. Gaining Confidence in the Level of Quality
 
@@ -257,7 +265,9 @@ Before releasing a new mobile banking app version, the QA team:
 
 This evidence gives the CTO confidence to approve the release. Without it, the release would be a gamble.
 
-> → Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform): the confidence story here is built from a different mix of evidence — **85%+ automation coverage** across critical claim workflows, a **95%+ defect resolution rate** within sprint cycles against 350+ defects raised, and a maintained **Requirement Traceability Matrix (RTM)** proving every requirement has corresponding test coverage. None of those numbers alone proves the software is defect-free (remember the testing paradox from 1.1) — together they're what lets a QA sign-off report tell stakeholders "here is the evidence behind this release decision," not just "trust us."
+> Picture a QA sign-off meeting for a claims platform that has raised and tracked over 350 defects across a sprint cycle: **85%+ automation coverage** across the critical claim workflows, a **95%+ defect resolution rate** on those 350+ defects within the sprint, and a maintained Requirement Traceability Matrix proving every regulatory requirement has corresponding test coverage on record. None of those numbers alone proves the software is defect-free — remember the testing paradox from 1.1 — but together they're what lets the QA lead walk into that meeting and say "here is the evidence behind this release decision," instead of just "trust us."
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 #### 3. Providing Information for Decision-Making
 
@@ -273,7 +283,9 @@ Testing generates data that stakeholders use to make informed decisions about th
 | Test coverage percentage | Risk assessment | "Only 60% of the API endpoints are covered — we need more API tests" |
 | Defect trend analysis | Process improvement | "Defect injection rate is declining sprint over sprint — our reviews are working" |
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): tracking **300+ defects** end-to-end surfaced a defect-theme taxonomy (missing ledger debit fees, commercial calculation mismatches, GST rounding discrepancies) that pointed directly at one integration boundary — Settlement Calculation Service → Ledger Service — as the recurring source of financially-serious defects. That's testing-generated information driving a real decision: allocate more integration test coverage to that specific boundary rather than spreading effort evenly across the ~40-service architecture.
+> Picture a QA lead laying out 300+ tracked defects side by side across a multi-month collection engine project and noticing a pattern: missing ledger debit fees, commercial calculation mismatches, GST rounding discrepancies — different symptoms, but every one of them traces back to the same handoff point, the Settlement Calculation Service passing data to the Ledger Service. That's testing-generated information turning directly into a resourcing decision: instead of spreading test effort evenly across a roughly 40-service architecture, the team deliberately concentrates integration test coverage on that one boundary, because the defect data itself pointed there.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 #### 4. Preventing Defects (Prevention)
 
@@ -295,7 +307,9 @@ A requirements document for a flight booking system states: "Users can book up t
 
 These questions uncover ambiguities that, if left unresolved, would lead to coding defects.
 
-> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): the highest-value prevention question on this project wasn't asked during testing at all — it was asked during test *design*, before a line of concurrency-handling code shipped: "What happens when two travelers try to lock the same last hotel room at the same moment?" Treating overbooking prevention as a first-class requirement (not an edge case discovered later) shaped the fare-lock architecture itself and led to a dedicated k6-based concurrency test approach — a defect category that sequential, one-user-at-a-time UI testing could never have reproduced after the fact.
+> Picture the single most valuable question asked on a travel booking marketplace project — and it wasn't asked during testing at all. It was asked during test *design*, before a line of concurrency-handling code shipped: "What happens when two travelers try to lock the same last hotel room at the same moment?" Treating overbooking prevention as a first-class requirement from day one, instead of an edge case discovered after launch, is what shaped the fare-lock architecture itself and led to a dedicated k6-based concurrency test approach — a defect category that ordinary, one-user-at-a-time UI testing could never have reproduced after the fact.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Distracted Boyfriend**
@@ -505,7 +519,9 @@ from being introduced                   before release
 | A tester executes BUG-COL-1042's reproduction steps — collect ₹1,000 at 2% commercial fee, then check the Ledger for a matching ₹20 debit entry — and finds it missing | **Testing** | Executing the software to verify correctness |
 | After the third recurring "ledger vs. settlement mismatch" defect, the team adds "ledger reconciliation" as a mandatory regression checklist item for every release | **QA** | Uses defect trend data to improve the process, not just fix the instance |
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) — see [`sample-defect-report.md`](https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/sample-defect-report.md) for the full worked defects.
+The three rows above aren't hypothetical — they trace the actual path from a QA lead's process decision, through a reviewer catching a duplicated rounding function, to a tester reproducing BUG-COL-1042's exact steps (collect ₹1,000 at 2% commercial fee, then check the Ledger for the missing ₹20 debit entry) on a real collection engine platform.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">Fintech Collection Engine — sample-defect-report.md</a>
 
 > [!NOTE]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -610,12 +626,14 @@ An e-commerce platform has a requirement: *"Users shall be able to filter produc
 
 #### Real-World V&V Pair — Consent Revocation (Fintech Account Aggregator)
 
-[YOBO](https://github.com/ghanendra-sdet/yobo) is a consent-based Account Aggregator: a user links bank accounts and grants a scoped, revocable consent for an app or lender to read their financial data. The platform's single highest-severity requirement is: *"When a user revokes consent, data sharing must stop immediately."* This one requirement is a clean, real illustration of why V&V are both necessary and distinct:
+Picture a consent-based Account Aggregator platform: a user links their bank accounts and grants a scoped, revocable consent letting an app or lender read their financial data. The platform's single highest-severity requirement is *"When a user revokes consent, data sharing must stop immediately."* This one requirement is a clean, real illustration of why V&V are both necessary and distinct:
 
 - **Verification ("are we building it right?"):** A design reviewer checks that the revocation-handling design actually accounts for a fetch that is *already in flight* when the revoke button is clicked — not just fetches requested afterward. This is a static check: no code runs, no data moves, someone is reading a design document and asking "does this handle the timing edge case?"
 - **Validation ("are we building the right thing, and does it actually work?"):** A tester triggers a live data fetch from a linked bank (FIP), revokes consent while that fetch is mid-flight, and checks whether the data still gets delivered to the requesting app (FIU). This is exactly the scenario the project's real regression suite treats as its top-priority test case — because "consent revoked" has to mean "data stops," not "data stops for every fetch except the one that was already running."
 
 If verification alone had happened (a design doc that *says* "handle in-flight fetches") without validation actually exercising a live in-flight revoke, the gap between "documented intent" and "actual running behavior" would never have surfaced — which is precisely the failure mode V&V, used together, is designed to close.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/yobo" target="_blank" rel="noopener noreferrer">YOBO</a>
 
 ### Static vs. Dynamic Testing
 
@@ -850,7 +868,9 @@ graph LR
 | **Defect** | The async job that's supposed to write a ledger debit entry for the commercial fee isn't triggered by the settlement-calculation event | Flaw in the code/integration |
 | **Failure** | A merchant collects ₹1,000 with a 2% fee; the settlement amount correctly shows the ₹20 deduction, but the Ledger shows only the gross credit — no matching debit entry exists anywhere | Observable (to an auditor, not to the merchant) — settlement and ledger totals silently stop reconciling |
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) `sample-defect-report.md`. This one is worth sitting with: the **failure** here isn't a crash or an error message a user sees — it's an *absence*, a row that should exist and doesn't. That's exactly why financial-domain testing can't rely on "does the screen look right" as a proxy for "is the system correct" — you have to go check the ledger, not just the dashboard.
+> This one is worth sitting with: the **failure** here isn't a crash or an error message a user sees — it's an *absence*, a row that should exist and doesn't. That's exactly why financial-domain testing can't rely on "does the screen look right" as a proxy for "is the system correct" — you have to go check the ledger, not just the dashboard.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine — sample-defect-report.md</a>
 
 ### Important Nuance: Not Every Defect Causes a Failure
 
@@ -1103,7 +1123,9 @@ Defects are not evenly distributed across the software. Certain modules tend to 
 
 **Practical Implication:** The QA team should allocate more testing resources to Payment Processing and Loan Calculation, and investigate why these modules are defect-prone (complexity? unclear requirements? new developers?).
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): across a ~40-service architecture, defects didn't spread evenly — they clustered specifically at the **Settlement Calculation Service → Ledger Service** boundary. The recurring theme (missing ledger debit entries, commercial calculation mismatches, GST rounding discrepancies — BUG-COL-1042, BUG-COL-1078, and BUG-COL-1105 are all examples of this exact same clustering pattern) is defect clustering playing out at the *integration-boundary* level rather than the *module* level. The practical response mirrored the textbook advice exactly: dedicated integration test coverage was designed specifically for that one boundary, rather than spreading effort evenly across all ~40 services.
+> Picture plotting every defect from a ~40-service collection engine architecture on a map of the system, expecting them to be scattered roughly evenly. Instead they pile up almost entirely at one seam: the handoff between the Settlement Calculation Service and the Ledger Service. Missing ledger debit entries, commercial calculation mismatches, GST rounding discrepancies — BUG-COL-1042, BUG-COL-1078, and BUG-COL-1105 are three different symptoms of the exact same clustering pattern, just at the *integration-boundary* level rather than the *module* level the textbook usually illustrates. The practical response mirrored the textbook advice exactly: dedicated integration test coverage was designed specifically for that one boundary, rather than spreading effort evenly across all ~40 services.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 #### The Warning: Don't Ignore Other Modules
 
@@ -1183,7 +1205,9 @@ There is no "one size fits all" approach to testing. The testing strategy, techn
 | **Defect tolerance** | Minor UI bugs may be acceptable at launch | **Zero tolerance** for any defect |
 | **Testing duration** | 2-4 week test cycles | Multi-year test campaigns |
 
-> → Real comparison across this account's own portfolio projects: [YOBO](https://github.com/ghanendra-sdet/yobo) (a consent-based Account Aggregator) treats **consent-revocation timing** as its single highest-severity test surface — because revoking consent a half-second too late means data was shared without authorization, a regulatory and trust failure, not a UI inconvenience. [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform), by contrast, treats a stale price shown for a few seconds during search as a Major inconvenience, not a Critical/Blocker issue — because the fare-lock step, not the search step, is what has to be airtight. Same overall discipline (functional + regression + API testing), very different rigor allocated to different features, because the *context* of what "unacceptable" means differs by domain.
+> Picture two portfolio projects side by side. On a consent-based Account Aggregator, a half-second delay in cutting off data access after a user revokes consent is a regulatory and trust failure — so consent-revocation timing gets treated as the single highest-severity test surface on the entire platform. On a flight and hotel booking marketplace, a stale price flickering on screen for a few seconds during search is filed as a Major inconvenience, not a Critical or Blocker issue — because it's the fare-lock step, not the search step, that has to be airtight; a stale search result gets corrected before money ever changes hands. Same overall testing discipline on both projects — functional, regression, API testing — but wildly different rigor allocated to different features, because what counts as "unacceptable" is defined by domain context, not by a universal checklist.
+>
+> → References: <a href="https://github.com/ghanendra-sdet/yobo" target="_blank" rel="noopener noreferrer">YOBO</a> · <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 | **Regulatory testing** | PCI-DSS for payment | FAA/EASA certification testing |
 | **Independence** | Internal QA team | Independent V&V (IV&V) by a third party |
 | **Test coverage** | Risk-based (80% coverage may suffice) | Near-exhaustive (MC/DC coverage required) |
@@ -1332,7 +1356,9 @@ Testers are **analytical and critical thinkers**. Their primary goal is to find 
 - What if the user logs in from two devices simultaneously?
 - What if the user copies a password from a password manager with trailing whitespace?
 
-> → Real example from [YOBO](https://github.com/ghanendra-sdet/yobo) (Account Aggregator): the tester mindset here shows up as the single question that shaped the entire regression strategy: "What if the user clicks Revoke while a data fetch to the FIU is already in flight?" A developer building the happy path reasonably thinks "revoke sets consent to inactive, done." A tester in breaking-mode immediately asks what happens to the *request that started one second before* the revoke click — and that exact question is what the project's real defect report (Defect #1) was built around. It's the same "what if?" reflex as the login-form list above, just aimed at a timing window instead of an input field.
+> Picture the single question that shaped an entire regression strategy on an Account Aggregator platform: "What if the user clicks Revoke while a data fetch to the requesting app is already in flight?" A developer building the happy path reasonably thinks "revoke sets consent to inactive, done." A tester in breaking-mode immediately asks what happens to the *request that started one second before* the revoke click — and that exact question is what the project's top-priority defect report (Defect #1) was built around. It's the same "what if?" reflex as the login-form list above, just aimed at a timing window instead of an input field.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/yobo" target="_blank" rel="noopener noreferrer">YOBO</a>
 
 > [!NOTE]
 > Neither mindset is "better" — they are **complementary**. A successful project needs both builders and breakers working together. The best teams recognize and value both perspectives.
@@ -1416,10 +1442,9 @@ Testers are inherently bearers of "bad news" — they find and report problems w
 > Environment: Chrome 120, Windows 11, Staging
 > Severity: High | Priority: High
 
-> → This is exactly the shape used in this account's real portfolio defect reports — see
-> [Fintech Collection Engine's `sample-defect-report.md`](https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/sample-defect-report.md)
-> and [Healthcare Insurance Platform's `sample-defect-report.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/sample-defect-report.md).
-> Every worked defect there follows a consistent **Title → Steps to Reproduce → Expected Result → Actual Result → Impact → Suggested Fix** structure — factual, reproducible, and framed around *product behavior* ("Ledger debit entry missing for commercial fee") rather than blame. Notice the **Impact** field in particular: it's what turns "the ledger looks different" into a statement a non-technical stakeholder can act on ("breaks the audit trail... could cause discrepancies during a compliance or financial audit").
+> This is exactly the shape real portfolio defect reports follow in practice. Every worked defect follows a consistent **Title → Steps to Reproduce → Expected Result → Actual Result → Impact → Suggested Fix** structure — factual, reproducible, and framed around *product behavior* ("Ledger debit entry missing for commercial fee") rather than blame. Notice the **Impact** field in particular: it's what turns "the ledger looks different" into a statement a non-technical stakeholder can act on — "breaks the audit trail, could cause discrepancies during a compliance or financial audit."
+>
+> → References: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">Fintech Collection Engine — sample-defect-report.md</a> · <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform — sample-defect-report.md</a>
 
 #### Communication Principles for Testers
 

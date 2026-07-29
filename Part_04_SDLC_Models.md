@@ -73,9 +73,9 @@ Before going model-by-model, here's a preview of how this plays out on real proj
 
 | SDLC Model | Real Project | Why It Fits |
 |---|---|---|
-| **V-Model** | [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) | A HIPAA-adjacent claims platform spanning 4 entity portals (Provider/Payer/Employer/Member) needs verification planned in advance at every level — you can't retrofit an RTM (Requirement Traceability Matrix) after the fact |
-| **Agile / Scrum** | [LMS Platform](https://github.com/ghanendra-sdet/lms-platform), [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform) | Course/assessment features and ESS (Employee Self-Service) features both shipped incrementally, sprint by sprint, with real user feedback shaping the next sprint |
-| **Enterprise / complexity-driven** | [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) | A ~40-service architecture is where SDLC model choice stops being academic — the more services, the more integration boundaries, the more a wrong model choice costs |
+| **V-Model** | <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a> | A HIPAA-adjacent claims platform spanning 4 entity portals (Provider/Payer/Employer/Member) needs verification planned in advance at every level — you can't retrofit an RTM (Requirement Traceability Matrix) after the fact |
+| **Agile / Scrum** | <a href="https://github.com/ghanendra-sdet/lms-platform" target="_blank" rel="noopener noreferrer">LMS Platform</a>, <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a> | Course/assessment features and ESS (Employee Self-Service) features both shipped incrementally, sprint by sprint, with real user feedback shaping the next sprint |
+| **Enterprise / complexity-driven** | <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> | A ~40-service architecture is where SDLC model choice stops being academic — the more services, the more integration boundaries, the more a wrong model choice costs |
 
 See sections 4.3, 4.4, and 4.10 respectively for the full walkthrough of each.
 
@@ -348,7 +348,7 @@ flowchart TD
 
 ### Real-World Example: Healthcare Insurance Claims Platform (V-Model in Practice)
 
-**Scenario:** the [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) portfolio project — a SaaS claims platform spanning **four entity portals** (Provider, Payer, Employer, Member) that all view the same underlying claim, in a domain adjacent to HIPAA-style regulatory scrutiny.
+**Scenario:** Picture a SaaS health-insurance claims platform where the exact same claim has to look identical no matter which of **four separate portals** opens it — a hospital biller checking status in the Provider portal, the insurer's own adjuster working the Payer portal, an HR admin auditing coverage in the Employer portal, and the patient checking their own claim in the Member portal. The claim carries protected health information (PHI), and the domain sits close enough to HIPAA-style regulatory scrutiny that "the four portals mostly agree" isn't good enough — they have to match byte for byte, every time.
 
 **Why V-Model fits here — even without a formal FDA-style mandate:**
 1. A claim's status (**Final / Need Review / Rejected**) and its PHI (protected health information) must match, byte for byte, across four independently-built portals — that's a correctness requirement that has to be *designed for*, not discovered during UAT
@@ -369,6 +369,8 @@ flowchart TD
 → Real example: **BUG-HIP-6014** (Critical) — the Member portal showed a claim as `FINAL` while the Payer portal, the source of truth, still showed `NEED REVIEW`. Root cause: the Member portal was reading from an independently cached copy of claim status instead of the same live source the Payer portal used. This is exactly the class of defect the V-Model's Architecture-Design-↔-Integration-Testing pairing exists to catch *before coding starts* — "will every portal read from one shared source, or will someone quietly add a cache?" is an architecture question, and under V-Model discipline the Integration Test plan for that question should have existed the same week the architecture was decided, not been discovered as a production-shaped defect months later.
 
 A second defect, **BUG-HIP-6032** (Major) — a rejection reason recorded by the Payer never appeared in the Provider portal — traces to the same root pattern: a field added to the schema wasn't propagated to every entity-facing view, something a Module-Design-↔-Unit-Testing pairing (does every portal's claim-detail unit test assert on the rejection-reason field?) would have caught immediately.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Expanding Brain**
@@ -635,7 +637,7 @@ Shift-Left:     ████ TESTING ██████████████�
 
 ### Real-World Example: Agile Delivery — LMS & HRMS Portfolio Projects
 
-Two portfolio projects illustrate Agile/Scrum delivery in domains where "ship it incrementally, sprint by sprint" is the only realistic approach: a **[LMS Platform](https://github.com/ghanendra-sdet/lms-platform)** (course/assessment/certification features) and an **[HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)** (Employee Self-Service / MyInfo features).
+Picture two very different teams that both learned the same lesson about "ship it incrementally, sprint by sprint": a **Learning Management System (LMS)** team building the course/assessment/certification journey, and an **HRMS** team building the Employee Self-Service (ESS) module where staff view and edit their own personal details.
 
 **LMS Platform — course & assessment features shipped sprint by sprint:**
 
@@ -646,6 +648,8 @@ The enrollment → content consumption → assessment → certification journey 
 The Employee Self-Service module's Personal/Contact Details form was tested field-by-field, and because each field's access-control state (editable vs. HR-managed read-only) is a discrete, demoable unit of work, defects surfaced early and per-story rather than in one late audit: **BUG-HRM-7021** (Critical) — the Date of Birth field, which should be HR-controlled and disabled for the employee, was editable and saved changes with no HR approval step at all. Caught as part of a single story's "field enabled/disabled state" acceptance criteria — not as a company-wide data-integrity incident discovered by payroll months later.
 
 **The Agile pattern common to both:** in Waterfall, both of these would have been discovered during one late testing phase, after the entire feature (the whole certification engine, the whole ESS form) was already built. In Scrum, each was caught story-by-story, inside the sprint where the relevant code was written — which is the entire point of "Definition of Done" including testing criteria (see the Scrum Ceremonies table earlier in this section).
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/lms-platform" target="_blank" rel="noopener noreferrer">LMS Platform</a>, <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>
 
 > [!IMPORTANT]
 > **🎭 Meme Break — Galaxy Brain**
@@ -1267,7 +1271,7 @@ Because passing automated tests proves the code behaves correctly against the *s
 
 ### Real-World Example: SDLC Choice at Scale — Fintech Collection Engine's ~40-Service Architecture
 
-The comparison table above treats each SDLC model as a single choice for an entire project — but real systems rarely fit in one box, and the bigger the system, the more that matters. The **[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)** — a merchant payment collection platform — is a useful illustration because its documented architecture spans roughly **40 services**, grouped into Identity & Merchant, Collection Core, five independent Collection-Type services (UPI/QR/VAM/Payment Link/Manual Deposit), Settlement & Financial Correctness, Reporting & Analytics, and cross-cutting Platform services.
+The comparison table above treats each SDLC model as a single choice for an entire project — but real systems rarely fit in one box, and the bigger the system, the more that matters. Picture a merchant payment collection platform that lets a merchant get paid by UPI, QR code, virtual account number (VAM), payment link, or manual deposit — and picture what's actually running behind that simple choice: roughly **40 services**, split across Identity & Merchant, Collection Core, five independent Collection-Type services (one per payment method), Settlement & Financial Correctness, Reporting & Analytics, and a layer of cross-cutting Platform services underneath all of it.
 
 **Why service count changes the SDLC calculus:**
 
@@ -1279,7 +1283,9 @@ The comparison table above treats each SDLC model as a single choice for an enti
 
 **A concrete boundary that actually broke:** → Real example — **BUG-COL-1105** (Critical): the Settlement Report total was ₹1,240 higher than the independently-summed Ledger total for the same date range. Root cause: the Settlement Report and the Ledger were reading from two different snapshots of transaction state (the report included some later-reversed transactions the Ledger correctly excluded). This is precisely the **Settlement Calculation Service → Ledger Service** integration boundary the project's own service-architecture documentation flags as a "historically common defect theme" — a defect class that doesn't exist at all in a 1-service system, becomes possible at ~5 services, and becomes *likely* at ~40 services unless integration boundaries are deliberately mapped and tested, not discovered by accident.
 
-**What this means for model choice in practice:** a project this size rarely runs on one pure model end-to-end. The realistic pattern — and the one reflected in this portfolio project — looks like: Agile/Scrum for feature delivery within each service team (fast iteration, sprint reviews), combined with V-Model-style discipline specifically at the highest-risk integration boundaries (Settlement ↔ Ledger, and cross-collection-type consistency in the Dashboard Analytics Service) — because letting *every* one of ~40 services' interactions get "tested at the end" the Waterfall way isn't just risky, at this scale it's close to untestable. This is the same hybrid principle called out earlier in this chapter's decision framework, just visible at a scale where getting it wrong has a real, dated defect ID attached to it.
+**What this means for model choice in practice:** a project this size rarely runs on one pure model end-to-end. The realistic pattern looks like: Agile/Scrum for feature delivery within each service team (fast iteration, sprint reviews), combined with V-Model-style discipline specifically at the highest-risk integration boundaries (Settlement ↔ Ledger, and cross-collection-type consistency in the Dashboard Analytics Service) — because letting *every* one of ~40 services' interactions get "tested at the end" the Waterfall way isn't just risky, at this scale it's close to untestable. This is the same hybrid principle called out earlier in this chapter's decision framework, just visible at a scale where getting it wrong has a real, dated defect ID attached to it.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!WARNING]
 > **🎭 Meme Break — "This Is Fine" Dog**

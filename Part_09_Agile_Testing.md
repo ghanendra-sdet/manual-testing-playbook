@@ -223,7 +223,9 @@ Sprint 7 of an e-commerce platform project:
 - **Sprint Review:** The tester helped demo the guest checkout flow with various payment methods
 - **Retrospective:** The tester suggested: "We should add a 'testability review' during story grooming to catch issues early"
 
-> → Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform): the same four ceremonies map onto a real ESS (Employee Self-Service) sprint. **Sprint Planning** — the tester reviews the Personal/Contact Details form story and immediately flags that it isn't one flat form but 14 fields under three different access rules (some HR-only/disabled, like Employee ID and Date of Birth; some employee-editable, like Nick Name and Marital Status), so "test the contact details form" quietly expands into a field-by-field enabled/disabled matrix (`TC_MYINFO_PERSDETAILS_01`). **Daily Standup** — "Yesterday I finished the enabled/disabled matrix for all 14 fields. Today I'm testing combo box and radio button behavior. No impediments." **Sprint Review** — the tester demos an HR-controlled field (Employee ID) staying read-only no matter what the employee tries, right next to an employee-editable field (Nick Name) saving correctly — the contrast is the whole point of the demo. **Retrospective** — "We should test the disabled-field matrix before the save/persistence logic is built, not after — we found two employee-editable fields the design doc had marked read-only, and it was cheaper to catch that in planning than in a bug report."
+> Picture the same four ceremonies playing out on a real Employee Self-Service (ESS) sprint. **Sprint Planning** — the tester reviews the Personal/Contact Details form story and immediately flags that it isn't one flat form but 14 fields under three different access rules (some HR-only/disabled, like Employee ID and Date of Birth; some employee-editable, like Nick Name and Marital Status), so "test the contact details form" quietly expands into a field-by-field enabled/disabled matrix. **Daily Standup** — "Yesterday I finished the enabled/disabled matrix for all 14 fields. Today I'm testing combo box and radio button behavior. No impediments." **Sprint Review** — the tester demos an HR-controlled field (Employee ID) staying read-only no matter what the employee tries, right next to an employee-editable field (Nick Name) saving correctly — the contrast is the whole point of the demo. **Retrospective** — "We should test the disabled-field matrix before the save/persistence logic is built, not after — we found two employee-editable fields the design doc had marked read-only, and it was cheaper to catch that in planning than in a bug report."
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a> (test case `TC_MYINFO_PERSDETAILS_01`)
 
 > [!TIP]
 > **🎭 Meme Break — Distracted Boyfriend**
@@ -617,7 +619,7 @@ Tester's contributions during sprint planning:
 **🎬 Full Worked Example — Sprint 12: LMS Platform, "Certificate Generation" (Planning):**
 
 This is the same four-phase cycle above, run start-to-finish against one real feature from the
-[LMS Platform](https://github.com/ghanendra-sdet/lms-platform) portfolio project — a Learning
+<a href="https://github.com/ghanendra-sdet/lms-platform" target="_blank" rel="noopener noreferrer">LMS Platform</a> portfolio project — a Learning
 Management System where a certificate is a credential, not just a UI state. Follow it through the
 rest of this section's phases: Planning (here), a mid-sprint defect (Phase 2), Daily Standup
 (Phase 3), and Sprint Review + Retrospective (Phase 4).
@@ -736,10 +738,11 @@ graph LR
 
 **Real Examples — Same Table, Real Defects:**
 
-Two defects from the [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) portfolio project show both ends of that table in the same kind of sprint:
+Picture a merchant collection platform mid-sprint, chasing a goal of shipping a reconciled settlement report. Three days in, a tester finds that a successful UPI collection isn't writing a ledger debit entry for its commercial fee — the money moved, but the books don't show it. That's not cosmetic: without that entry, settlement totals won't reconcile and a compliance audit could fail on it. Logged as **BUG-COL-1042** (Critical), it gets pulled into the sprint immediately and fixed before the sprint goal can ship — a textbook "Critical production bug" from the table above.
 
-- **BUG-COL-1042** (Critical — "Ledger debit entry missing for commercial fee on successful UPI collection") directly blocked a sprint goal of shipping a reconciled settlement report, so it was pulled in and fixed immediately, matching the table's "Critical production bug" row.
-- **BUG-COL-1131** (Major — "Transaction Search status filter returns stale results after a status change") was real and worth fixing, but it didn't block anything that sprint had committed to ship. It was logged to the backlog, prioritized normally by the PO, and the sprint continued without displacing any committed story — matching the "Bug in previously completed story" row, not the Critical row. Treating it as an emergency anyway would have been exactly the anti-pattern the warning above describes.
+A few days later the same tester finds something else: the Transaction Search screen's status filter shows stale results after a transaction's status changes — filter by "Failed," and a transaction that just flipped to "Success" is still sitting there. Logged as **BUG-COL-1131** (Major), it's a real, worth-fixing bug, but nothing the sprint committed to ship depends on it. So it goes to the backlog, the PO prioritizes it normally, and the sprint continues without displacing any committed story — the "Bug in previously completed story" row, not the Critical row. Treating a stale-filter bug as a fire to drop everything for would have been exactly the anti-pattern the warning above describes.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> (BUG-COL-1042, BUG-COL-1131)
 
 **🎬 Sprint 12, Continued — The Mid-Sprint Defect:**
 
@@ -1220,7 +1223,7 @@ A well-written user story should meet the **INVEST** criteria:
 > As an employee, I want to update my emergency contact details in the Personal/Contact Details
 > form so that HR has accurate information without me having to email HR directly.
 
-This one is grounded directly in the real [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)
+This one is grounded directly in the real <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>
 ESS module, where the Personal/Contact Details form has 14 fields split across **three different
 access rules** — some HR-managed and shown read-only (Employee ID, Date of Birth, Driver's
 License Number), some employee-editable (Nick Name, Marital Status, and — for this story — the
@@ -1823,7 +1826,9 @@ Feature: Stock Market Order Placement
     But the user should be able to place a limit order for the next trading session
 ```
 
-> → Real example from [LMS Platform](https://github.com/ghanendra-sdet/lms-platform): the automation suite is built with **Playwright + TypeScript**, using **Cucumber** for BDD scenario definition — the exact tool pairing from the table above, applied to the enrollment-to-certification journey covered throughout this section. A real feature file scenario from that suite reads almost exactly like the cart and trading examples above: `Given a learner has enrolled in a course`, `When they seek the video player directly to the final timestamp`, `Then the lesson should remain "In Progress", not "Complete"` — which is the BDD-scenario version of the manual reproduction steps for BUG-LMS-4015 in Section 9.5. Writing that scenario *before* the fix, in Gherkin, is what turns "a bug we found" into "a regression test that guarantees it never comes back."
+> Picture the same enrollment-to-certification journey from Section 9.5, now automated with **Playwright + TypeScript** and **Cucumber** for BDD — the exact tool pairing from the table above. Once BUG-LMS-4015 (seeking a video to its end falsely marked it complete) is fixed, someone writes the regression scenario in Gherkin: `Given a learner has enrolled in a course`, `When they seek the video player directly to the final timestamp`, `Then the lesson should remain "In Progress", not "Complete"` — the BDD-scenario version of the exact manual reproduction steps that caught the bug in the first place. Writing that scenario in Gherkin, wired into the automation suite, is what turns "a bug we found" into "a regression test that guarantees it never comes back."
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/lms-platform" target="_blank" rel="noopener noreferrer">LMS Platform</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> BUG-LMS-4015 was originally found through manual functional testing (Section 9.5), not an automated BDD scenario. Once it's fixed, why does it belong in the Cucumber feature file going forward, and what would happen if it stayed manual-only?</summary>

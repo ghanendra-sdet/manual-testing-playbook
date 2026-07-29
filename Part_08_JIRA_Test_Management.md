@@ -73,7 +73,7 @@ For **QA and testing professionals**, JIRA serves as:
 | **Enterprise** | Unlimited | Custom pricing | Unlimited sites, Atlassian Intelligence, advanced security (SAML SSO, SCIM), data residency, 24/7 support |
 
 > [!NOTE]
-> Prices are approximate and subject to change. Atlassian uses a tiered pricing model where the per-user cost decreases with larger team sizes. For the latest pricing, check [atlassian.com/software/jira/pricing](https://www.atlassian.com/software/jira/pricing).
+> Prices are approximate and subject to change. Atlassian uses a tiered pricing model where the per-user cost decreases with larger team sizes. For the latest pricing, check <a href="https://www.atlassian.com/software/jira/pricing" target="_blank" rel="noopener noreferrer">atlassian.com/software/jira/pricing</a>.
 
 ---
 
@@ -101,7 +101,9 @@ For **QA and testing professionals**, JIRA serves as:
 
 ### JIRA in the Real World — Why the Field Names Look Familiar
 
-If you've worked through the earlier parts of this playbook, the "Severity," "Module," and "Environment" fields you saw in sample defect reports weren't invented for this course — they're exactly the custom field set most fintech and healthcare QA teams configure on top of JIRA's defaults. For example, the [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s `sample-defect-report.md` logs **BUG-COL-1042** with `Severity: Critical`, `Module: Collection → Ledger`, `Environment: UAT (dummy data)` — that's not a coincidence, it's the same structure a real JIRA Bug screen enforces. Throughout this module, we'll use real defect IDs from three portfolio projects — **BUG-COL-*** (Fintech Collection Engine), **BUG-PAY-*** (Fintech Payout Engine), and **BUG-HIP-*** (Healthcare Insurance Platform) — to show exactly how a ticket like this would move through a real JIRA board, not a hypothetical one.
+If you've worked through the earlier parts of this playbook, the "Severity," "Module," and "Environment" fields you saw in sample defect reports weren't invented for this course — they're exactly the custom field set most fintech and healthcare QA teams configure on top of JIRA's defaults. Picture a QA engineer closing out a UPI collection regression run: a merchant's successful payment goes through, the commercial fee should be deducted and written to the ledger, but it isn't — the money moves, the audit trail doesn't. She logs it with `Severity: Critical` (because settlement and ledger totals will no longer reconcile), `Module: Collection → Ledger` (so it routes straight to the ledger owner, not general triage), and `Environment: UAT (dummy data)` (so nobody mistakes it for a live-money incident). That's not a coincidence of formatting — it's the same field structure a real JIRA Bug screen enforces, filled in by someone who already knew it would become a ticket. Throughout this module, we'll follow defect IDs shaped exactly like that one — **BUG-COL-\*** for a collection/ledger platform, **BUG-PAY-\*** for an outbound-payout platform, and **BUG-HIP-\*** for a healthcare claims platform — to show exactly how a ticket like this would move through a real JIRA board, not a hypothetical one.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!TIP]
 > **🎭 Meme Break — Drake Hotline Bling**
@@ -373,15 +375,15 @@ stateDiagram-v2
 
 ### Real Example: Project Keys Across the Portfolio
 
-The "Project Key" row above (`ECOM` → `ECOM-1`, `ECOM-2`...) is the generic textbook version. In practice, this account's own portfolio repos already use exactly this convention — each platform gets its own short, stable project key, and every defect ID inherits it:
+The "Project Key" row above (`ECOM` → `ECOM-1`, `ECOM-2`...) is the generic textbook version. In practice, a QA org running three different platforms out of one JIRA instance would set this up almost exactly the same way — one short, stable key per platform, so the key itself tells you what you're looking at before you've opened the ticket:
 
-| Repo | Project Key | Real Issue Example |
-|---|---|---|
-| [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) | `COL` | `BUG-COL-1042` — Ledger debit entry missing for commercial fee |
-| [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) | `PAY` | `BUG-PAY-3081` — Retry re-submits a payout that already succeeded |
-| [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) | `HIP` | `BUG-HIP-6014` — Member portal shows "Final" while Payer still shows "Need Review" |
+- A merchant payment-collection platform (UPI/QR/VAM/Payment Link, ledger, settlement) gets the key `COL`. Its ledger-reconciliation bug — a commercial fee deducted from a merchant's collection but never written to the ledger — files as `BUG-COL-1042`.
+- An outbound payout platform (IMPS/NEFT/RTGS transfers to beneficiaries) gets `PAY`. Its retry-idempotency bug — a stuck transfer resubmitted after a delayed bank confirmation, resulting in the beneficiary being paid twice — files as `BUG-PAY-3081`.
+- A healthcare claims platform spanning Provider, Payer, Employer, and Member portals gets `HIP`. Its cross-portal status-mismatch bug — a claim the Member portal shows as "Final" while the Payer portal still shows "Need Review" — files as `BUG-HIP-6014`.
 
 Each of these is a real **Bug** issue type (🐛) as defined in the Issue Types table above — not a Story, not a Task. That distinction matters: filing BUG-PAY-3081 as a "Task" instead of a "Bug" would make it invisible to every JQL query and dashboard gadget in this module that filters on `type = Bug`.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> · <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a> · <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 > [!NOTE]
 > **🎭 Meme Break — Expanding Brain**
@@ -488,7 +490,7 @@ The workflow diagrams above are the general shape. Here's what it actually looks
 | **Triage** | QA Lead confirms Critical: settlement and ledger totals won't reconcile — audit risk. Assigned same day. | Skips the normal triage queue entirely — Blocker severity + "real money moved twice" triggers an incident-style escalation, assigned within the hour. | Sits in Triage for two days behind the Critical/Blocker items above — Major severity means "fix this release," not "fix this now." |
 | **In Progress** | Backend dev traces the async ledger-write step and finds it isn't triggered by the same event as the settlement calculation. | Dev adds a bank-rail status check before any retry resubmits — the actual root cause (retry trusted the platform's local `FAILED` status instead of verifying with the bank). | Dev centralizes the GST rounding rule into one shared function used by both the UI and the report service, instead of two independent roundings. |
 | **Code Review** | Reviewer confirms the ledger write and settlement calculation now happen inside the same atomic event. | Expedited review — a second senior engineer specifically checks for other unconditional-retry paths in the same service. | Standard review; reviewer also adds a unit test asserting UI and report always agree. |
-| **QA/Retest** | QA re-executes `TC-014` ("Ledger debit entry created") from the [Collection Engine regression checklist](https://github.com/ghanendra-sdet/fintech-collection-engine) — the exact case that would have caught this originally. | QA specifically retests the delayed-bank-confirmation scenario that exposed the bug, plus the full retry regression set — this defect class doesn't get a partial retest. | QA cross-checks UI figures against exported reports across the full regression suite, not just the one transaction that surfaced it. |
+| **QA/Retest** | QA re-executes `TC-014` ("Ledger debit entry created"), the exact regression case that would have caught this originally. | QA specifically retests the delayed-bank-confirmation scenario that exposed the bug, plus the full retry regression set — this defect class doesn't get a partial retest. | QA cross-checks UI figures against exported reports across the full regression suite, not just the one transaction that surfaced it. |
 | **Done** | Verified, linked back to `TC-014`, closed. | Verified, hotfix released same day given the financial exposure. | Verified in the next scheduled release — no hotfix needed, Major severity doesn't warrant one. |
 
 > [!IMPORTANT]
@@ -616,7 +618,7 @@ Linked Issues:
 
 The generic `ECOM-TC-042` example above shows the *mechanics* of linking a test case to a story. Here's a case where the link is even tighter — where a specific regression test case is directly responsible for catching a real, documented defect.
 
-The [Collection Engine regression checklist](https://github.com/ghanendra-sdet/fintech-collection-engine) includes:
+Picture a regression checklist for a merchant-collection platform, sitting quietly in the suite as case `TC-014`: run a UPI collection that includes a commercial fee, then check that the ledger records a matching debit entry for that fee. It's a small, unglamorous check — one line in a checklist of dozens. Then a release ships an async change to how ledger writes fire, and on the next regression pass, `TC-014` fails: the transaction succeeds, the fee is charged, but no matching ledger debit shows up.
 
 ```
 TC-014 | Ledger debit entry created | Steps: Successful transaction with commercial fee
@@ -650,6 +652,8 @@ Linked Issues:
 ```
 
 Once the fix ships, QA re-executes `COL-TC-014` (not a new ad hoc check) — if it now passes, `BUG-COL-1042` is safe to close, and the traceability matrix shows an unbroken chain: **Story → Test Case → Defect → Retest → Closed**. That chain is exactly what an auditor or a QA manager pulls up when someone asks "how do we know this is actually fixed, not just that a developer said so?"
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!TIP]
 > **🎭 Meme Break — Drake Hotline Bling**
@@ -813,7 +817,7 @@ Configure your project's **Field Configuration** to make essential fields mandat
 
 ### Real Example: BUG-PAY-3081 Filled Into the JIRA Bug Template
 
-Here's what the description template above looks like filled in with a real defect — **BUG-PAY-3081** from the [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine)'s sample defect report, rewritten exactly as it would be entered into a JIRA Create Issue screen:
+Picture a payout platform mid-regression: a beneficiary was supposed to receive one IMPS transfer, but the bank's confirmation for it got delayed, so the platform's local status shows `FAILED` even though the bank actually completed the transfer. Someone — or an automated retry job — sees `FAILED` and hits Retry. Retry trusts the local status instead of checking with the bank rail first, so it resubmits unconditionally. The bank processes the second request too. The beneficiary now has two transfers sitting in their account for what should have been one payment. That's **BUG-PAY-3081**, and here's what it looks like filled into the description template above, exactly as it would be entered into a JIRA Create Issue screen:
 
 | Field | Value |
 |-------|-------|
@@ -861,6 +865,8 @@ This is treated as the single most severe defect class in the Payout Engine — 
 money sent twice to an external party is far harder to reverse than a software fix.
 Retry idempotency is the highest-priority regression scenario for this module.
 ```
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a>
 
 Notice how directly the "Impact" reasoning from the source defect report maps onto **Severity: Blocker** rather than merely **Priority: Highest** — the two fields answer different questions (see Best Practice #5 later in this module): Priority says "fix this first," Severity says "this is a financial-correctness failure, not a UI glitch."
 
@@ -1458,9 +1464,11 @@ Zephyr is one of the oldest and most popular test management plugins for JIRA. I
 
 ### Real Example: Why a Compliance-Heavy Platform Leans Toward a Traceability Matrix
 
-The [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) maintains a **Requirement Traceability Matrix (RTM)** precisely because it operates under HIPAA — every regulatory requirement has to trace to a specific test, on the record, not just "we probably covered that." That's the exact capability Xray and Zephyr Scale both advertise as "Traceability Matrix: Requirements ↔ Tests ↔ Defects" in the comparison table above.
+Picture a health-insurance claims platform spanning four separate portals — Provider, Payer, Employer, and Member — operating under HIPAA. A HIPAA auditor doesn't accept "we're pretty sure that requirement was tested"; they want a paper trail: this regulatory requirement traces to this exact test, which ran against this exact build, with this exact result, on the record. So when requirement `REQ-CLAIM-042` (claims must show a consistent status across every portal) needs proof of coverage, the QA Lead needs to produce, unambiguously: "Requirement REQ-CLAIM-042 → Test HIP-TC-018 → executed in Build #217 → Passed → linked defect BUG-HIP-6014 (Member portal showed 'Final' while Payer still showed 'Need Review') → Fixed → retested → Passed." That's the exact capability Xray and Zephyr Scale both advertise as "Traceability Matrix: Requirements ↔ Tests ↔ Defects" in the comparison table above.
 
-For a platform like this, the choice tips toward **Zephyr Scale** or **Xray** over Native JIRA specifically because an auditor doesn't accept "we linked some issues informally" — they want a report that says, unambiguously, "Requirement REQ-CLAIM-042 → Test HIP-TC-018 → executed in Build #217 → Passed → linked defect BUG-HIP-6014 → Fixed → retested → Passed." Native JIRA's manual issue-linking (⚠️ in the comparison table) can produce the same chain, but only a dedicated plugin's built-in report can generate it on demand without someone manually reconstructing the chain link by link before every audit.
+For a platform like this, the choice tips toward **Zephyr Scale** or **Xray** over Native JIRA specifically because an auditor doesn't accept "we linked some issues informally" — they want that chain generated on demand, not assembled by hand under audit pressure. Native JIRA's manual issue-linking (⚠️ in the comparison table) can technically produce the same chain, but only a dedicated plugin's built-in report can generate it without someone manually reconstructing the chain link by link before every audit.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> Native JIRA's issue-linking can technically build the same Requirement → Test → Defect chain as Xray or Zephyr Scale. So why does the comparison table mark Native JIRA's Traceability Matrix row with a ⚠️ instead of a plain ❌?</summary>
@@ -1605,9 +1613,11 @@ Before closing a sprint, ensure:
 
 ### Real Example: Best Practice #5 Is Already Standard Practice in the Portfolio
 
-Best Practice #5 above says: create a custom **Severity** field separate from **Priority**, because they measure different things. This isn't a theoretical recommendation — every one of the portfolio repos already follows it. The [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine), [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine), and [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) all define the identical severity scale — **Minor, Major, Critical, Blocker** — as a first-class field on every defect, independent of whatever priority/urgency label a triage meeting might separately assign.
+Best Practice #5 above says: create a custom **Severity** field separate from **Priority**, because they measure different things. This isn't a theoretical recommendation — picture a QA engineer who spends Monday triaging ledger bugs on a merchant-collection platform, then Tuesday gets pulled onto a payout platform to help clear a backlog before a release. She doesn't have to relearn what "Critical" means on the new project, because both platforms — and a healthcare claims platform besides — enforce the identical four-point severity scale: **Minor, Major, Critical, Blocker**, as a first-class field on every defect, completely independent of whatever priority/urgency label a triage meeting separately assigns. A ledger discrepancy on the collection side and a beneficiary paid twice on the payout side both earn "Critical" or above for the same underlying reason — audit and financial-correctness risk — not because someone eyeballed each one and picked a number that felt right that day.
 
-That consistency is itself a best practice: a QA engineer moving from the Collection Engine to the Payout Engine doesn't have to relearn what "Critical" means — it's the same bar (audit/financial-correctness risk) in both places. That's what a shared, disciplined severity scale buys a growing QA org: comparable metrics across projects instead of every team inventing its own five-point scale.
+That consistency is itself a best practice: it's what a shared, disciplined severity scale buys a growing QA org — comparable metrics across projects instead of every team inventing its own five-point scale from scratch.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> · <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a> · <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Galaxy Brain**

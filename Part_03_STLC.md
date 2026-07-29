@@ -80,19 +80,22 @@ flowchart LR
 ### The Running Example for This Module
 
 Rather than switching to a new toy project every phase, this module walks all six STLC phases
-using **one real portfolio project** as a single worked example: the
-[Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)
-— a SaaS claims platform spanning **four entity types** (Provider, Payer, Employer, Member),
-where the same claim is viewed differently by each portal. It's a genuinely good STLC teaching
-case because every phase maps onto something concrete in a 4-sided system: Requirement Analysis
-has to define what "consistent" means *across four portals*, Environment Setup needs *four test
-personas* instead of one, and Test Execution has to catch defects that only show up when you
-compare views instead of testing any single screen in isolation.
+using **one real portfolio project** as a single worked example: a SaaS health insurance claims
+platform spanning **four entity types** (Provider, Payer, Employer, Member), where the same claim
+is viewed differently by each portal. It's a genuinely good STLC teaching case because every phase
+maps onto something concrete in a 4-sided system: Requirement Analysis has to define what
+"consistent" means *across four portals*, Environment Setup needs *four test personas* instead of
+one, and Test Execution has to catch defects that only show up when you compare views instead of
+testing any single screen in isolation.
 
-For **Test Cycle Closure**, we'll bring in a second project — the
-[Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform) —
-for contrast, since its regression-execution-summary tells a slightly different closure story (a
-Critical concurrency defect caught right before release) that's worth comparing against.
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
+
+For **Test Cycle Closure**, we'll bring in a second project — a travel booking marketplace
+(flights, hotels, packages) — for contrast, since its regression-execution-summary tells a
+slightly different closure story (a Critical concurrency defect caught right before release)
+that's worth comparing against.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> Why is a 4-entity claims platform a better STLC teaching example than a typical single-portal e-commerce site?</summary>
@@ -332,17 +335,20 @@ All 250+ requirements are entered into the RTM with unique IDs, module mapping, 
 
 ### Real Example: Requirement Analysis on the Healthcare Insurance Platform
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform):
-early requirement analysis on this platform ran into exactly the kind of ambiguity this section
-warns about. A requirement like "claim status should be consistent for the Member" reads as
-reasonable — until a tester asks "consistent with what, checked how often, by whom?" It only
-became testable once refined (per the platform's
-[`docs/business-overview.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/docs/business-overview.md))
-into something closer to: *"the claim status shown to the Member must match the Payer's
-authoritative status, sourced live or with a bounded cache TTL, verified at the data layer — not
-just visually compared on screen."* That single clarification is the difference between a vague
-requirement and the specific, data-level test case (TC-012 through TC-014 in the regression
-checklist) that later catches real cross-entity bugs.
+Picture a health insurance claims platform where the same claim record is viewed through four
+different doors — a hospital's Provider portal, an insurer's Payer portal, an employer's benefits
+portal, and the patient's own Member portal. Early requirement analysis runs into exactly the kind
+of ambiguity this section warns about: someone writes "claim status should be consistent for the
+Member," and it sounds perfectly reasonable — until a tester pushes back with "consistent with
+what, checked how often, verified by whom?" As written, nobody can build a pass/fail test case
+against it. It only becomes testable once it's rewritten into something far more specific: *"the
+claim status shown to the Member must match the Payer's authoritative status, sourced live or with
+a bounded cache TTL, verified at the data layer — not just visually compared on screen."* That one
+rewrite is the difference between a vague aspiration and a concrete, data-level test case — and
+it's exactly the kind of test case (TC-012 through TC-014 in the project's regression checklist)
+that later catches real cross-entity bugs no single-portal check would ever surface.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 The requirement-review checkpoints from the table above map directly onto this project:
 
@@ -353,12 +359,17 @@ The requirement-review checkpoints from the table above map directly onto this p
 | **Testability** | "The platform should keep claim data in sync" was refined into the measurable, data-level requirement described above |
 | **Traceability** | Every claim-status requirement was assigned an ID feeding the RTM the QA team maintained every release |
 
-For contrast, the [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
-shows the same discipline applied to a very different ambiguity: "the price shown should be the
-price charged" sounds obvious, but only becomes testable once scoped to *"the amount charged at
-payment time must equal the fare-locked price captured at selection time, within the hold
-window"* — a requirement precise enough to design a test case against (and, as its regression
-summary shows, precise enough to later catch a real stale-price defect).
+For contrast, picture a completely different kind of ambiguity on a travel booking marketplace
+selling flights, hotels, and packages: "the price shown should be the price charged" sounds so
+obvious that nobody would think to question it — until someone asks what happens in the gap
+between a traveler selecting a fare and actually paying for it. Prices move, currency conversions
+round differently, and hold windows expire. The requirement only becomes testable once it's scoped
+precisely: *"the amount charged at payment time must equal the fare-locked price captured at
+selection time, within the hold window."* That rewritten requirement is precise enough to design a
+real test case against — and, on this project, precise enough to later catch an actual stale-price
+defect before release.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Distracted Boyfriend**
@@ -690,9 +701,13 @@ flowchart TD
 
 ### Real Example: Test Planning on the Healthcare Insurance Platform
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform):
-the test strategy for this platform had to answer the six Test Plan questions with a 4-entity
-system in mind, not a single-portal one:
+Imagine sitting down to write a test strategy for a claims platform that four completely different
+audiences depend on — a hospital's billing team, an insurer's claims reviewers, an employer's HR
+department administering a group health plan, and the patients themselves — all looking at the
+same underlying claim through four separate portals. The six standard Test Plan questions don't
+get easier to answer just because there's more surface area; they get harder, because "who tests
+it" and "what if something goes wrong" now have to account for four systems that all have to agree
+with each other, not just work correctly in isolation:
 
 | Test Plan Question | Answer on this project |
 |---|---|
@@ -703,10 +718,13 @@ system in mind, not a single-portal one:
 | **Where**? | UAT environment seeded with dummy claims already in each of the three statuses (Final/Need Review/Rejected) |
 | **What if** something goes wrong? | Highest risk explicitly called out in planning: the Claims Engine is read by all four portals, so a single stale-cache defect there has a four-portal blast radius (this became the actual root cause of BUG-HIP-6014, covered later in Test Execution) |
 
-Note the tool selection matches the platform's real stack — Playwright + TypeScript for UI
-automation, REST Assured/Postman for API CRUD coverage, and direct SQL for data-level checks —
-which only makes sense once the test strategy has explicitly decided that "the UI looks right" is
-not sufficient evidence for this platform; the underlying claim record has to be checked too.
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
+
+Note the tool selection matches a real stack built for exactly this problem — Playwright +
+TypeScript for UI automation, REST Assured/Postman for API CRUD coverage, and direct SQL for
+data-level checks — which only makes sense once the test strategy has explicitly decided that "the
+UI looks right" is not sufficient evidence for this platform; the underlying claim record has to
+be checked too.
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> Why does the Healthcare Insurance Platform's test strategy include direct SQL/data-level testing as a first-class technique, when most web apps are tested through the UI alone?</summary>
@@ -990,10 +1008,10 @@ flowchart TD
 
 ### Real Example: Test Case Development on the Healthcare Insurance Platform
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)'s
-[`regression-checklist.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/regression-checklist.md):
-the same test-case-design disciplines above — one technique per risk, not one technique for
-everything — show up directly in how this suite is organized by category rather than by screen:
+Picture the regression checklist for that same four-portal claims platform. Instead of one
+technique applied uniformly across every screen, each cluster of test cases is deliberately
+matched to the specific risk it exists to catch — the same test-case-design disciplines covered
+above show up directly in how the suite is organized by category, not by screen:
 
 | TC ID | Scenario | Technique Used | Why |
 |---|---|---|---|
@@ -1009,6 +1027,8 @@ sense — its *test data* is a single claim ID, and its *steps* are "check four 
 and diff them." This is exactly the kind of test case that only gets written if Requirement
 Analysis explicitly called out cross-entity consistency as testable (see 3.2 above) — otherwise a
 test designer defaults to testing each portal in isolation and never designs this case at all.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a> (<a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/regression-checklist.md" target="_blank" rel="noopener noreferrer">regression-checklist.md</a>)
 
 > [!TIP]
 > **🎭 Meme Break — Expanding Brain**
@@ -1220,11 +1240,11 @@ flowchart TD
 
 ### Real Example: Test Environment Setup on the Healthcare Insurance Platform
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform):
-this is the phase where the platform's 4-entity model has the most direct, practical impact on
-STLC. A single-portal application typically needs one test-user persona per role (admin,
-standard user). This platform needs **four independent personas layered on the same test data**,
-because every phase downstream depends on being able to see one claim from four different seats:
+Picture standing up the test environment for that same four-portal claims platform. This is the
+phase where the four-entity model has the most direct, practical impact on STLC. A single-portal
+application typically needs one test-user persona per role (admin, standard user). This platform
+needs **four independent personas layered on the same test data**, because every phase downstream
+depends on being able to see one claim from four different seats:
 
 | Entity | Test Persona Needed | What Must Be Seeded For It |
 |---|---|---|
@@ -1244,6 +1264,8 @@ test strategy from 3.3 already committed to data-level validation as a first-cla
 This mirrors — and reinforces — the MedConnect example above: both are healthcare platforms where
 "realistic but synthetic test data, seeded across every role that needs to see it" is the hard
 part of environment setup, not the server stack itself.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 > [!WARNING]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -1555,9 +1577,8 @@ Pass rate now exceeds the 95% threshold. All Critical defects are fixed and veri
 
 ### Real Example: Test Execution on the Healthcare Insurance Platform
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)'s
-[`sample-defect-report.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/sample-defect-report.md):
-this is what executing TC-009 (cross-entity consistency) actually found.
+Picture running TC-009 — the cross-entity consistency check — against a live build of that
+four-portal claims platform. This is what it actually found.
 
 **BUG-HIP-6014** — *Member portal shows claim as "Final" while Payer portal still shows "Need
 Review"* — Severity: **Critical**
@@ -1577,6 +1598,8 @@ recorded* — Severity: **Major**
 - **Actual:** the Provider portal's claim detail view simply hadn't been updated to read the
   rejection-reason field when it was added to the schema, even though the Member portal displayed
   it correctly.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a> (<a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">sample-defect-report.md</a>)
 
 Mapping this onto the generic execution/defect workflow above: both defects were caught by test
 cases specifically designed to *compare across portals* (TC-009, TC-020), not by any single-portal
@@ -1831,16 +1854,17 @@ flowchart TD
 Closure is easiest to understand by comparing two real, differently-shaped test cycles side by
 side.
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)
-(cumulative, across the engagement): **350+ defects** raised in JIRA with a **95%+ resolution
-rate** within sprint cycles, **85%+ automation coverage** across critical claim workflows, and a
-**25% reduction** in overall release cycle time attributed to early defect detection and
-shift-left testing — plus an RTM maintained every single sprint, so "100% requirement coverage"
-in a closure report isn't a one-time claim, it's a standing one.
+Picture closing out a full release engagement on that four-portal claims platform, cumulatively,
+across every sprint: **350+ defects** raised in JIRA with a **95%+ resolution rate** within sprint
+cycles, **85%+ automation coverage** across critical claim workflows, and a **25% reduction** in
+overall release cycle time attributed to early defect detection and shift-left testing — plus an
+RTM maintained every single sprint, so "100% requirement coverage" in a closure report isn't a
+one-time claim, it's a standing one.
 
-→ Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)'s
-[`regression-execution-summary.md`](https://github.com/ghanendra-sdet/travel-marketplace-platform/blob/main/regression-execution-summary.md)
-(one regression cycle):
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
+
+Now picture a very different closure moment — the end of a single regression cycle on a travel
+booking marketplace, days before a release, rather than a whole engagement's cumulative record:
 
 | Metric | Value |
 |---|---|
@@ -1852,13 +1876,14 @@ in a closure report isn't a one-time claim, it's a standing one.
 | Critical Defects | 1 (concurrent double-booking in Overbooking Prevention) |
 | Major Defects | 1 (stale-price payment defect in Fare Lock & Booking) |
 
+→ Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a> (<a href="https://github.com/ghanendra-sdet/travel-marketplace-platform/blob/main/regression-execution-summary.md" target="_blank" rel="noopener noreferrer">regression-execution-summary.md</a>)
+
 The Travel Marketplace cycle's 89.4% pass rate is below the generic 95% exit-criteria threshold
 used earlier in this section — and that's the point of a closure report: it doesn't hide the
 number, it explains it. The summary's own conclusion calls out that the single Critical defect
 (concurrent double-booking) is exactly the risk the test strategy was built to catch, since the
-platform's [`docs/business-overview.md`](https://github.com/ghanendra-sdet/travel-marketplace-platform/blob/main/docs/business-overview.md)
-identifies price/availability integrity as the module's central risk — so catching it here,
-before release, is the closure phase doing its job, not a red flag to hide.
+platform's business overview names price/availability integrity as the module's central risk —
+so catching it here, before release, is the closure phase doing its job, not a red flag to hide.
 
 **The contrast worth remembering:** the Healthcare platform's numbers describe *release cadence
 across many sprints*; the Travel Marketplace numbers describe *one regression cycle's health*.

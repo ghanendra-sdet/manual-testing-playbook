@@ -126,9 +126,8 @@ The system accepts ages from 18 to 65 for a standard life insurance policy.
 **The Same Idea, Real Money on the Line — Transfer-Mode Limits (Fintech Payout Engine)**
 
 The insurance-age example above is the textbook version. Here's the same technique against a
-target where getting the boundary wrong moves real money: the
-[Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) sends merchant
-funds out via **IMPS, NEFT, or RTGS**, and — critically — each mode has independent limits and
+target where getting the boundary wrong moves real money: a merchant payout engine that sends
+merchant funds out via **IMPS, NEFT, or RTGS**, and — critically — each mode has independent limits and
 commercial rules, so *the same amount can be valid on one mode and invalid on another*. That
 single fact is a BVA test design in disguise.
 
@@ -149,7 +148,7 @@ transaction. No amount boundary was crossed at all — the dividing line that br
 adjacent *modes*, which is exactly what BVA thinking generalizes to once you stop assuming
 boundaries only live on a number line.
 
-> → Real example from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine)
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a>
 
 > [!TIP]
 > **🎭 Meme Break — Distracted Boyfriend**
@@ -432,7 +431,7 @@ A tester knows:
 
 #### The Same Grey-Box Approach, Real Domain — BBPS Bill Fetch/Pay APIs
 
-A grey-box tester on the [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)
+A grey-box tester on a real bill-payment aggregation platform
 knows:
 - The bill-fetch endpoint calls out live to an external biller for the current outstanding amount
 - The payment-rail resolution logic: an internal Payout/Connected Banking rail if the merchant has
@@ -447,7 +446,7 @@ knows:
 | Fetch, wait, then pay | Fetch a bill, artificially delay, then pay | 1. API either re-fetches or flags the amount as stale (**black box**) 2. No silent charge of an outdated figure (**grey-box knowledge of the staleness rule**) |
 | Biller timeout during fetch | Simulate a biller-side timeout | 1. API returns a clear error, not a stale cached amount (**black box**) 2. No transaction record is created for a failed fetch (**grey-box: verifying nothing silently persisted**) |
 
-> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 
 #### Comprehensive Comparison: Black Box vs. White Box vs. Grey Box
 
@@ -728,9 +727,8 @@ A small internal tool with 5 modules (UI, Auth, Database, Reports, Notifications
 
 Textbook integration testing picks two adjacent layers (UI → API, API → DB). In a real
 microservice platform, the harder part is knowing *which* of dozens of service boundaries actually
-deserves dedicated integration test coverage. The
-[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) documents
-its integration test boundaries explicitly rather than leaving them implicit:
+deserves dedicated integration test coverage. A real merchant collection engine's QA strategy
+documents its integration test boundaries explicitly rather than leaving them implicit:
 
 | Boundary | What to Verify |
 |---|---|
@@ -747,7 +745,7 @@ right number); a unit test on Ledger Service in isolation would also pass (it co
 whatever debit event it receives). Only a test spanning *both* services — a true integration test
 — can catch "the second service never received an event at all."
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!IMPORTANT]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -891,8 +889,7 @@ Before deploying a new CRM system:
 
 Not every "does this meet business needs" check maps neatly onto Alpha/Beta/Contract/Regulation/OAT
 — but the underlying UAT question ("would a real business stakeholder or real user accept this?")
-applies just as directly to the
-[Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform). Its
+applies just as directly to a real flight/hotel booking marketplace. Its
 core business promise, stated in the product's own docs, is that only one traveler can ever
 successfully confirm a booking against a given limited inventory unit, and that the amount charged
 at payment time must always match the fare-locked price shown at selection time.
@@ -910,7 +907,7 @@ This is the essence of UAT even outside its five formal categories: a business s
 asking "does the fare-lock code pass its unit tests?" — they're asking **"can I stand behind this
 system in front of a customer who just got charged the wrong price?"**
 
-> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 ### Key Takeaways — Section B
 
@@ -987,8 +984,7 @@ Functional testing is based on the **specification** — the defined behavior of
 #### The Same Checklist Idea, Real Fields — HRMS Employee Self-Service (ESS)
 
 The e-commerce checklist above is the generic pattern. Here's what functional testing looks like
-against a real, narrower-but-deeper target: the
-[HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s Employee Self-Service (ESS /
+against a real, narrower-but-deeper target: an HRMS platform's Employee Self-Service (ESS /
 MyInfo) module — the form every employee in a company fills out to manage their own personal
 details. Because this single form is used by *every* employee, field-level correctness carries
 outsized weight.
@@ -1012,7 +1008,7 @@ company-wide data-integrity problem, not a one-user inconvenience. Manual functi
 pre-release**, and the team shipped with **zero critical defects escaping to production** across
 payroll-adjacent modules.
 
-> → Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>
 
 > [!NOTE]
 > **🎭 Meme Break — Expanding Brain**
@@ -1142,7 +1138,7 @@ The term comes from electronics: when you power on a new circuit board, if it do
 
 #### Real-World Example — Post-Deployment Smoke Check (Reseller Management Platform)
 
-The [Reseller Management Platform](https://github.com/ghanendra-sdet/reseller-management-platform)
+A real reseller/partner management platform
 runs a post-deployment health check after every release — the smoke-testing pattern applied to a
 genuinely multi-tenant system, where "critical path" means something slightly sharper than in a
 single-tenant app: it's not enough that the dashboard loads, it has to load *scoped correctly*.
@@ -1160,7 +1156,7 @@ reseller's merchants — the build is rejected immediately. Nobody proceeds to d
 multi-tenancy regression testing on a build where the basic scoping layer is visibly broken;
 that's the equivalent of checking paint color on a car that won't start.
 
-> → Real example from [Reseller Management Platform](https://github.com/ghanendra-sdet/reseller-management-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/reseller-management-platform" target="_blank" rel="noopener noreferrer">Reseller Management Platform</a>
 
 ---
 
@@ -1223,7 +1219,7 @@ Notice this sanity test does **not** re-run the entire onboarding-to-revenue-rep
 would be regression testing. It stays narrow: the toggle fix itself, plus the two or three screens
 that share the same underlying scoping query.
 
-> → Real example from [Reseller Management Platform](https://github.com/ghanendra-sdet/reseller-management-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/reseller-management-platform" target="_blank" rel="noopener noreferrer">Reseller Management Platform</a>
 
 ### Detailed Comparison: Smoke Testing vs. Sanity Testing
 
@@ -1293,8 +1289,7 @@ Since running the entire test suite for every change may not be feasible (time, 
 #### The Same Idea at Real Scale — Fintech Collection Engine's 64-Case Regression Suite
 
 The banking-app table above illustrates *why* teams scope down from "run everything" to "run
-what's actually impacted." The
-[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s real
+what's actually impacted." A real merchant collection engine's
 regression suite shows what that scoping looks like once you stop hand-waving and actually write
 the 64 test cases out. Its highest-priority "Merchant Regression Flow" runs on every release,
 annotated with what's actually being validated at each step — because the real defect pattern in
@@ -1335,7 +1330,7 @@ Transaction Details, Settlement) are automated so far — the rest exist as docu
 cases, a realistic snapshot of where most regression suites actually sit: partially automated,
 prioritized by the highest-traffic path first.
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!WARNING]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -1492,8 +1487,8 @@ application code** — Collection Engine hit database connection pool saturation
 hit Redis queue memory saturation. Neither report blamed the business logic, and both explicitly
 called that out as a capacity-planning finding rather than a code defect.
 
-> → Real examples from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
-> and [Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
+> · <a href="https://github.com/ghanendra-sdet/fintech-connected-banking-platform" target="_blank" rel="noopener noreferrer">Connected Banking Platform</a>
 
 ---
 
@@ -1539,7 +1534,7 @@ pushing further. That's the load-testing discipline working as intended — vali
 load, and stop at the first sign of exceeding it, rather than wandering into stress-test territory
 mid-run.
 
-> → Real example from [Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-connected-banking-platform" target="_blank" rel="noopener noreferrer">Connected Banking Platform</a>
 
 ---
 
@@ -1574,9 +1569,8 @@ mid-run.
 #### What a Real Breaking Point Looks Like (Even From a Load Test)
 
 The streaming-service table above is the textbook shape of a stress test: push past normal, watch
-it degrade, find the breaking point, confirm recovery. The
-[Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)'s
-load test wasn't designed as a stress test — but its termination event is a genuine real-world
+it degrade, find the breaking point, confirm recovery. A real multi-bank connected-banking
+platform's load test wasn't designed as a stress test — but its termination event is a genuine real-world
 example of exactly the "breaking point" concept this section is about:
 
 | Stress-Testing Concept | What Actually Happened |
@@ -1591,7 +1585,7 @@ planning issue, not a software defect."* Knowing how to tell those two things ap
 digging until you can name the actual bottleneck instead of stopping at "it broke" — is the real
 skill stress testing is meant to build.
 
-> → Real example from [Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-connected-banking-platform" target="_blank" rel="noopener noreferrer">Connected Banking Platform</a>
 
 > [!CAUTION]
 > **🎭 Meme Break — Galaxy Brain**
@@ -1657,8 +1651,8 @@ The **Open Web Application Security Project (OWASP)** defines the top 10 most cr
 
 #### Real-World Example — Consent Revocation Integrity (YOBO Account Aggregator)
 
-Most of the OWASP Top 10 above is about keeping attackers *out*. The
-[YOBO](https://github.com/ghanendra-sdet/yobo) Account Aggregator platform has an additional,
+Most of the OWASP Top 10 above is about keeping attackers *out*. A real consent-based Account
+Aggregator platform has an additional,
 narrower security surface that's just as critical: making sure data stops flowing to a party the
 user *explicitly, correctly authorized* the instant they revoke that authorization.
 
@@ -1678,7 +1672,7 @@ fetch initiation — is a small code change with an outsized effect: it turns re
 something that can only block *future* requests into something that can interrupt an *in-flight*
 one, which is the actual guarantee the product promises its users.
 
-> → Real example from [YOBO](https://github.com/ghanendra-sdet/yobo)
+> → Reference: <a href="https://github.com/ghanendra-sdet/yobo" target="_blank" rel="noopener noreferrer">YOBO</a>
 
 > [!WARNING]
 > **🎭 Meme Break — Drake Hotline Bling**
@@ -1711,8 +1705,8 @@ one, which is the actual guarantee the product promises its users.
 
 #### Real-World Example — Usability Meets Integrity (LMS Platform)
 
-Usability testing usually asks "is this pleasant and intuitive to use?" The
-[LMS Platform](https://github.com/ghanendra-sdet/lms-platform) is a good illustration of usability
+Usability testing usually asks "is this pleasant and intuitive to use?" A real Learning
+Management System is a good illustration of usability
 testing colliding with a *correctness* concern, because its output is a credential: the platform
 must be able to prove a learner genuinely engaged with material, not just that a progress bar
 visually reached 100%.
@@ -1730,7 +1724,7 @@ progress bar look nice" — it's "does what the progress bar communicates match 
 happened," because a misleading progress indicator on a certification platform isn't a cosmetic
 flaw, it's a false statement about a credential.
 
-> → Real example from [LMS Platform](https://github.com/ghanendra-sdet/lms-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/lms-platform" target="_blank" rel="noopener noreferrer">LMS Platform</a>
 
 ---
 
@@ -1788,8 +1782,8 @@ flaw, it's a false statement about a credential.
 
 #### Real-World Example — Cross-Device Price Consistency (Travel Marketplace)
 
-Compatibility testing isn't only "does the button render correctly on Safari." On the
-[Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform), the
+Compatibility testing isn't only "does the button render correctly on Safari." On a real flight/
+hotel booking marketplace, the
 same booking has to look and behave identically whether a traveler is on a laptop browser or a
 phone browser — because price, booking status, and fare-lock countdown all have to agree
 everywhere, on every device, or the platform's core promise (charged price == fare-locked price)
@@ -1807,7 +1801,7 @@ booking platform reselling third-party inventory it doesn't own has to be *espec
 about what it displays, since it's already asking users to trust numbers sourced from an external
 supplier API.
 
-> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 ---
 
@@ -2193,7 +2187,7 @@ a system test could stub the biller response and still pass; an E2E test has to 
 fetch-to-settlement chain holds together when the amount, the rail, and the fee all have to agree
 by the time money actually moves.
 
-> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)
+> → Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 
 ### Key Takeaways — Section F
 

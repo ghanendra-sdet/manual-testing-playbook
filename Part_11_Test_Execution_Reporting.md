@@ -94,11 +94,11 @@ flowchart TD
 
 ### Real-World Example — Why the Readiness Checklist Actually Matters
 
-The prerequisites table above isn't theoretical — it shows up directly in real regression cycles. Two portfolio regression runs each logged exactly one **Blocked** test case, and in both cases the cause traces straight back to Prerequisite #4 (Test Environment Ready), not a code defect:
+The prerequisites table above isn't theoretical — it shows up directly in real regression cycles. Two portfolio regression runs each logged exactly one **Blocked** test case, and in both cases the cause traces straight back to Prerequisite #4 (Test Environment Ready), not a code defect.
 
-> → Real example from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine): the regression cycle blocked 1 of 18 "Payout — IMPS/NEFT/RTGS" test cases because the RTGS test environment limit was not configured — an environment setup gap, not an application bug.
->
-> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform): the regression cycle blocked 1 Settlement test case because the test settlement window was not configured — again, an environment readiness gap, caught only because the team tracked Blocked separately from Failed.
+Picture a payout regression suite of 18 "Payout — IMPS/NEFT/RTGS" test cases. Seventeen run clean. The eighteenth, an RTGS transfer above the standard limit, never even gets a verdict — the tester opens the case, follows the steps, and hits a wall before the application even has a chance to respond: the test environment's RTGS limit configuration was simply never set. Nobody wrote a line of bad code here; the environment itself wasn't ready for that test case to run. In a separate cycle on a bill-payment platform, the same story plays out with a Settlement test case: the tester can't verify a settlement window scenario because the test settlement window itself was never configured in that environment. Same root cause, different domain — Prerequisite #4, silently skipped.
+
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a> and <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 
 Neither of these cost a wasted afternoon debugging phantom application behavior, because the team correctly filed them as **Blocked** (environment issue) instead of **Failed** (code defect) — the metrics stayed honest and the fix routed straight to DevOps instead of a developer chasing a bug that didn't exist.
 
@@ -336,7 +336,7 @@ consistently.
 ─────────────────────────────────────────
 ```
 
-→ Full source: [Fintech Payout Engine — sample-defect-report.md](https://github.com/ghanendra-sdet/fintech-payout-engine/blob/main/sample-defect-report.md), Defect #1. Notice this defect never shows up as a broken screen — a tester who only clicked through the UI would never find it. It only surfaces when the test execution plan explicitly includes API-level testing alongside UI testing, which is exactly why "execute the API layer, not just the UI" belongs in Step 4's priority-order thinking for any module touching money movement.
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">Fintech Payout Engine — sample-defect-report.md</a>, Defect #1. Notice this defect never shows up as a broken screen — a tester who only clicked through the UI would never find it. It only surfaces when the test execution plan explicitly includes API-level testing alongside UI testing, which is exactly why "execute the API layer, not just the UI" belongs in Step 4's priority-order thinking for any module touching money movement.
 
 > [!WARNING]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -396,7 +396,9 @@ After all execution cycles are complete, update the status of every test case in
 | TC-RPT-007 | Sales report export | Blocked | Pass | Pass |
 
 > [!NOTE]
-> Real portfolio regression trackers follow the exact same idea at smaller scale — the [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform) regression cycle tracked "Profile Picture Upload" as 3 test cases with a final status of 1 Pass / 2 Fail (a field-access-control bypass and a file-size validation gap), while the [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) cycle tracked "Beneficiary Management" at 14 test cases, 12 Pass / 2 Fail. The tracker doesn't need to be fancy — it needs to show, per area, exactly how many cases reached a final Pass so a reviewer can see quality at a glance.
+> Real portfolio regression trackers follow the exact same idea at smaller scale. Picture an HR self-service tester running "Profile Picture Upload" through three cycles: Cycle 1 turns up a field-access-control bypass, Cycle 2 turns up a file-size validation gap, and by the final cycle the tracker settles at 1 Pass / 2 Fail out of 3 cases — two genuine defects caught, not noise. On a payout platform's tracker, "Beneficiary Management" runs wider — 14 test cases across the add/edit/approve flow — and lands at 12 Pass / 2 Fail by the final cycle. The tracker doesn't need to be fancy — it needs to show, per area, exactly how many cases reached a final Pass so a reviewer can see quality at a glance.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a> and <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a>
 
 ---
 
@@ -437,7 +439,9 @@ A test case is **Blocked** when it cannot be executed due to an external depende
 | **Missing Feature** | Feature not yet developed | Mark as Not Executable, remove from current cycle |
 | **Access Issue** | No permissions for admin panel | Request access from project admin |
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): the "Anomaly Detection & Negative Testing" area had 1 of 3 test cases Blocked because fraud-pattern test data wasn't seeded in that cycle — a textbook **Missing Test Data** blocker, not a defect in the anomaly-detection logic itself.
+> Picture a tester assigned to the "Anomaly Detection & Negative Testing" area of an AI dispute-resolution copilot, with 3 test cases lined up to verify the fraud-pattern detector flags suspicious dispute claims correctly. Two cases run fine. The third needs a specific seeded fraud pattern in the test data — and that pattern was never loaded into the environment for this cycle. The tester can't reach a verdict on whether the anomaly-detection logic itself works, because the input it needs to detect was never planted. Filed as Blocked, not Failed — a textbook **Missing Test Data** blocker.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
 
 > [!NOTE]
 > Blocked test cases should be tracked separately and reviewed daily. The QA Lead must follow up on blockers and ensure they are resolved before the end of the execution cycle. Persistently blocked test cases inflate the "Not Executed" count and can delay the release decision.
@@ -676,9 +680,9 @@ Testing for Sprint 22 commenced on November 11 with build v3.2.1-RC1. Smoke test
 
 ### Real-World Example — A Lightweight Status Report in Practice
 
-The Daily and Weekly templates above are the full, formal version — appropriate for a 485-test-case, multi-week enterprise release. Most regression cycles don't need that much ceremony. Here is what an actual, right-sized status report looks like for a portfolio-scale regression cycle:
+The Daily and Weekly templates above are the full, formal version — appropriate for a 485-test-case, multi-week enterprise release. Most regression cycles don't need that much ceremony. Picture a QA lead on a bill-payment aggregation platform closing out a regression cycle covering biller categories, bill fetch, and payment: 42 test cases run, 39 pass, 2 fail, 1 is blocked, landing at a 92.9% pass rate. Instead of stopping there, the report's conclusion names the pattern behind the two failures directly — both trace back to stale bill amounts, one on the fetch side and one on the payment side, meaning a customer could pay against an amount that had already changed by the time they confirmed. That single sentence tells a reviewer more than the raw 92.9% ever could.
 
-> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform):
+> → Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 >
 > | Metric | Value |
 > |---|---|
@@ -687,8 +691,6 @@ The Daily and Weekly templates above are the full, formal version — appropriat
 > | Failed | 2 |
 > | Blocked | 1 |
 > | Pass Rate | 92.9% |
->
-> Followed by a one-paragraph conclusion naming the *theme* behind the failures ("stale bill amounts, both fetch-side and payment-side"), not just the raw count.
 
 Both reports answer the exact same three questions the Daily/Weekly templates ask — how much got done, what's the pass rate, and what's the story behind the failures — just scaled to the size of the effort. A report doesn't need eleven modules and a 400-row test suite to be useful; it needs to answer those three questions honestly, every time.
 
@@ -984,9 +986,11 @@ The QA team recommends proceeding with the release of ShopEasy v3.2.1 with the f
 
 ### Real Test Summary / Regression Execution Reports — Portfolio Examples
 
-The ShopEasy TSR above is the textbook IEEE 829 version — nine formal sections, signatures, the works. In practice, most teams produce a condensed version of the same document for each regression cycle: an **Execution Overview**, **Results by Area**, a **Defect Summary**, and a **Conclusion** with a release-readiness call. It's the same substance in a smaller package. Here are four real, worked examples from this portfolio's regression cycles — read them as "what section 3, 4, and 7 of a TSR actually look like when someone fills them in for real, at project scale":
+The ShopEasy TSR above is the textbook IEEE 829 version — nine formal sections, signatures, the works. In practice, most teams produce a condensed version of the same document for each regression cycle: an **Execution Overview**, **Results by Area**, a **Defect Summary**, and a **Conclusion** with a release-readiness call. It's the same substance in a smaller package. Here are four narrated scenarios drawn from this portfolio's regression cycles — read them as "what section 3, 4, and 7 of a TSR actually look like when someone fills them in for real, at project scale":
 
-> → Real example from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine):
+Picture the QA lead on a merchant payout platform wrapping up a regression cycle: 68 test cases across the IMPS/NEFT/RTGS payout flow, 64 pass, 3 fail, 1 is blocked — a 94.1% pass rate that would look great on a dashboard. But two of those three failures aren't cosmetic: one is a critical defect where the payout API skips the beneficiary-approval check that the UI enforces, and the other is a major commercial-calculation defect in fee computation. The conclusion the lead writes doesn't hide behind the headline number — it states plainly that both defects are prioritized for fix-and-retest before sign-off. A 94.1% pass rate looks strong in isolation, but see the Quick Check below for why this cycle is still a hard **No-Go** as written.
+
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a>
 >
 > | Metric | Value |
 > |---|---|
@@ -996,20 +1000,28 @@ The ShopEasy TSR above is the textbook IEEE 829 version — nine formal sections
 > | Blocked | 1 |
 > | Pass Rate | 94.1% |
 > | Defects — Critical / Major / Minor | 1 / 1 / 1 |
->
-> **Conclusion:** "The regression cycle surfaced one critical defect related to API-level approval enforcement... and one major commercial-calculation defect. Both were prioritized for fix-and-retest before sign-off." A 94.1% pass rate looks strong in isolation — but see the Quick Check below for why this cycle is still a hard **No-Go** as written.
 
-> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform): 42 test cases, 39 Passed, 2 Failed, 1 Blocked (92.9% pass rate). Conclusion names the defect *theme* directly: "stale bill amounts — as both a fetch-side and payment-side gap" — treated as a first-class regression scenario rather than an edge case, because paying against a stale amount is a financial-correctness issue, not a cosmetic one.
+On the bill-payment platform's regression cycle, 42 test cases run to 39 Passed, 2 Failed, 1 Blocked — 92.9%. Rather than stopping at the number, the conclusion names the *theme* behind the two failures directly: stale bill amounts, showing up on both the fetch side and the payment side. Treated as a first-class regression finding, not an edge case, because letting a customer pay against a bill amount that already changed is a financial-correctness problem.
 
-> → Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform): only 10 test cases this cycle, 8 Passed, 2 Failed (80% pass rate) — the smallest and lowest-pass-rate cycle in the portfolio. Both failures were on Profile Picture Upload: a field-access-control bypass (Critical) and a file-size validation gap (Major). The conclusion is explicit that these "are exactly the defect classes this module's QA strategy is built to catch through field-by-field GUI validation rather than happy-path-only testing."
+> → Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): 69 test cases, 63 Passed, 5 Failed, 1 Blocked (91.3% pass rate). This report also tracks a **product-specific metric**, not just pass/fail: "AI-only resolution rate (aggregate): target ~80%, observed 78.6%." On its own, 78.6% vs. an 80% target looks like a minor miss — until the report explains the aggregate number was hiding a much bigger, single-product problem (see the Quick Check below).
+Now picture the smallest, lowest-pass-rate cycle in the whole portfolio: an HR self-service regression run of just 10 test cases, 8 Passed, 2 Failed — 80%. Both failures land on the same feature, Profile Picture Upload: an employee can bypass field-access control, and a file-size validation check doesn't fire. Ten cases isn't a large sample, but the conclusion doesn't apologize for that — it states outright that catching exactly these two defect classes, through deliberate field-by-field validation rather than happy-path clicking, is the whole point of this module's QA strategy.
 
-**Reporting non-functional results the same way:** a Test Summary Report isn't only for functional pass/fail counts — performance and load results get the same "here's the number, here's what it means" treatment:
+> → Reference: <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) — a 3-hour sustained load test, 40 merchants, 180,000+ transactions: target throughput 45 TPS, achieved ~42–45 TPS stable (60 TPS peak validated), 0.01% error rate, P99 latency 900ms. The bottleneck wasn't application code — it was database connection pool saturation under sustained load, so the recommendation was infrastructure sizing, not a code fix.
->
-> → Real example from [Fintech Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform) — a 1-hour-26-minute load test processing 405,067 transactions at an average 80.2 TPS (100 TPS peak), 0.001% error rate, P95 latency 319ms, P99 1,500ms. The **Final Verdict** line reads: "✅ PASS (with Infrastructure Recommendation)" — the test was stopped by Redis queue memory saturation, an infrastructure capacity limit, not an application defect. The report's one-line executive summary is worth studying as a model of how to compress a whole load test into one sentence a non-technical stakeholder can act on: *"The payment system processed over 4 lakh transactions with sub-second latency for 95% of requests and an error rate of just 0.001%; performance is strong, and the only identified risk is Redis capacity, which is addressable."*
+On an AI-assisted dispute-resolution copilot, the regression cycle runs 69 test cases to 63 Passed, 5 Failed, 1 Blocked — 91.3%. This report doesn't stop at pass/fail; it also tracks a product-specific metric, the AI-only resolution rate: target roughly 80%, observed 78.6%. Read alone, a 1.4-point miss against target looks minor — until the report explains that the aggregate number was masking a much bigger problem concentrated in a single product line (see the Quick Check below for the full picture).
+
+> → Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
+
+**Reporting non-functional results the same way:** a Test Summary Report isn't only for functional pass/fail counts — performance and load results get the same "here's the number, here's what it means" treatment.
+
+Picture a 3-hour sustained load test against a merchant collection engine: 40 merchants hammering the system simultaneously, generating over 180,000 transactions. Target throughput was 45 TPS; the system held a stable 42–45 TPS with a validated 60 TPS peak, an error rate of just 0.01%, and a P99 latency of 900ms. Nothing in the application code buckled — the ceiling the team hit was the database connection pool saturating under sustained concurrent load, so the recommendation that went into the report was infrastructure sizing, not a code fix.
+
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
+
+Now picture a connected-banking platform under an hour-and-26-minute load test, pushing through 405,067 transactions at an average of 80.2 TPS with a 100 TPS peak, an error rate of 0.001%, P95 latency of 319ms, and P99 of 1,500ms. The test didn't end because the application failed — it ended because the Redis queue backing it ran out of memory under the sustained load, a capacity limit, not a defect. The Final Verdict line the team wrote reads "PASS (with Infrastructure Recommendation)," and the one-line executive summary is worth studying as a model of compressing an entire load test into one sentence a non-technical stakeholder can act on: the payment system processed over 4 lakh transactions with sub-second latency for 95% of requests and an error rate of just 0.001%; performance is strong, and the only identified risk is Redis capacity, which is addressable.
+
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-connected-banking-platform" target="_blank" rel="noopener noreferrer">Fintech Connected Banking Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Drake Hotline Bling**
@@ -1095,10 +1107,10 @@ Pass Rate = (456 / 479) × 100 = 95.2%
 
 | Repo | Executed | Passed | Pass Rate | Interpretation Band |
 |---|---|---|---|---|
-| [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) | 68 | 64 | 94.1% | Good quality — review failure severity |
-| [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform) | 42 | 39 | 92.9% | Good quality — review failure severity |
-| [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine) | 69 | 63 | 91.3% | Good quality — review failure severity |
-| [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform) | 10 | 8 | 80.0% | Right at the Moderate/Poor boundary |
+| <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a> | 68 | 64 | 94.1% | Good quality — review failure severity |
+| <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a> | 42 | 39 | 92.9% | Good quality — review failure severity |
+| <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a> | 69 | 63 | 91.3% | Good quality — review failure severity |
+| <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a> | 10 | 8 | 80.0% | Right at the Moderate/Poor boundary |
 
 The HRMS number is the interesting one: 80% sits right on the boundary between "moderate quality" and "poor quality" per the interpretation bands above. Read in isolation, that looks concerning. Read with severity attached — the two failures were a Critical field-access-control bypass and a Major file-size validation gap on a 10-case cycle — it's actually a small, targeted regression run that did exactly its job: it caught two real defects. This is exactly why pass rate is never read alone; see the Quick Check at the end of this section.
 
@@ -1649,9 +1661,9 @@ No — and jumping to that conclusion is exactly the mistake the Expanding Brain
 | 8 | Email not working | Order confirmation email not sent when order is placed using PayPal payment method |
 | 9 | Button doesn't do anything | "Apply Coupon" button is unresponsive on checkout page after removing and re-adding items to cart |
 | 10 | Doesn't work on mobile | "Add to Cart" button falls below the fold and is not visible on iPhone SE (375×667) in portrait mode |
-| 11 | Approval check missing | Payout succeeds via API against a beneficiary still "Pending Approval" — the same check the UI enforces is not enforced at the API layer *(real example, [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine))* |
-| 12 | DOB field editable | Date of Birth field is editable by the ESS employee, contrary to the field-access-control design — an HR-only field is saved without any approval step *(real example, [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform))* |
-| 13 | Mobile number bug | Mobile number change is applied without completing the verification step when the chat is abandoned mid-flow *(real example, [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine))* |
+| 11 | Approval check missing | Payout succeeds via API against a beneficiary still "Pending Approval" — the same check the UI enforces is not enforced at the API layer *(real example, <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a>)* |
+| 12 | DOB field editable | Date of Birth field is editable by the ESS employee, contrary to the field-access-control design — an HR-only field is saved without any approval step *(real example, <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>)* |
+| 13 | Mobile number bug | Mobile number change is applied without completing the verification step when the chat is abandoned mid-flow *(real example, <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>)* |
 
 Notice what all three real "Good" titles share: they name the exact mechanism (API vs. UI, which specific field, what specific condition triggers it), not just the symptom. That's the difference a developer actually feels when triaging a queue of 40 open defects — a title like "Approval check missing" could mean anything; "Payout succeeds via API against a beneficiary still Pending Approval" tells them exactly where to start looking before they've even opened the ticket.
 
@@ -1718,7 +1730,7 @@ FREQUENCY: Reproducible every time when called directly against the API (UI path
 unaffected — the bug is API-layer only)
 ```
 
-→ Real example from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine/blob/main/sample-defect-report.md). Notice the FREQUENCY note calls out something the generic template doesn't have to: *which* entry point reproduces it. That's a direct consequence of best practice #7 ("Specify the environment") extended to API vs. UI — for a defect that only exists at one layer, saying so explicitly saves the developer from wasting time trying to reproduce it through the screen.
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">Fintech Payout Engine — sample-defect-report.md</a>. Notice the FREQUENCY note calls out something the generic template doesn't have to: *which* entry point reproduces it. That's a direct consequence of best practice #7 ("Specify the environment") extended to API vs. UI — for a defect that only exists at one layer, saying so explicitly saves the developer from wasting time trying to reproduce it through the screen.
 
 ### Providing Evidence
 
@@ -1948,7 +1960,7 @@ A **Go/No-Go Decision** is a critical checkpoint where stakeholders collectively
 
 Applying the **Decision Criteria** table above to two real portfolio regression cycles produces two different recommendations, despite both having a strong pass rate:
 
-| Criteria | [Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) | [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform) |
+| Criteria | <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Payout Engine</a> | <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a> |
 |---|---|---|
 | Pass Rate | 94.1% (64/68) | 92.9% (39/42) |
 | Open Critical/Blocker Defects | Module's known defect catalog includes a **Blocker**-severity retry-duplication defect (BUG-PAY-3081 — beneficiary paid twice) | Failures are Major/Minor — stale bill amount handling, no Blocker-class defect |

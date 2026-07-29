@@ -143,9 +143,11 @@ Testers participate in requirements review meetings to identify:
 - Add regression tests incrementally as features are developed
 - Integrate automated tests into the CI/CD pipeline
 
-### Real Example: Shift-Left via Integration-Boundary Testing (Fintech Collection Engine)
+### Real Example: Shift-Left via Integration-Boundary Testing
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): the Collection Engine is built on a **~40-service architecture**, and QA coverage was explicitly designed around the service boundaries most prone to drift — most notably **Settlement Calculation Service → Ledger Service**, the exact boundary where a real defect theme (missing ledger debit entries, e.g. BUG-COL-1042 from Part 1) kept recurring. Instead of waiting for system testing to catch a settlement/ledger mismatch, integration test coverage for that specific boundary was designed early — as soon as the service split was known, before the settlement feature was even code-complete. That's shift-left in practice: the highest-risk *seam* between two services was identified from the architecture itself, not discovered the hard way in a late regression cycle.
+Picture a payment collection platform stitched together from roughly 40 independent services — one calculates what a merchant is owed after fees and GST, another writes that number into the ledger as a debit/credit pair, a third rolls it up into the daily settlement report. The seam between the first two, Settlement Calculation → Ledger, is exactly where money silently goes missing on paper: the settlement service computes a payout correctly, but the corresponding ledger debit entry never gets written, so the books stop reconciling even though nothing "crashed." Rather than wait for a full system-test pass to catch that mismatch — by which point a real defect, a missing ledger debit entry, had already recurred more than once — the QA team drew a box around that specific boundary the moment the service split was known, before the settlement feature was even code-complete, and built integration coverage for it first. That's shift-left in practice: the riskiest *seam* between two services gets identified from the architecture diagram itself, not discovered the hard way three sprints later during a late regression cycle.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!TIP]
 > **🎭 Meme Break — Distracted Boyfriend**
@@ -298,7 +300,11 @@ Post-deployment monitoring is a critical shift-right activity:
 | **Alerts** | Automated notification when metrics exceed thresholds | PagerDuty, OpsGenie, Slack webhooks |
 | **User Feedback** | Support tickets, app reviews, NPS scores | Zendesk, Intercom, SurveyMonkey |
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): production monitoring of the AI's per-category resolution rate functions as an ongoing shift-right check, just for an AI system instead of a code deployment. A drop in resolution rate for one issue category (or one originating product) is treated the same way a canary release treats a spike in error rate — a signal to investigate before it silently degrades support quality across all six connected products the engine serves. This is exactly how a real cross-product regression, BUG-AID-5012, was found: BBPS-originated queries were resolving at a noticeably lower rate than the other five products, caught through production-style monitoring, not a pre-release test case.
+### Real Example: Shift-Right for an AI System, Not a Code Deployment
+
+Now picture an AI support copilot sitting behind six different fintech products — Collection, Payout, Connected Banking, BBPS, Reseller, and a consent-based banking app — quietly resolving customer tickets for all of them. There's no single "deployment" moment to canary here, so the team watches something else instead: the AI's resolution rate, broken down by product. One week, tickets originating from the BBPS product start resolving at a noticeably lower rate than the other five — nothing crashed, no error spiked, the AI just started getting quietly worse at one specific slice of its job. That drop gets treated exactly the way a canary release treats an uptick in error rate: a signal to stop and investigate before it silently degrades support quality further. Digging in, the cause turned out to be mundane — BBPS was passing transaction data to the AI in a different field format than the other five products, and the intent handler wasn't parsing it correctly, so it kept punting cases to escalation instead of resolving them. That cross-product regression was filed as BUG-AID-5012, and it was only visible because someone was watching live, per-product resolution rates in production — not because a pre-release test case caught it.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
 
 ### Chaos Engineering Basics
 
@@ -412,9 +418,9 @@ Impact measures the consequences if the risk materializes:
 
 With this approach, 70% of testing effort goes to the three highest-risk modules (Authentication, Payment Transfer, Account Balance), which represent the areas with the greatest potential for business damage.
 
-### Real Example: Risk-Based Testing Applied (Fintech Collection Engine)
+### Real Example: Risk-Based Testing Applied
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): the regression checklist explicitly states the testing strategy prioritized **financial correctness first** — commercial accuracy, ledger consistency, and settlement reconciliation — ahead of purely cosmetic UI issues. Applying the same Likelihood × Impact model used above:
+Picture that same payment collection platform's regression checklist landing on a QA lead's desk. It doesn't treat every module as equally worth testing — it says, in plain terms, test financial correctness first: commercial accuracy, ledger consistency, and settlement reconciliation, ahead of anything cosmetic in the UI. Applying the same Likelihood × Impact model used above to that platform's actual modules:
 
 | Module | Likelihood | Impact | Risk Score | Risk Level | Why |
 |--------|:---------:|:------:|:----------:|-----------|-----|
@@ -426,6 +432,8 @@ With this approach, 70% of testing effort goes to the three highest-risk modules
 | Merchant Profile / Settings | 1 | 1 | 1 | Low | No financial calculation involved |
 
 This is the same Likelihood × Impact mechanics as the MobilePayz example above — the only difference is which modules land at the top, and *why*. In a payment collection platform, that "why" is always some variant of "this module touches money movement or the paper trail behind it."
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 > [!TIP]
 > **🎭 Meme Break — Expanding Brain**
@@ -590,9 +598,9 @@ After each session, a **10-15 minute debrief** is conducted between the tester a
 | Were there any blockers? | Identify impediments |
 | How confident are you in the quality of this area? | Qualitative assessment |
 
-### Real Example: Exploratory Testing Where Scripted Tests Fall Short (Travel Marketplace Platform)
+### Real Example: Exploratory Testing Where Scripted Tests Fall Short
 
-> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): a booking marketplace resells flight/hotel inventory it doesn't own, sourced live from third-party supplier APIs whose price and availability can change at any moment. Scripted test cases can verify "search returns results" and "booking confirms with a PNR" — but they can't easily anticipate every way a *live, third-party* system misbehaves. That's exactly the gap exploratory testing is suited for. A real charter reflecting that project's testing approach:
+Picture a travel booking marketplace that doesn't own a single flight or hotel room it sells — every fare and every room it shows a traveler is resold live from third-party supplier APIs, and the price or availability behind that quote can shift at any second. A scripted test case can confirm "search returns results" and "booking confirms with a PNR" all day long, but it can't easily anticipate every way a *live, flaky, third-party* system might misbehave mid-transaction. That gap — the unscripted, unpredictable stuff — is exactly where exploratory testing earns its keep. A charter built for exactly that kind of platform:
 
 ```
 SESSION CHARTER
@@ -627,6 +635,8 @@ TIME BOX: 90 minutes
 ```
 
 This charter reflects testing the platform's core promise directly: what a traveler is quoted must be exactly what they're charged, and only one traveler can ever win a given limited inventory unit — the same property the project's k6-based concurrency tests validate under load, but explored here manually, interactively, for the *unscripted* edge cases a load test script wouldn't think to try (e.g., clicking "Pay Now" at the exact millisecond the hold expires).
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 > [!WARNING]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -805,9 +815,9 @@ SCHEDULED: November 19, 2025, 10:00 AM
 ═══════════════════════════════════════════════
 ```
 
-### Real Example: An SBTM Session That Found a Real AI Defect (AI Dispute Resolution Engine)
+### Real Example: An SBTM Session That Found a Real AI Defect
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): SBTM works just as well for exploring an AI system's *behavior* as it does for exploring a traditional UI. A session charter for the Commission/Revenue Dispute category — where a dummy reseller questions a commission figure — is what surfaced **BUG-AID-5047**.
+SBTM works just as well for exploring an AI system's *behavior* as it does for exploring a traditional UI. Picture a reseller messaging an AI support copilot to ask why their commission figure looks off this month. The AI explains the calculation clearly and confidently — so far, so good. Then, in the same conversation, the reseller follows up: "okay, please correct this." A tester running a time-boxed session against exactly this category — Commission/Revenue Disputes — is what surfaced **BUG-AID-5047**.
 
 ```
 SESSION CHARTER (condensed)
@@ -826,9 +836,11 @@ TEST IDEAS:
 ═══════════════════════════════════════════════
 ```
 
-**What the session found:** the AI correctly *explained* the commission calculation with high confidence — but then reused that same confidence score to auto-close the ticket as "resolved" when the reseller asked for an *adjustment*, without ever escalating. Two logically distinct actions (explaining vs. adjusting) had been incorrectly treated as one for escalation purposes. Filed as **BUG-AID-5047**, Major severity — see [`sample-defect-report.md`](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine/blob/main/sample-defect-report.md) Defect #3 for the full write-up.
+**What the session found:** the AI correctly *explained* the commission calculation with high confidence — but then reused that same confidence score to auto-close the ticket as "resolved" when the reseller asked for an *adjustment*, without ever escalating. Two logically distinct actions (explaining vs. adjusting) had been incorrectly treated as one for escalation purposes. Filed as **BUG-AID-5047**, Major severity — see <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer"><code>sample-defect-report.md</code></a> Defect #3 for the full write-up.
 
 This is exactly the kind of defect exploratory testing is good at finding and scripted testing tends to miss: nobody would necessarily *script* "ask the AI to explain, then immediately ask it to fix" as two back-to-back steps in a single conversation — but a tester exploring the conversation naturally would, because that's how a real reseller talks.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
 
 ### Session Metrics
 
@@ -893,9 +905,9 @@ Because the defect wasn't in either question alone — it was in the AI incorrec
 | **Requirements-to-Test Ratio** | Test cases / Requirements | 3:1 to 5:1 | Test design thoroughness |
 | **Rework Rate** | Reopened defects / Total defects × 100 | <10% | Fix quality |
 
-### Real Example: These Metrics, With Real Numbers (Healthcare Insurance Platform)
+### Real Example: These Metrics, With Real Numbers
 
-> → Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform): the project's own "Key Achievements" read almost like a filled-in version of the tables above —
+Picture a health insurance claims platform spanning four very different user types — the hospital or clinic filing a claim, the payer processing it, the employer whose group plan covers it, and the individual member it all comes back to. Every claim moves through that chain, and one team's job was to make sure none of it silently broke. By the time that team could write up its own "Key Achievements," the numbers read almost like a filled-in version of the metric tables above —
 
 | Metric (from tables above) | Real Result | What Drove It |
 |---|---|---|
@@ -906,6 +918,8 @@ Because the defect wasn't in either question alone — it was in the AI incorrec
 | Requirements-to-Test Ratio (proxy: traceability) | RTM maintained every sprint | Every requirement traces to a specific test — not "we probably covered that" |
 
 Notice these are the *good* metrics from the tables above (automation ROI, resolution rate, cycle time) — not the anti-metrics below (test case count, bugs-per-tester). That distinction is what makes them meaningful: **85%+ automation coverage** is a statement about risk reduction, not a vanity number.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 > [!NOTE]
 > **🎭 Meme Break — Galaxy Brain**
@@ -969,9 +983,9 @@ A simple, powerful technique for finding the root cause of a problem by asking "
 **Root Cause:** Missing item in requirements review checklist
 **Action:** Add "UI state management (loading, disabled, error)" to the requirements checklist
 
-#### Real Example: 5 Whys Applied to a Real AI Defect (AI Dispute Resolution Engine)
+#### Real Example: 5 Whys Applied to a Real AI Defect
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): the same 5 Whys technique applied to **BUG-AID-5047** (commission adjustment requests auto-closing without escalation):
+Take that same commission-adjustment defect from the AI support copilot — a ticket auto-closed as resolved when it should have escalated to a human — and run it through the same 5 Whys technique used above for the doubled e-commerce orders:
 
 | Level | Question | Answer |
 |-------|----------|--------|
@@ -983,6 +997,8 @@ A simple, powerful technique for finding the root cause of a problem by asking "
 
 **Root Cause:** Explanation-confidence and adjustment-escalation were treated as the same signal instead of two independently gated decisions.
 **Action:** Separate the confidence score for "can I explain this" from the escalation gate for "was an adjustment explicitly requested" — exactly the fix recorded in the defect's own Suggested Fix field.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
 
 #### Fishbone Diagram (Ishikawa)
 
@@ -1116,7 +1132,9 @@ The opposite — it means newer features deserve *more* scrutiny for exactly thi
 
 ### Seeing These Practices Applied, Not Just Listed
 
-Practice 1 (risk-based testing) is exactly what [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) did by prioritizing Settlement/Ledger/GST over cosmetic UI issues (12.3 above). Practice 14 (real device / real conditions over emulation) has a fintech-adjacent cousin in [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)'s insistence on testing against the *actual* flaky third-party supplier APIs rather than a clean mock (12.4 above). Practice 18 (root cause analysis for escaped defects) is exactly the 5 Whys walkthrough on BUG-AID-5047 above (12.7). None of these are abstract advice — they're the same handful of principles showing up again and again across unrelated domains, which is usually a sign the principle is actually load-bearing.
+Practice 1 (risk-based testing) is exactly what the payment collection platform's QA team did by prioritizing Settlement/Ledger/GST over cosmetic UI issues (12.3 above). Practice 14 (real device / real conditions over emulation) has a fintech-adjacent cousin in the travel marketplace's insistence on testing against the *actual* flaky third-party supplier APIs rather than a clean mock (12.4 above). Practice 18 (root cause analysis for escaped defects) is exactly the 5 Whys walkthrough on BUG-AID-5047 above (12.7). None of these are abstract advice — they're the same handful of principles showing up again and again across unrelated domains, which is usually a sign the principle is actually load-bearing.
+
+→ References: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>, <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> Practices 1, 14, and 18 above come from three different real projects — Collection Engine, Travel Marketplace, and the AI Dispute Resolution Engine. What do all three examples have in common, despite the domains being unrelated?</summary>
@@ -1219,11 +1237,13 @@ Generated Automation (pseudocode):
 | Bug triage → AI-assisted | Stakeholder communication → still human |
 | Test execution → more automated | Quality advocacy → still human |
 
-### Real Example: Testing an AI Operations Copilot, Not Just AI Testing Tools (AI Dispute Resolution Engine)
+### Real Example: Testing an AI Operations Copilot, Not Just AI Testing Tools
 
-Everything above in this section is about using AI *to help test software*. There's a second, newer discipline this playbook would be incomplete without: **testing software that *is* AI** — validating an AI system's own decisions, recommendations, and actions. This is a fundamentally different QA problem, and it's grounded here in a real project.
+Everything above in this section is about using AI *to help test software*. There's a second, newer discipline this playbook would be incomplete without: **testing software that *is* AI** — validating an AI system's own decisions, recommendations, and actions. This is a fundamentally different QA problem, and it's grounded here in a real, worked example.
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): an **AI Operations Copilot** with permissioned access across a fintech platform's Connected Banking, Collection, Payout, Disputes, Settlements, Reports, Commercials, KYC, Transactions, Audit Logs, User Roles, and Analytics data. It understands, correlates, explains, recommends — and for a defined set of low-risk actions, executes directly. The most mature, most deeply tested slice of it is a **shared dispute/support layer across six connected products** (Collection, Payout, Connected Banking, BBPS, Reseller, YOBO): whatever goes wrong in any of those six — a stuck transaction, an account-detail change, a reseller's commission question — this one engine is the final destination for resolving it. **Key achievement: average ticket resolution time dropped from a 24-72 hour baseline to under 6 hours, with ~80% of issues resolved by the AI without human involvement.**
+Picture an **AI Operations Copilot** sitting on top of a fintech platform with permissioned access to Connected Banking, Collection, Payout, Disputes, Settlements, Reports, Commercials, KYC, Transactions, Audit Logs, User Roles, and Analytics data. It understands, correlates, explains, recommends — and for a defined set of low-risk actions, executes directly. The most mature, most deeply tested slice of it is a **shared dispute/support layer across six connected products** (Collection, Payout, Connected Banking, BBPS, Reseller, and a consent-based banking app): whatever goes wrong in any of those six — a stuck transaction, an account-detail change, a reseller's commission question — this one engine is the final destination for resolving it. **Key achievement: average ticket resolution time dropped from a 24-72 hour baseline to under 6 hours, with ~80% of issues resolved by the AI without human involvement.**
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
 
 #### The Action-Tier Model: Why "AI Decides" Isn't One Risk Level
 
@@ -1263,7 +1283,7 @@ Testing this kind of system surfaces defect classes that don't map cleanly onto 
 
 #### How Do You Even Regress an AI's Recommendations?
 
-The same way you regress anything else — by defining an expected result and checking actual behavior against it — but the "expected result" column looks different than a traditional test case. From the project's own [`regression-checklist.md`](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine/blob/main/regression-checklist.md), the categories that make up a full AI-copilot regression suite:
+The same way you regress anything else — by defining an expected result and checking actual behavior against it — but the "expected result" column looks different than a traditional test case. From the project's own <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine/blob/main/regression-checklist.md" target="_blank" rel="noopener noreferrer"><code>regression-checklist.md</code></a>, the categories that make up a full AI-copilot regression suite:
 
 - **Intent recognition** — does the AI classify the right category, for all 6 issue types?
 - **AI-resolved happy path** — per category, *per originating product* (36 combinations for 6 categories × 6 products)
@@ -1342,7 +1362,11 @@ flowchart LR
 | **Data Management** | Automate test data setup and teardown; use database snapshots for consistency |
 | **Parallel Environments** | Maintain multiple test environments for parallel development streams |
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): the Playwright/TypeScript regression suite is explicitly "designed to run headless in Jenkins/GitHub Actions on every merge to main" — not as an aspirational CI/CD goal, but as the actual automation approach for the highest-priority Login → Reports merchant journey. Pairing that with [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)'s **25% reduction in overall release cycle time** — attributed directly to early defect detection and shift-left practices — shows the DevOps/shift-left connection isn't theoretical: continuous testing in the pipeline is *why* the release cycle got shorter, not a separate initiative running alongside it.
+### Real Example: Continuous Testing, Not Just a CI/CD Diagram
+
+Picture the payment collection platform's merchant journey — login, browse dashboard, reconcile settlements, download reports — wrapped in a Playwright/TypeScript regression suite that runs headless on every single merge to main, not just before a release. That's not an aspirational CI/CD slide; it's the actual automation approach protecting the highest-priority path through the product, so a bad merge gets caught the same day it lands instead of surfacing weeks later in a pre-release scramble. Now pair that with what happened on the healthcare claims platform once it adopted the same discipline: overall release cycle time dropped 25%, attributed directly to catching defects early instead of at the end. Put the two together and the DevOps/shift-left connection stops being theoretical — continuous testing in the pipeline is *why* the release cycle got shorter, not a separate initiative running alongside it.
+
+→ References: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>, <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> The Collection Engine's regression suite runs "on every merge to main," not just before a release. What class of defect does this catch that a pre-release-only regression run would catch much later?</summary>
@@ -1493,7 +1517,11 @@ For manual testers, understanding API testing is increasingly essential because:
 | **Idempotency** | Send same request twice, verify no duplicate creation |
 | **Integration** | Test API interactions with other APIs and databases |
 
-> → Real example: [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) performed "full CRUD operation validation via API" using REST Assured/Postman, cutting API regression cycle time by 40% — while [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) used API testing specifically to validate transaction status transitions and commercial/GST calculations, the exact category of defect (BUG-COL-1078, the GST rounding mismatch) that a UI-only test would have found much later, if at all, since the mismatch was between the UI figure and an *exported report* — two different response paths from the same underlying data.
+### Real Example: What API Testing Catches That the UI Doesn't
+
+Picture two testers working the same claims platform. One clicks through the UI, submitting claims and checking screens. The other hits the underlying REST endpoints directly with REST Assured and Postman, running full create/read/update/delete validation against every claim, policy, and enrollment service — and cuts the API regression cycle time by 40% in the process, simply because API calls run in seconds where UI clicks take minutes. Now picture the payment collection platform's GST rounding defect, BUG-COL-1078: the on-screen transaction figure and the exported settlement report disagreed by a few paise on any transaction with a fractional GST value, because the two screens were built from two independently rounded calculations. A UI-only tester would have had to notice a discrepancy between two separate surfaces they weren't necessarily looking at side by side. A tester hitting both API responses directly — transaction detail and report export — could catch the mismatch as a single assertion, because the comparison happens on the data itself instead of two different rendered screens.
+
+→ References: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>, <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 ### Basic API Testing Using Postman (Step-by-Step)
 
@@ -1627,9 +1655,9 @@ Because testing through the UI only shows you one of the two divergent numbers a
 | **LoadRunner** | Enterprise commercial | High | Enterprise applications |
 | **Artillery** | Open-source, YAML/JS | Low | Quick API load tests |
 
-### Real Example: A Load Test Report, With Real Numbers (Fintech Collection Engine)
+### Real Example: A Load Test Report, With Real Numbers
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) — a JMeter load test simulating realistic merchant volume:
+Picture 40 merchants on the payment collection platform all pushing transactions simultaneously for three straight hours — 180,000 transactions in total, a JMeter script standing in for real merchant traffic:
 
 | Metric | Result |
 |---|---|
@@ -1643,6 +1671,8 @@ Because testing through the UI only shows you one of the two divergent numbers a
 | P99 Latency | 900 ms |
 
 **Observation:** under sustained load, **database connection pool saturation** became the limiting factor before application logic did — a reminder that the bottleneck a performance test reveals is often infrastructure configuration, not code, and needs to be flagged to engineering as a capacity-planning conversation, not just filed as a single defect.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 ### When to Involve Performance Testing
 
@@ -1695,7 +1725,11 @@ The **OWASP Top 10** is the most widely recognized list of the most critical web
 - [ ] Test concurrent sessions — can the same user log in from two devices?
 - [ ] Test "Forgot Password" — does it reveal user existence?
 
-> → Real example from [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine): **BUG-AID-5031**, filed **Blocker** — a mobile number change (a security-sensitive account field) was applied even though the user abandoned the conversation mid-verification. The resolution logic applied the change optimistically, before confirming the verification step actually succeeded, instead of gating the field update on a confirmed verification-success event. This is the conversational-AI equivalent of a classic authentication-testing checklist item — "does the system correctly require verification before a sensitive change takes effect?" — just tested through a chat interface instead of a form.
+### Real Example: A Verification Bypass, Found Through a Chat Interface
+
+Picture a user chatting with an AI support copilot to update their registered mobile number — a classic security-sensitive account change. They start the verification step, then get distracted or their connection drops, and they never come back to complete it. Except the number changed anyway. The AI's resolution logic had applied the update optimistically, the moment the conversation *looked* like it was proceeding normally, instead of waiting for an actual confirmed verification-success event before touching the field. Filed as **BUG-AID-5031**, severity Blocker — the highest severity on the scale, because there was no safe fallback: any account's mobile number could be changed just by starting, then abandoning, a chat. It's the conversational-AI equivalent of a classic authentication-testing checklist item — "does the system correctly require verification before a sensitive change takes effect?" — just tested through a chat interface instead of a form.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a>
 
 > [!CAUTION]
 > **🎭 Meme Break — Distracted Boyfriend**

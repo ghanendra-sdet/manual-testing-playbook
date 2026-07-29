@@ -686,7 +686,7 @@ Tester logs BUG-1125: *"Checkout page is broken."* That's the entire defect repo
 
 ### Full Life Cycle Walkthrough — A Real Defect, State by State
 
-Every state above was illustrated with a short, invented "Example Scenario." Here's what the same journey looks like on a real (portfolio/demo) project, using an actual worked defect from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine)'s `sample-defect-report.md` — **BUG-PAY-3081**, the highest-severity defect theme this module tracks: a retry that re-submits a payout which had already succeeded on the bank side.
+Every state above was illustrated with a short, invented "Example Scenario." Here's what the same journey looks like on a real (portfolio/demo) project: `BUG-PAY-3081`, the highest-severity defect theme this module tracks — a retry that re-submits a payout which had already succeeded on the bank side.
 
 > [!IMPORTANT]
 > **Why this defect makes a good teaching example:** it isn't a UI glitch. It's exactly the kind of defect that justifies why the Retest → Verified → Closed chain is non-negotiable — a retry-idempotency bug means real money moving twice, and "the developer says it's fixed" is nowhere near good enough on its own.
@@ -734,7 +734,7 @@ stateDiagram-v2
     Verified --> Closed: Regression test case added
 ```
 
-→ Real example from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine)
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a>
 
 > [!TIP]
 > **🎭 Meme Break — "This Is Fine" Dog**
@@ -1005,10 +1005,10 @@ Severity and Priority tell you how bad and how urgent a *single* defect is. But 
 
 | Project | Domain Risk Area | Recurring Defect Themes |
 |---|---|---|
-| [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) | Merchant collection, ledger, GST, settlement | Ledger debit fee missing, commercial calculation mismatch, GST mismatch, settlement inconsistency, report mismatch, search/filter issue, export issue, permission issue, validation issue, dashboard issue, API validation issue |
-| [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) | Outbound fund transfer (IMPS/NEFT/RTGS) | Beneficiary permission issues, approval-flow gaps, commercial calculation mismatches, API validation defects, bulk-batch reporting issues, **retry idempotency failures** (highest-severity theme — risk of duplicate real-money transfer) |
-| [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) | Claims across 4 entity types (Provider/Payer/Employer/Member) | Cross-entity data inconsistency, claim status stuck in "Need Review," missing/incorrect rejection reason, plan coverage-rule changes corrupting settled claims, data-level vs UI-level mismatch |
-| [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine) | AI copilot across 6 connected products | Intent misclassification, false AI-resolution, escalation failure, context loss across conversation turns, cross-product inconsistency, security-sensitive action applied without proper verification |
+| <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> | Merchant collection, ledger, GST, settlement | Ledger debit fee missing, commercial calculation mismatch, GST mismatch, settlement inconsistency, report mismatch, search/filter issue, export issue, permission issue, validation issue, dashboard issue, API validation issue |
+| <a href="https://github.com/ghanendra-sdet/fintech-payout-engine" target="_blank" rel="noopener noreferrer">Fintech Payout Engine</a> | Outbound fund transfer (IMPS/NEFT/RTGS) | Beneficiary permission issues, approval-flow gaps, commercial calculation mismatches, API validation defects, bulk-batch reporting issues, **retry idempotency failures** (highest-severity theme — risk of duplicate real-money transfer) |
+| <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a> | Claims across 4 entity types (Provider/Payer/Employer/Member) | Cross-entity data inconsistency, claim status stuck in "Need Review," missing/incorrect rejection reason, plan coverage-rule changes corrupting settled claims, data-level vs UI-level mismatch |
+| <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a> | AI copilot across 6 connected products | Intent misclassification, false AI-resolution, escalation failure, context loss across conversation turns, cross-product inconsistency, security-sensitive action applied without proper verification |
 
 > [!NOTE]
 > **Pattern worth noticing:** every one of these taxonomies is domain-specific — a travel marketplace's top risk (overbooking the same inventory unit) and a payout engine's top risk (retrying an already-successful transfer) are structurally unrelated. A generic checklist like "test the happy path and a few edge cases" won't surface either one. What *does* surface them is understanding the product's specific money/data/consistency risk before testing starts — which is exactly what a theme taxonomy captures once a team has been through enough regression cycles to know where their bugs actually live.
@@ -1299,7 +1299,7 @@ The three sample reports above use realistic-but-invented data to teach the temp
 
 **Suggested Fix:** Ensure the ledger debit write and settlement calculation are triggered from the same transaction event, ideally within the same atomic operation or a reliably retried async job.
 
-→ Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 ---
 
@@ -1326,7 +1326,7 @@ The three sample reports above use realistic-but-invented data to teach the temp
 
 **Suggested Fix:** Make the fare-lock-to-confirmation sequence atomic at the inventory-unit level (e.g. a database-level lock or optimistic-concurrency check at confirmation time), not just an initial-selection-time check.
 
-→ Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
+→ Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 ---
 
@@ -1352,7 +1352,7 @@ The three sample reports above use realistic-but-invented data to teach the temp
 
 **Suggested Fix:** The Member portal's claim status should be sourced live (or with a short, bounded cache TTL) from the same authoritative claim-status source the Payer portal reads from, not an independently cached copy.
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Expanding Brain**
@@ -1830,9 +1830,11 @@ flowchart TD
 
 Traditional triage (above) assumes every ticket reaches a human queue where a QA Lead, Dev Lead, and Product Owner decide validity, severity, and assignment. A growing number of support and dispute-resolution products now insert an AI layer *before* that human triage step — the AI attempts to resolve or auto-close simple tickets, and only escalates the rest. This doesn't remove the need for defect management; it adds a new defect class: **the AI's own triage/escalation logic can itself be defective**, and the failure mode is quiet — a ticket that should have escalated simply doesn't, with no human ever aware a decision was made.
 
-**Real example:** [AI Dispute Resolution Engine](https://github.com/ghanendra-sdet/ai-dispute-resolution-engine)'s `sample-defect-report.md` documents `BUG-AID-5047` (Major): a reseller asks the AI to explain a commission figure, then explicitly asks it to *correct* the figure. The AI is highly confident in its *explanation*, and that explanation-confidence score gets incorrectly reused as the resolution-confidence signal for the *correction request* — so the ticket auto-closes as "AI-resolved" and never reaches a human, even though nothing was actually corrected.
+Picture a reseller messaging the AI copilot inside a dispute-resolution product about a commission figure that looks wrong on their statement. First they ask the AI to *explain* the number — the AI walks through the calculation confidently and clearly. Encouraged, the reseller then asks it to go a step further: *"okay, please correct it."* Behind the scenes, something quietly goes wrong. The AI's confidence score from the *explanation* it just gave gets reused, unchanged, as the confidence score for whether the *correction* was actually handled. Because that borrowed confidence score is high, the system treats the correction request as successfully resolved and auto-closes the ticket as "AI-resolved." The reseller sees a closed, green-tick ticket. Nobody — no human agent, no reviewer — ever looks at it, because nothing flagged it for escalation. The catch: the commission figure was never actually corrected. The explanation was right; the fix never happened.
 
-**Why this belongs in a defect-management module, not just an AI module:** the life cycle states from §7.2 still apply — this is a **New** defect, it still needs **Assigned/Open/Fixed**, and critically it still needs **Retest/Verified**, because "the AI seemed confident" is exactly as unreliable a signal of a real fix as "the developer says it's fixed" (§7.2, State 3). The suggested fix in the real report reinforces this: separate the confidence score for *explaining* something from the escalation gate for *whether a correction was explicitly requested* — the latter should always route to a human, regardless of model confidence.
+**Why this belongs in a defect-management module, not just an AI module:** the life cycle states from §7.2 still apply — this is a **New** defect (Major severity), it still needs **Assigned/Open/Fixed**, and critically it still needs **Retest/Verified**, because "the AI seemed confident" is exactly as unreliable a signal of a real fix as "the developer says it's fixed" (§7.2, State 3). The fix here is to separate the confidence score for *explaining* something from the escalation gate for *whether a correction was explicitly requested* — the latter should always route to a human, regardless of model confidence.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/ai-dispute-resolution-engine" target="_blank" rel="noopener noreferrer">AI Dispute Resolution Engine</a> (`BUG-AID-5047`)
 
 > [!NOTE]
 > **🎭 Meme Break — Galaxy Brain**

@@ -172,6 +172,15 @@ renderer.code = function(code, language) {
   return `<pre class="${langClass}"><code class="${langClass}">${highlighted}</code></pre>`;
 };
 
+// External links (any absolute http(s) URL — always a different repo/site) open in a new tab;
+// internal/relative links (in-app hash routes, anchors) stay in the same tab.
+renderer.link = function(href, title, text) {
+  const titleAttr = title ? ` title="${title}"` : '';
+  const isExternal = /^https?:\/\//i.test(href || '');
+  const targetAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+  return `<a href="${href}"${titleAttr}${targetAttrs}>${text}</a>`;
+};
+
 marked.use({ renderer });
 
 function escapeHtml(text) {

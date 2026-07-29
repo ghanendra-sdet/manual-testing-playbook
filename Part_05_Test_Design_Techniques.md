@@ -126,7 +126,7 @@ These techniques leverage the **tester's knowledge, experience, and intuition** 
 > 🧠💫 *Galaxy brain: layer Boundary Value Analysis on the paisa-level rounding, a Decision Table on the payment-rail fee logic, and a State Transition diagram on the transaction lifecycle — before a single rupee moves*  
 > 🌌 *Cosmic brain: all of the above, plus Error Guessing why the GST shows ₹3.06 in the UI and ₹3.10 in the downloaded report*
 
-Throughout this chapter, real worked examples pulled from actual portfolio QA project repos (Fintech Collection Engine, BBPS Bill Payment Platform, Travel Marketplace, Healthcare Insurance Platform, HRMS) sit alongside the textbook examples — look for the `→ Real example from...` callouts.
+Throughout this chapter, real worked scenarios — narrated in full, grounded in actual portfolio QA engagements across a Fintech Collection Engine, a BBPS Bill Payment Platform, a Travel Marketplace, a Healthcare Insurance Platform, and an HRMS — sit alongside the textbook examples. Each one is told as a self-contained story; a small "→ Reference" line after each points back to the source repo if you want to dig further.
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> A tester says "I tested the checkout page — I tried five random order quantities and they all worked." Why isn't this the same as applying a test design technique?</summary>
@@ -281,7 +281,9 @@ Step 5: Verify Coverage
 
 ### Example 4 (Real-World): HRMS Profile Picture Upload — Format & Size
 
-→ Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform) — the Employee Self-Service (ESS) module's Personal Details form includes a profile picture upload, and its regression checklist calls out format and size validation as dedicated line items rather than one generic "upload works" checkbox.
+Picture an employee opening the HRMS Employee Self-Service (ESS) portal the morning of a company town hall, trying to swap out their profile picture before the all-hands call. The Personal Details form gives no hint of how much validation logic sits behind that one upload button — but a rushed implementation here is exactly the kind of thing that lets a 12 MB photo silently hang the page, or lets someone upload a file that only *looks* like an image. That's why a well-run HRMS regression suite treats format and size as two separate, dedicated checklist line items instead of one generic "upload works" checkbox.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>
 
 **Specification (from the HRMS regression checklist):**
 - Accepted formats: JPG, PNG, GIF
@@ -508,7 +510,9 @@ For a range [min, max]:
 
 ### Example 4 (Real-World): GST Rounding Boundary — Fintech Collection Engine
 
-→ Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) — this is an actual logged defect (see [`sample-defect-report.md`](https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/sample-defect-report.md)), not a hypothetical.
+Picture a merchant on the Fintech Collection Engine opening their dashboard to check a single collection: a ₹17.00 commercial fee, 18% GST, showing ₹3.06 — correct, because 17 × 0.18 comes out to exactly ₹3.06. Then they download the same transaction in their monthly settlement report and see ₹3.10 instead. Same fee, same transaction, same GST rate — two different numbers on two different screens. That's an actual logged defect, not a hypothetical: the dashboard rounds to the nearest paisa, while the report-generation service independently rounds *up* to the nearest 10 paise. Two services implementing the same "round the GST" rule, two different ways.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> · <a href="https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/sample-defect-report.md" target="_blank" rel="noopener noreferrer">sample-defect-report.md</a>
 
 **Specification:** A merchant is charged 18% GST on the platform's commercial (fee) for every successful collection. Amounts are shown to paisa (2 decimal) precision on both the dashboard/transaction-details screen and the downloadable CSV report.
 
@@ -537,7 +541,7 @@ The UI rounds to the nearest paisa; the report-generation service independently 
 | BVA5 | ₹999,999.99 | ₹179,999.998... | Confirms the rounding rule doesn't drift at high-value boundaries |
 
 > [!IMPORTANT]
-> The real defect wasn't found by testing one field in isolation — it was found by comparing the **same value across two systems** (UI vs. report). This is a boundary-value lesson generic textbook examples don't usually teach: sometimes the "boundary" that matters is a *precision* boundary, and the test isn't "is this value correct" but "do all systems agree on this value." The [regression checklist](https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/regression-checklist.md) formalizes this as TC-013: *"Commercial rounding — edge case... Rounding follows defined rule, consistent across UI and report."*
+> The real defect wasn't found by testing one field in isolation — it was found by comparing the **same value across two systems** (UI vs. report). This is a boundary-value lesson generic textbook examples don't usually teach: sometimes the "boundary" that matters is a *precision* boundary, and the test isn't "is this value correct" but "do all systems agree on this value." The <a href="https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/regression-checklist.md" target="_blank" rel="noopener noreferrer">regression checklist</a> formalizes this as TC-013: *"Commercial rounding — edge case... Rounding follows defined rule, consistent across UI and report."*
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> The GST rounding defect (₹3.06 in the UI vs. ₹3.10 in the report) wasn't found by picking a "typical" fee amount. What made ₹17.00 at 18% GST a good BVA-style test value to pick in the first place?</summary>
@@ -821,9 +825,11 @@ Here, `-` means "don't care" — the condition doesn't matter for that rule's ou
 
 ### Example 4 (Real-World): BBPS Payment Rail Selection — Internal Rail vs. External Gateway
 
-→ Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform) — when a user pays a fetched bill, the platform must decide *which payment rail* to route through and *which fee* to charge, and both depend on more than one condition evaluated together.
+Picture a customer on the BBPS Bill Payment Platform paying an electricity bill they just fetched. From their side, it's one tap. Behind the scenes, the platform has to make two silent decisions before the money moves: *which rail* should carry this payment, and *which fee* applies. If this merchant already has an active internal Payout/Connected Banking service, the platform routes through its own cheaper internal rail. If not, it falls back to an external Payment Gateway — PhonePe, Razorpay, or Cashfree — at the standard gateway fee. But there's a second condition riding along with the first: the bill amount that was fetched earlier has a freshness window, and if that window has lapsed, the payment gets blocked outright and the customer is told to refetch — no matter which rail would otherwise have been chosen.
 
-**Specification (from the [regression checklist](https://github.com/ghanendra-sdet/bbps-bill-payment-platform/blob/main/regression-checklist.md), section 2 — Payment Rail Selection):**
+→ Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
+
+**Specification (from the <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform/blob/main/regression-checklist.md" target="_blank" rel="noopener noreferrer">regression checklist</a>, section 2 — Payment Rail Selection):**
 - If the merchant has an active internal Payout/Connected Banking service, route through the internal rail at a lower service charge
 - Otherwise, route through an external Payment Gateway (PhonePe PG / Razorpay PG / Cashfree PG) at the standard gateway fee
 - The fetched bill amount must still be within its freshness window at payment time — a stale fetch blocks payment regardless of which rail would otherwise apply
@@ -1150,7 +1156,9 @@ stateDiagram-v2
 
 ### Example 4 (Real-World): Merchant Collection Transaction Lifecycle
 
-→ Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) — every collection (UPI, QR, VAM, Payment Link, Manual Deposit) moves through the same core transaction states, but *which events cause which transitions* differs by collection type, which is why the regression checklist treats each collection type as its own set of state-transition test cases rather than one generic "test a collection" case.
+Picture a merchant on the Fintech Collection Engine accepting a customer's payment — it could arrive via UPI collect request, a static QR code scan, a Virtual Account (VAM) bank transfer, a shared Payment Link, or a manually reconciled deposit slip. Whichever route the money takes, that single transaction is now moving through the same shared state machine: `INITIATED` → `PROCESSING` → and eventually `SUCCESS`, `FAILED`, `DEEMED`, or `EXPIRED`. What differs by collection type isn't the states themselves — it's *which events* push the transaction from one state to the next. A UPI collection can sit `EXPIRED` if the customer never approves it; a VAM transfer instead waits patiently for a delayed bank credit notification and must never jump to `SUCCESS` early; a Payment Link, once paid, must refuse a second payment attempt outright. That's exactly why the regression checklist treats every collection type as its own dedicated set of state-transition test cases instead of one generic "test a collection" checkbox.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 **Core States:** `INITIATED` → `PROCESSING` → `SUCCESS` / `FAILED` / `DEEMED` / `EXPIRED`
 
@@ -1175,7 +1183,7 @@ stateDiagram-v2
 
 **Why `DEEMED` is the state most test suites under-cover:** it exists specifically for the case where the platform genuinely doesn't yet know if a payment succeeded or failed (a delayed bank/rail notification). A suite that only exercises `SUCCESS` and `FAILED` never proves the system handles genuine uncertainty correctly — and `DEEMED` transactions are exactly the ones that generate "is my payment stuck?" support tickets.
 
-**Collection-type-specific transitions (per the [regression checklist](https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/regression-checklist.md), section 2):**
+**Collection-type-specific transitions (per the <a href="https://github.com/ghanendra-sdet/fintech-collection-engine/blob/main/regression-checklist.md" target="_blank" rel="noopener noreferrer">regression checklist</a>, section 2):**
 
 | Collection Type | Event | Transition | Regression ID |
 |---|---|---|---|
@@ -1405,7 +1413,11 @@ Because in real payment rails, confirmation can be genuinely delayed — the pla
 
 ### Example 4 (Real-World): Travel Marketplace — Third-Party Supplier Quirks
 
-→ Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform) — a platform reselling flights/hotels/packages it doesn't own is a goldmine for error guessing, because the riskiest defects live in the seams between the platform and suppliers it doesn't control.
+Picture two travelers, on two different devices, both eyeing the last available room at a hotel during a flash sale on a travel marketplace platform. Both click "Book" within the same few-second window while the fare-lock is still active. Because the last-room check happens at selection time but is never re-verified atomically at confirmation time, both bookings slip through — and both travelers walk away with a confirmed booking and a PNR for the exact same physical room (BUG-TRV-2011, Critical).
+
+Now picture a different traveler on the same platform, watching a 10-minute countdown timer on a held fare tick down to zero. Instead of re-searching, they simply resubmit the original payment request after the timer expires. Because the hold's expiry was only ever checked by the countdown timer running in the browser — never independently re-checked on the server at the moment payment is submitted — the payment goes through at the stale, already-expired-hold price (BUG-TRV-2027, Major). A platform reselling flights, hotels, and packages it doesn't own is a goldmine for this class of defect, because the riskiest bugs live in the seams between the platform and suppliers it doesn't fully control.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/travel-marketplace-platform" target="_blank" rel="noopener noreferrer">Travel Marketplace Platform</a>
 
 **Domain-specific error categories an experienced tester would add on top of formal EP/BVA/Decision Table coverage:**
 
@@ -1637,7 +1649,9 @@ Every use case follows a standard structure:
 
 ### Example 3 (Real-World): Provider Submits an Insurance Claim — Healthcare Insurance Platform
 
-→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) — a claim is the one piece of data that all four entity types (Provider, Payer, Employer, Member) touch, which makes it an unusually rich use case: the "actor" changes partway through the flow.
+Picture a patient visiting their doctor for a routine procedure, covered under their employer's group health plan. The doctor's office submits a claim on the patient's behalf — and from that single moment, the claim becomes the one piece of data that all four entity types on the Healthcare Insurance Platform touch: the Provider who delivered the care, the Payer who has to evaluate it against the Employer's coverage rules, the Employer whose plan defines what's covered, and the Member (the patient) waiting to see whether they owe anything. Unlike most use cases where one actor drives the whole flow, here the "actor" changes partway through — submission belongs to the Provider, the coverage decision belongs to the Payer, and the outcome has to land identically on all four portals or nobody can trust what they're looking at.
+
+→ Reference: <a href="https://github.com/ghanendra-sdet/healthcare-insurance-platform" target="_blank" rel="noopener noreferrer">Healthcare Insurance Platform</a>
 
 **Use Case: UC-HC-01 — Submit and Resolve an Insurance Claim**
 
@@ -1764,7 +1778,9 @@ Use pairwise when you have **many input parameters**, each with **multiple value
 > Research shows that pairwise testing detects **70-85% of all defects** while reducing the test suite by **50-80%** compared to exhaustive testing. It's one of the most cost-effective techniques for configuration and compatibility testing.
 
 > [!NOTE]
-> **Real-world combinatorial surface:** → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform) — 5+ biller categories (electricity, water, gas, DTH, telecom) × 2 payment rails (internal Payout/Connected Banking vs. external Gateway) × multiple browsers means full exhaustive regression of every category/rail/browser combination on every release would be impractical. In practice, teams pick the highest-risk pairs — e.g. every biller category paired with both rails at least once — rather than the full cartesian product, which is pairwise thinking applied pragmatically even without formal tooling.
+> **Real-world combinatorial surface:** Picture a release-regression day on the BBPS Bill Payment Platform: 5+ biller categories (electricity, water, gas, DTH, telecom), each payable through 2 payment rails (the internal Payout/Connected Banking rail or an external Gateway), each of those checked across the browsers QA actually supports. Testing every category against every rail against every browser, every release, is impractical. So in practice the team picks the highest-risk pairs — every biller category paired with both rails at least once — rather than the full cartesian product. That's pairwise thinking applied pragmatically, even without formal tooling generating the table.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> If exhaustive testing of 5 biller categories × 2 payment rails × 4 browsers would need 40 test cases, why doesn't pairwise testing just randomly pick 12 and call it done?</summary>

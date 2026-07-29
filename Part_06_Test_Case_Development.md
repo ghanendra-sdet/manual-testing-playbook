@@ -76,7 +76,9 @@ Test Scenario: "Verify Login Functionality"
   └── Test Case 6: Login with account that is locked
 ```
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): the exact scenario-to-case fan-out shown above plays out in the project's actual `regression-checklist.md`. The scenario "Verify UPI collection reaches the correct terminal status" fans out into four real, atomic test cases: **TC-021** (customer approves → status goes INITIATED → SUCCESS), **TC-022** (customer declines → FAILED with a clear reason), **TC-023** (customer takes no action → must transition to EXPIRED, never sit PENDING forever), and **TC-024** (a malformed VPA is rejected before it ever reaches the customer's app). Four numbered test cases, one scenario, each with a single precise expected result — the same 1-to-many relationship as the diagram above, just with real IDs instead of placeholders.
+> Picture a single line in a test plan: "verify a UPI collection reaches the correct terminal status." It can't stay one line, because a UPI payment can genuinely resolve four different ways, and each one needs its own atomic, precisely-worded test case. The customer approves — the transaction has to move cleanly from INITIATED to SUCCESS. The customer declines — it has to land on FAILED with a reason the merchant can actually read, not a silent dead end. The customer does nothing at all — and instead of sitting in PENDING forever like an unanswered question, it has to time out into EXPIRED, a state someone can actually act on. And a malformed VPA has to be rejected before the request ever reaches the customer's UPI app in the first place. One scenario, four numbered test cases, four different terminal outcomes — the exact 1-to-many relationship the diagram above describes, just with real numbers (TC-021 through TC-024) attached instead of placeholders.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 <details>
 <summary>🧠 <strong>Quick Check:</strong> TC-023 (UPI — customer takes no action) expects the transaction to move to EXPIRED. Why isn't "stays PENDING indefinitely" an acceptable expected result here, even though the customer genuinely never responded?</summary>
@@ -348,7 +350,9 @@ The four sample test cases above use a placeholder e-commerce app so the templat
 | **Created Date** | 2026-06-10 |
 | **Version** | 1.0 |
 
-> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s `regression-checklist.md` — this is TC-027 in the actual suite, expanded here into the full template. Notice the expected result is deliberately precise about *what doesn't happen* (no second debit, no duplicate ledger entry) — in fintech QA, "the payment was blocked" isn't enough on its own; you have to verify the money-movement side agrees, or you've only checked the UI's opinion of what happened.
+> TC-027 is written the way it is because "blocked" is a UI's opinion, not a fact. A popup can say "payment declined" while, two layers down, a race condition between the re-scan and the original SUCCESS callback quietly writes a second transaction anyway — the screen looks fine and the ledger is lying. So the test case doesn't stop at "did a second payment screen pop up" — it walks all the way down to Transaction Search and the merchant's settlement ledger and demands exactly one SUCCESS record and exactly one ₹500 credit for that QR, nothing more. In fintech QA, the UI's word is a claim; the ledger is the fact-check.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>
 
 #### Sample Test Case 6 (Real): Profile Picture Upload — Size Rejection
 
@@ -385,7 +389,9 @@ The four sample test cases above use a placeholder e-commerce app so the templat
 | **Created Date** | 2026-06-10 |
 | **Version** | 1.0 |
 
-> → Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s `regression-checklist.md` — this is TC_MYINFO_PERSDETAILS_06, and it has a real documented defect behind it: **BUG-HRM-7038** (Major) — "Profile picture upload accepts a file over the 1 MB limit," because the original check only validated the file *extension*, not the actual file size. Paired with its sibling TC_MYINFO_PERSDETAILS_05 (identical flow, file **under** 1 MB, upload allowed), it's a textbook Boundary Value pair — one test case on each side of the same limit. The same checklist's UI Consistency case, TC_MYINFO_UI_03, separately requires the format-rejection and size-rejection error messages to be *distinct* — a generic "upload failed" for both would pass this test case but fail that one.
+> This test case exists because of a genuinely sneaky bug: the original upload check only ever looked at the file's *extension* — .jpg, .png, .gif — and never actually measured how many bytes it was. So a 1.4 MB photo, safely under no real barrier at all, sailed straight past a "1 MB limit" that only existed on paper, and got logged as a documented defect, Major severity, before anyone caught it. That's exactly why this test case never travels alone — it's paired with a sibling that runs the identical upload flow with a file just *under* 1 MB and expects it to succeed, a textbook Boundary Value pair sitting on either side of the same line. A neighboring UI-consistency check raises the bar one notch further: it demands the size-rejection message read differently from the format-rejection message, because a lazy, identical "upload failed" for both would quietly pass this test case while failing that one.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>
 
 #### Sample Test Case 7 (Real): Stale-Amount Protection
 
@@ -422,7 +428,9 @@ The four sample test cases above use a placeholder e-commerce app so the templat
 | **Created Date** | 2026-06-10 |
 | **Version** | 1.0 |
 
-> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s `regression-checklist.md` — this is TC-006, and the project's README calls it out by name as a first-class scenario, not an afterthought. It's grounded in a real defect: **BUG-BBPS-1104** (Critical) — "Payment charges a stale bill amount after biller updates the balance mid-session," where the payment silently proceeded with the originally-fetched figure even after the freshness window had clearly elapsed. This test case is precisely the regression check written to make sure that defect never comes back.
+> Somewhere between fetching a ₹1,240 electricity bill and actually paying it, the biller can quietly update the outstanding balance — a part payment posts, a late fee lands, the meter reading gets corrected. If the platform just charges whatever number was on screen when the user first opened the page, it's charging a number that may no longer be true. That's exactly what happened before this test case existed: the payment silently went through on the originally-fetched figure even though the freshness window had clearly elapsed, a Critical-severity defect that made it all the way to a fix only because someone eventually noticed a charge that didn't match the live bill. This test case is the regression check written specifically so that gap can never reopen — it forces a re-fetch (or an explicit block) the moment the fetched amount goes stale, and then verifies the transaction record shows the freshly-fetched figure, never the old one.
+>
+> → Reference: <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>
 
 > [!TIP]
 > **🎭 Meme Break — Distracted Boyfriend**
@@ -550,7 +558,7 @@ graph TD
 
 ### Real Example: Scenarios to Test Cases — BBPS Payment Rail Selection
 
-The same "one scenario → many test cases" pattern from the Payment Module walkthrough above shows up in [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s actual `regression-checklist.md`, built around a genuinely tricky business rule: a merchant with an active Payout/Connected Banking service pays a **lower fee** by routing through that internal rail instead of the external Payment Gateway.
+The same "one scenario → many test cases" pattern from the Payment Module walkthrough above shows up in <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>'s actual `regression-checklist.md`, built around a genuinely tricky business rule: a merchant with an active Payout/Connected Banking service pays a **lower fee** by routing through that internal rail instead of the external Payment Gateway.
 
 **Test Scenario:** *Verify the correct payment rail (internal vs. external) is selected and the correct fee is charged*
 
@@ -710,9 +718,9 @@ Track changes to test cases over time. When requirements change, update test cas
 
 A few of the practices above are easiest to see by pointing at where they're actually followed in real, published regression checklists:
 
-- **Practice #3 (positive + negative cases) in action:** [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s bill-fetch flow has exactly this shape — TC-002 (valid reference, happy path), TC-003 (invalid reference, negative), TC-004 (biller timeout, negative/edge), and TC-006 (stale amount at payment time, negative/edge). One positive case, three negative/edge cases — closer to the "2-3 negative per positive" rule of thumb than most real suites manage.
-- **Practice #9 (specific, verifiable test data) in action:** [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s upload test cases don't say "upload a large file" — TC_MYINFO_PERSDETAILS_05 and TC_MYINFO_PERSDETAILS_06 specify **exactly** "under 1 MB" and "over 1 MB" as the test data, because the 1 MB line is the entire point of the two test cases.
-- **Practice #11 (prioritize) in action:** [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s own checklist explicitly ranks Login, Dashboard, Collection, Transaction Search, Transaction Details, and Settlement as the six highest-priority flows — automated first specifically because "they form the primary merchant regression path and are run on every release," while collection-type edge cases and UI-consistency checks are named as the *next* tier, not dropped, just sequenced later.
+- **Practice #3 (positive + negative cases) in action:** <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>'s bill-fetch flow has exactly this shape — TC-002 (valid reference, happy path), TC-003 (invalid reference, negative), TC-004 (biller timeout, negative/edge), and TC-006 (stale amount at payment time, negative/edge). One positive case, three negative/edge cases — closer to the "2-3 negative per positive" rule of thumb than most real suites manage.
+- **Practice #9 (specific, verifiable test data) in action:** <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>'s upload test cases don't say "upload a large file" — TC_MYINFO_PERSDETAILS_05 and TC_MYINFO_PERSDETAILS_06 specify **exactly** "under 1 MB" and "over 1 MB" as the test data, because the 1 MB line is the entire point of the two test cases.
+- **Practice #11 (prioritize) in action:** <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>'s own checklist explicitly ranks Login, Dashboard, Collection, Transaction Search, Transaction Details, and Settlement as the six highest-priority flows — automated first specifically because "they form the primary merchant regression path and are run on every release," while collection-type edge cases and UI-consistency checks are named as the *next* tier, not dropped, just sequenced later.
 
 > [!TIP]
 > **🎭 Meme Break — Expanding Brain**
@@ -806,7 +814,7 @@ Test data directly affects the quality of testing — if the data doesn't cover 
 
 ### Real Example: Dummy Data Conventions Across These Portfolio Projects
 
-Every regression checklist referenced in this Part follows the data-privacy discipline described above in practice, not just in policy: [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) uses `test@dummybank` as its VPA and an explicit "dummy merchant ID," [BBPS](https://github.com/ghanendra-sdet/bbps-bill-payment-platform) uses a "dummy valid consumer number" instead of a real utility account, and [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform) uses ESS accounts explicitly documented as "dummy/sample" test users. None of these checklists reference a real customer, a real bank, or a real employee — every ID, VPA, and file name is synthetic **Valid Data** or **Invalid Data** from the table above, built specifically so the checklist itself is safe to publish and share.
+Every regression checklist referenced in this Part follows the data-privacy discipline described above in practice, not just in policy: <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a> uses `test@dummybank` as its VPA and an explicit "dummy merchant ID," <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS</a> uses a "dummy valid consumer number" instead of a real utility account, and <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a> uses ESS accounts explicitly documented as "dummy/sample" test users. None of these checklists reference a real customer, a real bank, or a real employee — every ID, VPA, and file name is synthetic **Valid Data** or **Invalid Data** from the table above, built specifically so the checklist itself is safe to publish and share.
 
 > [!WARNING]
 > **🎭 Meme Break — This Is Fine**
@@ -942,7 +950,7 @@ Update the RTM whenever requirements change, new test cases are added, or defect
 
 ### Real RTM Example: BBPS Bill Payment Flow → Requirements → Test Cases
 
-The RTM concept above maps directly onto a real feature flow. [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s README describes its **How It Works — Bill Payment Flow** as: Bill Categories → Bill Fetch → Payment Rail Resolved (internal vs. external) → Bill Payment → Transaction Status → Settlement → Reports. Each stage of that flow maps to one or more requirements, each requirement maps to real test case IDs from the project's `regression-checklist.md`, and one row maps all the way through to a real defect:
+The RTM concept above maps directly onto a real feature flow. <a href="https://github.com/ghanendra-sdet/bbps-bill-payment-platform" target="_blank" rel="noopener noreferrer">BBPS Bill Payment Platform</a>'s README describes its **How It Works — Bill Payment Flow** as: Bill Categories → Bill Fetch → Payment Rail Resolved (internal vs. external) → Bill Payment → Transaction Status → Settlement → Reports. Each stage of that flow maps to one or more requirements, each requirement maps to real test case IDs from the project's `regression-checklist.md`, and one row maps all the way through to a real defect:
 
 | Req ID | Requirement Description | Priority | Test Case IDs | Test Status | Defect IDs | Coverage |
 |--------|------------------------|----------|---------------|-------------|-----------|----------|
@@ -1090,7 +1098,7 @@ After review is complete and all comments are addressed:
 
 ### Real Example: What Review Actually Catches
 
-This isn't hypothetical. [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s own `regression-checklist.md` carries this note at the top of the file:
+This isn't hypothetical. <a href="https://github.com/ghanendra-sdet/hrms-platform" target="_blank" rel="noopener noreferrer">HRMS Platform</a>'s own `regression-checklist.md` carries this note at the top of the file:
 
 > *"Cleaned up and structured from the original test case sheet — one duplicate test case ID in the source data (`TC_MYINFO_LOGIN_03` used twice) has been corrected below (`TC_MYINFO_LOGIN_04`)."*
 
@@ -1185,7 +1193,7 @@ Prioritize test cases that cover the most **unique code paths** or **requirement
 
 ### Real Example: Risk-Based Prioritization Applied — Fintech Collection Engine
 
-[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s own regression checklist doesn't just list test cases — it explicitly ranks them by risk in a "Priority Automation Candidates" section, in this order: **Login → Dashboard → Collection → Transaction Search → Transaction Details → Settlement**. Mapped onto the Risk Score table format from above:
+<a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>'s own regression checklist doesn't just list test cases — it explicitly ranks them by risk in a "Priority Automation Candidates" section, in this order: **Login → Dashboard → Collection → Transaction Search → Transaction Details → Settlement**. Mapped onto the Risk Score table format from above:
 
 | Flow | Business Impact (1-5) | Failure Probability (1-5) | Risk Score | Why |
 |---|:--:|:--:|:--:|---|
@@ -1283,7 +1291,7 @@ graph TD
 
 ### Real Example: Evidence of a Suite That Actually Evolved
 
-You can see test case maintenance happen just by looking at the ID numbering in [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s `regression-checklist.md`: the core flow and commercial/GST cases run TC-001 through TC-020, collection-type-specific cases (UPI/QR/VAM/Payment Link/Manual Deposit) run TC-021 through TC-039 — and then **TC-040** ("Late-succeeding transaction after settlement cutoff — must roll into the *next* settlement cycle automatically, never silently dropped") sits appended at the end of the Negative & Edge Cases section, and **TC-059 through TC-064** (an entire UI Consistency category) appear even further out, with a large ID gap between TC-040 and TC-059.
+You can see test case maintenance happen just by looking at the ID numbering in <a href="https://github.com/ghanendra-sdet/fintech-collection-engine" target="_blank" rel="noopener noreferrer">Fintech Collection Engine</a>'s `regression-checklist.md`: the core flow and commercial/GST cases run TC-001 through TC-020, collection-type-specific cases (UPI/QR/VAM/Payment Link/Manual Deposit) run TC-021 through TC-039 — and then **TC-040** ("Late-succeeding transaction after settlement cutoff — must roll into the *next* settlement cycle automatically, never silently dropped") sits appended at the end of the Negative & Edge Cases section, and **TC-059 through TC-064** (an entire UI Consistency category) appear even further out, with a large ID gap between TC-040 and TC-059.
 
 That gap is exactly what Practice #16 (Version Control Test Cases) and the maintenance-triggers table above look like in a real suite: nobody renumbered TC-001 through TC-040 to make room — new test cases got appended with new IDs as new risk categories (a late-settlement edge case, then an entire cross-screen UI-consistency category) were identified over time, almost certainly *after* the original suite was baselined and already in use for regression. Renumbering existing, already-executed, already-referenced-in-RTM test case IDs is exactly the kind of churn Practice #16 exists to avoid.
 
