@@ -66,6 +66,12 @@ This guide is structured as a **complete reference manual** covering every aspec
 | **12** | [QA Best Practices & Modern Trends (2025)](Part_12_QA_Best_Practices_Modern_Trends.md) | Shift-Left/Right, SBTM, AI in Testing, API/Performance/Security basics, DevOps testing, Career growth | ~96 KB |
 | **13** | [Tools & Resources (India-focused)](Resources.md) | Quick reference of popular tools: project, test, CI, performance, security | ~8 KB |
 
+### Quick Reference & Cheat Sheets
+
+| Guide | Title | Key Topics | File |
+|------|-------|------------|------|
+| ★ | [Testing Types Comparison Guide](Testing_Types_Comparison_Guide.md) | Smoke, Sanity, Regression, Retesting, System, Integration, E2E, UAT, API, UI, and Exploratory testing — side-by-side comparison table (When/Who/Purpose/How/Real Examples), the confusing pairs untangled, recommended execution sequence, and flow + frequency diagrams | ~15 KB |
+
 ---
 
 ## 🎯 Quick Reference: What to Study for Specific Goals

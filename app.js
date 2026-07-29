@@ -12,7 +12,8 @@ const files = [
   'Part_09_Agile_Testing.md',
   'Part_10_Test_Planning_Documentation.md',
   'Part_11_Test_Execution_Reporting.md',
-  'Part_12_QA_Best_Practices_Modern_Trends.md'
+  'Part_12_QA_Best_Practices_Modern_Trends.md',
+  'Testing_Types_Comparison_Guide.md'
 ];
 
 const fileTitles = {
@@ -28,7 +29,8 @@ const fileTitles = {
   'Part_09_Agile_Testing.md': 'Part 9: Agile Testing',
   'Part_10_Test_Planning_Documentation.md': 'Part 10: Test Planning & Documentation',
   'Part_11_Test_Execution_Reporting.md': 'Part 11: Test Execution & Reporting',
-  'Part_12_QA_Best_Practices_Modern_Trends.md': 'Part 12: QA Best Practices & Modern Trends'
+  'Part_12_QA_Best_Practices_Modern_Trends.md': 'Part 12: QA Best Practices & Modern Trends',
+  'Testing_Types_Comparison_Guide.md': 'Testing Types Comparison Guide'
 };
 
 const studyParts = files.filter(f => f !== '00_Table_of_Contents.md');
