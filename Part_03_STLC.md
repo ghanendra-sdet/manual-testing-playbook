@@ -77,6 +77,37 @@ flowchart LR
 > [!NOTE]
 > While the diagram shows a linear flow, in practice — especially in Agile environments — these phases may overlap or iterate. For example, Test Case Development and Environment Setup often happen in parallel.
 
+### The Running Example for This Module
+
+Rather than switching to a new toy project every phase, this module walks all six STLC phases
+using **one real portfolio project** as a single worked example: the
+[Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)
+— a SaaS claims platform spanning **four entity types** (Provider, Payer, Employer, Member),
+where the same claim is viewed differently by each portal. It's a genuinely good STLC teaching
+case because every phase maps onto something concrete in a 4-sided system: Requirement Analysis
+has to define what "consistent" means *across four portals*, Environment Setup needs *four test
+personas* instead of one, and Test Execution has to catch defects that only show up when you
+compare views instead of testing any single screen in isolation.
+
+For **Test Cycle Closure**, we'll bring in a second project — the
+[Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform) —
+for contrast, since its regression-execution-summary tells a slightly different closure story (a
+Critical concurrency defect caught right before release) that's worth comparing against.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Why is a 4-entity claims platform a better STLC teaching example than a typical single-portal e-commerce site?</summary>
+
+Because most of STLC's hardest lessons — traceability, environment parity, execution rigor —
+only bite when there's more than one "view" of the same underlying truth to keep in sync. A
+single-portal app can pass every test case and still be simple to reason about. A claim that's
+"Final" on one portal and "Need Review" on another forces every phase to be more disciplined:
+requirements must define cross-entity consistency explicitly, the environment must stand up four
+portals with matching seeded data, and execution must include comparison-style test cases, not
+just single-screen assertions. That's exactly the kind of realistic complexity STLC exists to
+manage.
+
+</details>
+
 ---
 
 ## 3.2 Phase 1: Requirement Analysis
@@ -298,6 +329,59 @@ All 250+ requirements are entered into the RTM with unique IDs, module mapping, 
 
 > [!TIP]
 > **Pro Tip for Requirement Analysis:** Always create a "Requirements Clarity Score" for your project. Rate each requirement on a scale of 1-5 for Clarity, Completeness, Testability, and Consistency. Requirements scoring below 3 on any dimension should be flagged for clarification before proceeding. This creates an objective measure and prevents subjective disputes.
+
+### Real Example: Requirement Analysis on the Healthcare Insurance Platform
+
+→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform):
+early requirement analysis on this platform ran into exactly the kind of ambiguity this section
+warns about. A requirement like "claim status should be consistent for the Member" reads as
+reasonable — until a tester asks "consistent with what, checked how often, by whom?" It only
+became testable once refined (per the platform's
+[`docs/business-overview.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/docs/business-overview.md))
+into something closer to: *"the claim status shown to the Member must match the Payer's
+authoritative status, sourced live or with a bounded cache TTL, verified at the data layer — not
+just visually compared on screen."* That single clarification is the difference between a vague
+requirement and the specific, data-level test case (TC-012 through TC-014 in the regression
+checklist) that later catches real cross-entity bugs.
+
+The requirement-review checkpoints from the table above map directly onto this project:
+
+| Checkpoint | What it caught here |
+|---|---|
+| **Completeness** | Early drafts described the happy path (submit → Final) but said nothing about what "Need Review" or "Rejected" claims should look like across portals |
+| **Consistency** | "Employer plan-rule changes apply going forward" vs. an unstated assumption that already-settled claims stay untouched — had to be reconciled explicitly (this became TC-010) |
+| **Testability** | "The platform should keep claim data in sync" was refined into the measurable, data-level requirement described above |
+| **Traceability** | Every claim-status requirement was assigned an ID feeding the RTM the QA team maintained every release |
+
+For contrast, the [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
+shows the same discipline applied to a very different ambiguity: "the price shown should be the
+price charged" sounds obvious, but only becomes testable once scoped to *"the amount charged at
+payment time must equal the fare-locked price captured at selection time, within the hold
+window"* — a requirement precise enough to design a test case against (and, as its regression
+summary shows, precise enough to later catch a real stale-price defect).
+
+> [!TIP]
+> **🎭 Meme Break — Distracted Boyfriend**
+>
+> 👀 *QA's attention: the "Final / approved" happy path.*  
+> 🚶 *QA, supposedly committed to: the "Final" happy path test cases.*  
+> 💃 *Walking by: "Need Review" claims that silently never resolve, and "Rejected" claims with a  
+> missing reason — the two outcomes requirement analysis explicitly has to call out, or nobody  
+> designs test cases for them.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> "The platform should keep claim data in sync" — is this requirement testable as written? If not, how would you fix it, using the Healthcare Insurance Platform example above?</summary>
+
+Not as written — "in sync" has no measurable definition (sync within what time window? verified
+how? by which side is treated as authoritative?). It's a **Non-Testable** requirement per the
+categories in this section, the same category as "the system should be intuitive." The fix
+mirrors the worked example: refine it to name the authoritative source, the acceptable
+staleness window, and how it will be verified — e.g. "the claim status shown on the Member
+portal must match the Payer's authoritative status within a bounded cache TTL, verified via a
+direct data-layer check." Once it says that, you can write TC-009 and TC-012 against it. Before
+that, you can't write a test case that has a real pass/fail outcome.
+
+</details>
 
 ---
 
@@ -604,6 +688,41 @@ flowchart TD
 
 6. **Key Risk Identified:** Payment gateway sandbox environment has limited transaction types → Mitigation: Coordinate with Stripe/PayPal for extended sandbox access; create mock responses for unavailable scenarios
 
+### Real Example: Test Planning on the Healthcare Insurance Platform
+
+→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform):
+the test strategy for this platform had to answer the six Test Plan questions with a 4-entity
+system in mind, not a single-portal one:
+
+| Test Plan Question | Answer on this project |
+|---|---|
+| **What** is in scope? | All four portals (Provider, Payer, Employer, Member) plus the API and data layer behind the shared claim record |
+| **How** will it be tested? | Functional + API (REST Assured/Postman) + **data-level** testing (direct SQL validation of claim status), not UI assertions alone |
+| **Who** tests it? | One QA/SDET owning end-to-end coverage across all four portals, plus RTM maintenance every sprint |
+| **When**? | Continuously, within the Agile sprint cycle — backlog grooming, sprint planning, and RCA meetings, not a single pre-release pass |
+| **Where**? | UAT environment seeded with dummy claims already in each of the three statuses (Final/Need Review/Rejected) |
+| **What if** something goes wrong? | Highest risk explicitly called out in planning: the Claims Engine is read by all four portals, so a single stale-cache defect there has a four-portal blast radius (this became the actual root cause of BUG-HIP-6014, covered later in Test Execution) |
+
+Note the tool selection matches the platform's real stack — Playwright + TypeScript for UI
+automation, REST Assured/Postman for API CRUD coverage, and direct SQL for data-level checks —
+which only makes sense once the test strategy has explicitly decided that "the UI looks right" is
+not sufficient evidence for this platform; the underlying claim record has to be checked too.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Why does the Healthcare Insurance Platform's test strategy include direct SQL/data-level testing as a first-class technique, when most web apps are tested through the UI alone?</summary>
+
+Because for this platform, the UI can be *wrong in a way that still looks right* — a portal
+showing a cached, stale status is visually indistinguishable from one showing the correct,
+current status. If the test strategy only asserted on what's rendered on screen, a defect like
+"Member portal shows Final while Payer portal still shows Need Review" (a real defect theme on
+this project) could pass every UI-level test case while the underlying data is actually
+inconsistent. Data-level testing closes that gap by checking the claim record directly against
+what each portal displays — it's a strategy decision made during Test Planning specifically
+because of the risk identified in the four-entity architecture, not a generic "best practice"
+applied by default.
+
+</details>
+
 ---
 
 ## 3.4 Phase 3: Test Case Development
@@ -869,6 +988,53 @@ flowchart TD
 > [!TIP]
 > **Rule of Thumb for Test Case Coverage:** Aim for at least 3-5 test cases per requirement — at minimum one positive, one negative, and one boundary/edge case. Critical requirements like login, payments, and data security typically warrant 8-15 test cases each.
 
+### Real Example: Test Case Development on the Healthcare Insurance Platform
+
+→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)'s
+[`regression-checklist.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/regression-checklist.md):
+the same test-case-design disciplines above — one technique per risk, not one technique for
+everything — show up directly in how this suite is organized by category rather than by screen:
+
+| TC ID | Scenario | Technique Used | Why |
+|---|---|---|---|
+| TC-001 – TC-003 | Enrollment (individual, Employer group, duplicate) | Equivalence Partitioning + Error Guessing | Valid enrollment vs. the "duplicate" partition testers instinctively probe |
+| TC-004 – TC-008 | Claim submission and review outcomes | State Transition | Claim moves `SUBMITTED → FINAL / NEED REVIEW / REJECTED` — a textbook state machine |
+| **TC-009 – TC-011** | **Cross-Entity Data Consistency** | Use Case Testing across 4 actors | Marked *Highest Priority* in the checklist — no single-portal technique catches a same-claim, different-status bug |
+| TC-012 – TC-014 | Data-level validation (Final/Need Review/Rejected) | Boundary/state-specific checks, DB-level | Verifies the *record*, not just what one portal renders |
+| TC-015 – TC-018 | API CRUD | Use Case Testing (API) | POST/GET/PATCH/void, each with its own expected/negative behavior |
+| TC-019 – TC-022 | UI Consistency (labels, currency/date formatting, colorblind-safe status) | Pairwise-style comparison across 4 portals | Same data, four renderings — must match exactly |
+
+Notice that TC-009 ("Claim status consistent across all 4 portals") isn't a UI test in the usual
+sense — its *test data* is a single claim ID, and its *steps* are "check four different systems
+and diff them." This is exactly the kind of test case that only gets written if Requirement
+Analysis explicitly called out cross-entity consistency as testable (see 3.2 above) — otherwise a
+test designer defaults to testing each portal in isolation and never designs this case at all.
+
+> [!TIP]
+> **🎭 Meme Break — Expanding Brain**
+>
+> 🧠 *Level 1: Write one test case — "claim can be submitted."*  
+> 🧠🧠 *Level 2: Write positive + negative + boundary test cases per requirement, per the 3-5  
+> rule of thumb above.*  
+> 🧠🧠🧠 *Level 3: Add a data-level test case that queries the database directly instead of  
+> trusting the UI.*  
+> 🧠🧠🧠🧠 *Level 4: Write TC-009 — one test case whose entire job is opening four different  
+> portals for the same claim ID and asserting they all agree with each other.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> TC-005 ("Payer reviews and approves a claim") and TC-009 ("Claim status consistent across all 4 portals") both touch claim status. Why is TC-009 marked higher priority?</summary>
+
+TC-005 verifies that one action (Payer approval) produces the correct status transition in one
+place — a standard functional check, valuable but contained. TC-009 verifies something TC-005
+can't: that the *same* status is visible identically across all four independently-built portals
+after that transition. A platform can pass TC-005 every time and still ship the exact defect this
+module keeps returning to — BUG-HIP-6014, where the Payer's approval was correct but the Member
+portal kept showing stale data. Test case priority in this project follows the same logic as
+Requirement Analysis: single-portal correctness is necessary but not sufficient, so the test case
+that catches cross-portal drift outranks the one that only checks a single action.
+
+</details>
+
 ---
 
 ## 3.5 Phase 4: Test Environment Setup
@@ -1051,6 +1217,56 @@ flowchart TD
 
 5. **Multi-device Testing**: Need to test on iOS and Android devices
    - *Solution*: Used BrowserStack for cloud device testing; maintained 4 physical devices (2 iOS, 2 Android) for critical path testing
+
+### Real Example: Test Environment Setup on the Healthcare Insurance Platform
+
+→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform):
+this is the phase where the platform's 4-entity model has the most direct, practical impact on
+STLC. A single-portal application typically needs one test-user persona per role (admin,
+standard user). This platform needs **four independent personas layered on the same test data**,
+because every phase downstream depends on being able to see one claim from four different seats:
+
+| Entity | Test Persona Needed | What Must Be Seeded For It |
+|---|---|---|
+| **Provider** | Test provider account, credentialed in a test Provider Network | Ability to submit claims on behalf of test Members |
+| **Payer** | Test payer/reviewer account | Review queue populated with claims in all three outcome states |
+| **Employer** | Test employer admin account | A group plan with defined, known coverage rules a Payer can apply |
+| **Member/Patient** | Test member account, enrolled individually *and* via the test Employer's group plan (covers TC-001 and TC-002) | Visibility into their own claims at every status, to compare against the other three portals |
+
+The environment readiness checklist from this section maps onto a healthcare-specific version:
+instead of one generic "smoke test," the smoke check here has to confirm that **the same claim
+ID resolves consistently when queried through all four test personas** — because if the
+environment itself can't hold four consistent views before testing even starts, every downstream
+test result is unreliable in exactly the way this phase exists to prevent. Data-level access (a
+read-only test DB connection) also has to be provisioned here, not requested later, since the
+test strategy from 3.3 already committed to data-level validation as a first-class technique.
+
+This mirrors — and reinforces — the MedConnect example above: both are healthcare platforms where
+"realistic but synthetic test data, seeded across every role that needs to see it" is the hard
+part of environment setup, not the server stack itself.
+
+> [!WARNING]
+> **🎭 Meme Break — "This Is Fine" Dog**
+>
+> 🔥 *The room: four portals, four sets of test credentials, and a claim ID that's supposed to  
+> mean the same thing in all of them.*  
+> 🐶☕ *The QA engineer who only smoke-tested the Provider login: "This is fine."*  
+> 🔥🔥🔥 *(It is not fine. Nobody checked whether the Payer, Employer, and Member test accounts can  
+> even see the same claim yet.)*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Why isn't "the application URL is accessible and the login page loads" (ST-001 in the generic smoke test table) sufficient to declare this environment ready for the Healthcare Insurance Platform?</summary>
+
+Because that smoke check only proves *one* portal is reachable — it says nothing about whether
+the other three entity portals are up, or whether they'd all agree on the state of the same
+claim. An environment can pass ST-001 through ST-008 perfectly for the Provider portal alone and
+still be unusable for this project's actual test cases, since TC-009 (cross-entity consistency)
+and TC-012 through TC-014 (data-level checks) need all four portals *and* database access
+working together. The environment readiness checklist has to be widened to a 4-portal,
+cross-checked version of the same idea — otherwise Test Execution starts on an environment that
+was only ever verified from one entity's point of view.
+
+</details>
 
 ---
 
@@ -1337,6 +1553,59 @@ flowchart TD
 
 Pass rate now exceeds the 95% threshold. All Critical defects are fixed and verified. 9 remaining failures are Minor/Cosmetic and accepted as known issues for post-release fix.
 
+### Real Example: Test Execution on the Healthcare Insurance Platform
+
+→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)'s
+[`sample-defect-report.md`](https://github.com/ghanendra-sdet/healthcare-insurance-platform/blob/main/sample-defect-report.md):
+this is what executing TC-009 (cross-entity consistency) actually found.
+
+**BUG-HIP-6014** — *Member portal shows claim as "Final" while Payer portal still shows "Need
+Review"* — Severity: **Critical**
+
+- **Steps:** As Payer, move a dummy claim into `NEED REVIEW`. Before completing the review, check
+  the same claim in the Member portal.
+- **Expected:** Member portal shows `NEED REVIEW`, matching the Payer's actual state.
+- **Actual:** Member portal shows `FINAL` — it was reading a cached status from an earlier
+  polling cycle and never refreshed after the Payer's change.
+- **Root cause:** the Member portal's status wasn't sourced live (or with a bounded cache TTL)
+  from the same authoritative Claims Engine the Payer portal reads from — an independently
+  cached copy drifted out of sync.
+
+**BUG-HIP-6032** — *Rejected claim shows no reason in the Provider portal, though one was
+recorded* — Severity: **Major**
+
+- **Actual:** the Provider portal's claim detail view simply hadn't been updated to read the
+  rejection-reason field when it was added to the schema, even though the Member portal displayed
+  it correctly.
+
+Mapping this onto the generic execution/defect workflow above: both defects were caught by test
+cases specifically designed to *compare across portals* (TC-009, TC-020), not by any single-portal
+functional test — which is exactly why 3.2's requirement-analysis clarification and 3.4's
+cross-entity test case design mattered. A test suite that only exercised the Payer portal in
+isolation would have marked TC-005 "Pass" and shipped both of these.
+
+> [!TIP]
+> **🎭 Meme Break — Drake Hotline Bling**
+>
+> ❌ *Testing the happy path: Payer approves a claim, Payer portal shows Final. Ship it.*  
+> ✅ *Testing what the Member, Provider, and Employer portals show for that exact same claim ID,  
+> ten seconds later — before, during, and after the status change finishes propagating.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> BUG-HIP-6014 never breaks the Payer portal — the Payer's own view is correct throughout. Why is it still filed as Critical, not Minor?</summary>
+
+Because severity is about impact, not about which screen looks broken. The Member sees `FINAL`
+and reasonably believes their claim is settled — they may act on that (e.g., assume
+reimbursement is confirmed) when the real, authoritative state is still `NEED REVIEW`. That's a
+trust and potentially financial-planning problem for a real person, caused entirely by a stale
+cache the Payer never sees evidence of. This is the same principle as BUG-COL-1042 from Part 1
+(the missing ledger debit entry that never crashed the UI): the defect is invisible from the
+"working" side of the system and only visible from the side that's quietly wrong, which is
+precisely why cross-entity/cross-portal defects default to Critical in this kind of platform
+regardless of how clean any single portal looks.
+
+</details>
+
 ---
 
 ## 3.7 Phase 6: Test Cycle Closure
@@ -1557,6 +1826,71 @@ flowchart TD
 
 5. **Artifact Archival**: All artifacts archived per government data retention policy (7 years)
 
+### Real Example: Test Cycle Closure — Two Portfolio Projects Compared
+
+Closure is easiest to understand by comparing two real, differently-shaped test cycles side by
+side.
+
+→ Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform)
+(cumulative, across the engagement): **350+ defects** raised in JIRA with a **95%+ resolution
+rate** within sprint cycles, **85%+ automation coverage** across critical claim workflows, and a
+**25% reduction** in overall release cycle time attributed to early defect detection and
+shift-left testing — plus an RTM maintained every single sprint, so "100% requirement coverage"
+in a closure report isn't a one-time claim, it's a standing one.
+
+→ Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)'s
+[`regression-execution-summary.md`](https://github.com/ghanendra-sdet/travel-marketplace-platform/blob/main/regression-execution-summary.md)
+(one regression cycle):
+
+| Metric | Value |
+|---|---|
+| Total Test Cases Executed | 47 |
+| Passed | 42 |
+| Failed | 4 |
+| Blocked | 1 |
+| Pass Rate | 89.4% |
+| Critical Defects | 1 (concurrent double-booking in Overbooking Prevention) |
+| Major Defects | 1 (stale-price payment defect in Fare Lock & Booking) |
+
+The Travel Marketplace cycle's 89.4% pass rate is below the generic 95% exit-criteria threshold
+used earlier in this section — and that's the point of a closure report: it doesn't hide the
+number, it explains it. The summary's own conclusion calls out that the single Critical defect
+(concurrent double-booking) is exactly the risk the test strategy was built to catch, since the
+platform's [`docs/business-overview.md`](https://github.com/ghanendra-sdet/travel-marketplace-platform/blob/main/docs/business-overview.md)
+identifies price/availability integrity as the module's central risk — so catching it here,
+before release, is the closure phase doing its job, not a red flag to hide.
+
+**The contrast worth remembering:** the Healthcare platform's numbers describe *release cadence
+across many sprints*; the Travel Marketplace numbers describe *one regression cycle's health*.
+Both are legitimate STLC closure reporting — a Test Summary Report can be scoped to a single test
+cycle or rolled up across a release, as long as the scope is stated clearly (see Test Summary
+Report Structure, item 1, above).
+
+> [!NOTE]
+> **🎭 Meme Break — Galaxy Brain**
+>
+> 🧠 *Small brain: skip the retrospective, everyone's tired, ship it.*  
+> 🧠✨ *Medium brain: write the Test Summary Report because a stakeholder asked for it.*  
+> 🧠✨✨ *Big brain: archive the RTM and defect data because it's required for next sprint's  
+> planning.*  
+> 🌌 *Galaxy brain: realize the Travel Marketplace's 89.4% pass rate, written down and explained,  
+> is far more useful to the next release than a hidden 100% that nobody double-checked.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> The Travel Marketplace regression cycle closed at 89.4% pass rate — below the typical ≥95% exit-criteria threshold used earlier in this module. Should the team have refused to close this test cycle?</summary>
+
+Not necessarily — a pass-rate threshold is a *default* exit criterion, not an unconditional one.
+What matters is whether the specific failures are understood and acceptable. Here, 1 Critical
+defect (concurrent double-booking) was caught and would need to be fixed and verified before
+release — that's the exit criteria doing exactly what it should: blocking release on a Critical
+issue. The Major stale-price defect and the blocked UI-consistency case likely need triage too.
+Closing the *test cycle* (documenting results, filing defects, writing the summary) is different
+from declaring the *release* ready — you can formally close a regression cycle at 89.4% as long
+as the report is honest about what's still open and who owns fixing it before sign-off, which is
+exactly what this summary does.
+
+</details>
+
 ---
 
 ## 3.8 STLC Best Practices
@@ -1611,6 +1945,19 @@ flowchart TD
     - Good documentation enables knowledge transfer and audit compliance
     - Use templates for consistency
 
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Which single best practice above, if it had been skipped, would most plausibly explain how BUG-HIP-6014 shipped in the first place?</summary>
+
+"Maintain Traceability Throughout" (#2) is the strongest candidate. If the RTM had linked
+REQ-level cross-entity consistency requirements to a specific test case the way it's supposed to,
+TC-009 would have existed and been executed *before* release, not just eventually. Skipping
+traceability doesn't cause a caching bug directly — but it's exactly how a requirement like "the
+Member portal must reflect the Payer's live status" can quietly have no test case behind it for
+a release or two, which is how a defect like this survives multiple regression cycles before
+finally being caught.
+
+</details>
+
 ---
 
 ## 3.9 Common Mistakes in STLC
@@ -1629,6 +1976,46 @@ flowchart TD
 | 10 | **Not involving QA early** | Late discovery of testability issues | Practice shift-left; include QA in all project phases |
 | 11 | **Testing without a plan** | Ad-hoc, chaotic testing | Always create a test plan, even if lightweight |
 | 12 | **Ignoring blocked test cases** | Gaps in test coverage go unnoticed | Track and resolve blockers daily; report blocked cases separately |
+
+> [!IMPORTANT]
+> **🎭 Meme Break — Always Has Been (Astronaut)**
+>
+> 🧑‍🚀 *"Wait, mistake #8 (skipping closure), #3 (vague test cases), and #1 (skipping requirement  
+> analysis) all trace back to the same root cause on this project?"*  
+> 🧑‍🚀🔫 *"Always has been."*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Of the 12 common mistakes above, which one is the "silent" one — the one a team can be making for months without any obvious symptom, unlike a missed deadline or a rejected defect?</summary>
+
+Mistake #8, **Skipping Test Closure**. Skipping requirement analysis or writing vague test cases
+produces visible pain almost immediately — missed defects, confused testers, rejected bugs. But
+skipping the retrospective and lessons-learned step produces no immediate symptom at all; the
+current release ships fine either way. The cost only shows up later, as the *same* root cause
+(an under-specified requirement, an environment gap, a test case nobody thought to write)
+resurfaces on the next project, because nothing was ever written down the first time. It's the
+mistake most likely to go unnoticed precisely because its damage is deferred and diffuse rather
+than immediate.
+
+</details>
+
+---
+
+## 📌 Fact Sheet — Part 3 in 60 Seconds
+
+- **STLC ≠ SDLC.** SDLC builds the product; STLC validates it — six phases: Requirement Analysis → Test Planning → Test Case Development → Environment Setup → Test Execution → Test Closure.
+- **Requirement Analysis starts before code exists.** A requirement like "keep claim data in sync" isn't testable until it names an authoritative source, a staleness window, and a verification method — see the Healthcare Insurance Platform's REQ refinement in 3.2.
+- **The RTM is a living document, not a one-time artifact.** It's initiated in Phase 1, filled in during Phase 3, and updated through Phase 5 — skipping updates is how untested requirements (and undetected defects like BUG-HIP-6014) slip through.
+- **The Test Plan answers six questions:** What, How, Who, When, Where, and What-if — not just "what will we test."
+- **Effort estimation isn't guessing.** WBS, PERT (`E = (O + 4M + P) / 6`), and Function Point Analysis all turn "how long will this take" into a defensible number.
+- **Well-designed test cases target risk, not screens.** TC-009 on the Healthcare Insurance Platform (cross-entity consistency) outranks a single-portal approval test because it catches a class of bug single-portal tests structurally cannot.
+- **Data-level testing catches what UI testing can't.** A portal showing a stale cached status looks identical to one showing the correct status — only checking the underlying record (as this platform's QA strategy does) exposes the difference.
+- **Environment setup needs to match every consumer of the system, not just one.** A 4-entity platform needs four test personas seeded against the same claim data before Test Execution can even start meaningfully.
+- **Severity is about impact, not which screen looks broken.** BUG-HIP-6014 never crashed the Payer's UI — it was Critical because the Member's incorrect view could drive a real, wrong financial decision.
+- **Test Execution runs in cycles, not once.** Cycle 1 finds defects, retesting verifies fixes, regression proves nothing else broke — each is a distinct activity with a distinct purpose.
+- **A closure report can honestly show below-target numbers and still be a successful closure.** The Travel Marketplace's 89.4% pass rate, fully explained with owned next steps, is more useful than a hidden 100%.
+- **Test Closure is the phase most often skipped — and the one whose cost is deferred, not immediate.** Its absence doesn't cause today's release to fail; it causes next quarter's release to repeat today's mistake.
+- **Entry/exit criteria are gates, not suggestions.** Waivers should be formal and documented, never silent.
+- **Shift-left and traceability are the two threads that run through all six phases** — start QA early, and never let a requirement, test case, or defect exist without a link back to the others.
 
 ---
 

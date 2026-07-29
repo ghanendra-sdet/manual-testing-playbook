@@ -76,6 +76,15 @@ Test Scenario: "Verify Login Functionality"
   └── Test Case 6: Login with account that is locked
 ```
 
+> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine): the exact scenario-to-case fan-out shown above plays out in the project's actual `regression-checklist.md`. The scenario "Verify UPI collection reaches the correct terminal status" fans out into four real, atomic test cases: **TC-021** (customer approves → status goes INITIATED → SUCCESS), **TC-022** (customer declines → FAILED with a clear reason), **TC-023** (customer takes no action → must transition to EXPIRED, never sit PENDING forever), and **TC-024** (a malformed VPA is rejected before it ever reaches the customer's app). Four numbered test cases, one scenario, each with a single precise expected result — the same 1-to-many relationship as the diagram above, just with real IDs instead of placeholders.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> TC-023 (UPI — customer takes no action) expects the transaction to move to EXPIRED. Why isn't "stays PENDING indefinitely" an acceptable expected result here, even though the customer genuinely never responded?</summary>
+
+Because "PENDING forever" isn't a terminal state — it's an unresolved one, and unresolved states break every downstream process that assumes a transaction eventually lands somewhere final (settlement, reconciliation, merchant reporting). A precise expected result has to specify *what the system does about it*, not just describe the absence of customer action. This is the same CRISP-TRAM discipline as "Precise Expected Results": "should work correctly" and "stays pending" are both too vague to verify against — EXPIRED is a specific, checkable, terminal state.
+
+</details>
+
 ---
 
 ## 6.2 Test Case Writing Format
@@ -299,6 +308,138 @@ A well-structured naming convention makes test cases easy to find and organize:
 
 ---
 
+### Real-World Test Case Examples
+
+The four sample test cases above use a placeholder e-commerce app so the template itself stays the focus. Here's the exact same template applied to real, numbered test cases pulled from actual portfolio regression checklists — expanded from a one-line checklist row into the full format.
+
+#### Sample Test Case 5 (Real): QR Double-Charge Prevention
+
+| Field | Details |
+|-------|---------|
+| **Test Case ID** | TC-027 |
+| **Test Suite** | Collection — QR Collection |
+| **Test Scenario** | Verify a dynamic QR cannot be paid twice after a successful payment |
+| **Description** | This test case verifies that once a dynamic QR code has been successfully paid, re-scanning and attempting to pay the same QR a second time is blocked — preventing a customer (or a replay/race condition) from double-charging against the same QR. |
+| **Prerequisites** | 1. Merchant is logged in to the Collection Engine dashboard (dummy merchant account)<br/>2. A dynamic QR has been generated for a fixed dummy amount of ₹500<br/>3. The QR has NOT yet been paid<br/>4. Test UPI app/simulator is available to scan and pay |
+| **Test Data** | QR Amount: ₹500 (fixed, dynamic QR)<br/>Dummy VPA: test@dummybank |
+
+**Test Steps:**
+
+| Step # | Action | Expected Result |
+|--------|--------|-----------------|
+| 1 | Scan the dynamic QR with the test UPI app | Payment screen shows the fixed amount ₹500 (not editable) |
+| 2 | Approve the payment | Transaction status transitions INITIATED → SUCCESS; success confirmation shown |
+| 3 | Verify the transaction in Transaction Search shows status SUCCESS | Transaction is listed with status SUCCESS and amount ₹500 |
+| 4 | Re-scan the exact same QR code | QR still opens a payment screen (the QR itself isn't visually invalidated) |
+| 5 | Attempt to approve payment a second time against the same QR | Second payment attempt is blocked — no new transaction is created and no second debit occurs |
+| 6 | Verify Transaction Search still shows exactly one SUCCESS transaction for this QR | Only the original transaction from Step 2 exists; no duplicate entry |
+| 7 | Verify the merchant's settlement/ledger reflects only one ₹500 credit | Ledger and settlement totals show exactly one ₹500 credit, not two |
+
+| Field | Details |
+|-------|---------|
+| **Expected Result** | The second payment attempt against an already-paid dynamic QR is blocked; exactly one SUCCESS transaction and one ledger credit exist for the QR |
+| **Actual Result** | *(To be filled during execution)* |
+| **Status** | Not Executed |
+| **Priority** | High |
+| **Severity** | Critical |
+| **Test Type** | Functional, Regression |
+| **Requirement ID** | REQ-COL-QR-003 |
+| **Created By** | QA Team |
+| **Created Date** | 2026-06-10 |
+| **Version** | 1.0 |
+
+> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s `regression-checklist.md` — this is TC-027 in the actual suite, expanded here into the full template. Notice the expected result is deliberately precise about *what doesn't happen* (no second debit, no duplicate ledger entry) — in fintech QA, "the payment was blocked" isn't enough on its own; you have to verify the money-movement side agrees, or you've only checked the UI's opinion of what happened.
+
+#### Sample Test Case 6 (Real): Profile Picture Upload — Size Rejection
+
+| Field | Details |
+|-------|---------|
+| **Test Case ID** | TC_MYINFO_PERSDETAILS_06 |
+| **Test Suite** | ESS / MyInfo — Personal Details — Profile Picture Upload |
+| **Test Scenario** | Verify the system rejects a profile picture upload over 1 MB |
+| **Description** | This test case verifies that when an ESS user attempts to attach a profile picture larger than the platform's 1 MB limit on the Contact Details form, the upload is rejected with a clear, specific error rather than silently failing or being accepted. |
+| **Prerequisites** | 1. ESS user is logged in (valid dummy ESS account, created by an HR Admin)<br/>2. User has navigated to Personal Details → Contact Details<br/>3. A dummy image file (jpg/png/gif) larger than 1 MB is available on the test machine |
+| **Test Data** | File: `dummy_photo_large.jpg`, Size: 1.4 MB (over the 1 MB limit), Format: JPG |
+
+**Test Steps:**
+
+| Step # | Action | Expected Result |
+|--------|--------|-----------------|
+| 1 | Click "Edit" on the Contact Details page | Form becomes editable |
+| 2 | Click the "Add" button in the attachment/profile picture section | File browse dialog opens |
+| 3 | Browse to and select `dummy_photo_large.jpg` (1.4 MB) | File is selected in the dialog |
+| 4 | Click "Save" | Upload is **not** allowed; a specific file-size error is displayed (e.g. "File size exceeds 1 MB limit") — not a generic "upload failed" message |
+| 5 | Verify the Contact Details form | No profile picture is attached; any previous picture remains unchanged |
+| 6 | Re-open the form and check for orphaned references | No reference to the rejected file was saved |
+
+| Field | Details |
+|-------|---------|
+| **Expected Result** | Upload is blocked with a specific, size-related error message; the form's existing state is left unchanged |
+| **Actual Result** | *(To be filled during execution)* |
+| **Status** | Not Executed |
+| **Priority** | Medium |
+| **Severity** | Major |
+| **Test Type** | Functional |
+| **Requirement ID** | REQ-ESS-PROF-006 |
+| **Created By** | QA Team |
+| **Created Date** | 2026-06-10 |
+| **Version** | 1.0 |
+
+> → Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s `regression-checklist.md` — this is TC_MYINFO_PERSDETAILS_06, and it has a real documented defect behind it: **BUG-HRM-7038** (Major) — "Profile picture upload accepts a file over the 1 MB limit," because the original check only validated the file *extension*, not the actual file size. Paired with its sibling TC_MYINFO_PERSDETAILS_05 (identical flow, file **under** 1 MB, upload allowed), it's a textbook Boundary Value pair — one test case on each side of the same limit. The same checklist's UI Consistency case, TC_MYINFO_UI_03, separately requires the format-rejection and size-rejection error messages to be *distinct* — a generic "upload failed" for both would pass this test case but fail that one.
+
+#### Sample Test Case 7 (Real): Stale-Amount Protection
+
+| Field | Details |
+|-------|---------|
+| **Test Case ID** | TC-006 |
+| **Test Suite** | Bill Payment — Stale-Amount Protection |
+| **Test Scenario** | Verify the platform never charges a bill amount that has gone stale between fetch and payment |
+| **Description** | This test case verifies that if enough time passes between fetching a bill's outstanding amount and actually paying it, the platform either re-validates the amount with the biller or blocks payment and asks the user to refetch — it must never silently charge the originally-fetched (potentially outdated) amount. |
+| **Prerequisites** | 1. User is on the Bill Payment section with a valid dummy biller category selected (e.g. Electricity)<br/>2. A valid dummy consumer number/reference exists with a known outstanding amount<br/>3. Test environment allows simulating elapsed time past the platform's amount-freshness window |
+| **Test Data** | Biller: Electricity (dummy)<br/>Consumer Number: dummy valid reference<br/>Fetched Amount: ₹1,240 |
+
+**Test Steps:**
+
+| Step # | Action | Expected Result |
+|--------|--------|-----------------|
+| 1 | Select "Electricity" category and enter the dummy consumer number | Bill is fetched, outstanding amount ₹1,240 is displayed |
+| 2 | Wait until the platform's defined freshness window has elapsed (test env: simulate expiry) without paying | Fetched amount is still shown on screen (the UI does not auto-refresh silently) |
+| 3 | Click "Pay" using the now-stale ₹1,240 amount | Platform blocks the payment or re-fetches automatically — a clear message is shown (e.g. "Amount may have changed — please refetch to continue") |
+| 4 | Refetch the bill as prompted | Current outstanding amount is re-fetched and displayed (may be same or different from ₹1,240) |
+| 5 | Complete payment against the freshly-fetched amount | Payment succeeds for the freshly-fetched amount only |
+| 6 | Verify the transaction record | Transaction shows the freshly-fetched amount actually charged — never the original stale ₹1,240 if it had changed |
+
+| Field | Details |
+|-------|---------|
+| **Expected Result** | Payment against a stale fetched amount is never silently processed; the user is forced through a re-validation or refetch step first |
+| **Actual Result** | *(To be filled during execution)* |
+| **Status** | Not Executed |
+| **Priority** | High |
+| **Severity** | Critical |
+| **Test Type** | Functional, Regression |
+| **Requirement ID** | REQ-BBPS-FETCH-003 |
+| **Created By** | QA Team |
+| **Created Date** | 2026-06-10 |
+| **Version** | 1.0 |
+
+> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s `regression-checklist.md` — this is TC-006, and the project's README calls it out by name as a first-class scenario, not an afterthought. It's grounded in a real defect: **BUG-BBPS-1104** (Critical) — "Payment charges a stale bill amount after biller updates the balance mid-session," where the payment silently proceeded with the originally-fetched figure even after the freshness window had clearly elapsed. This test case is precisely the regression check written to make sure that defect never comes back.
+
+> [!TIP]
+> **🎭 Meme Break — Distracted Boyfriend**
+>
+> 👀 *QA engineer, distracted by:* writing yet another happy-path "successful payment" test case  
+> 🚶 *Walking past:* what happens the second the customer scans the same QR code again  
+> 👩 *Girlfriend, unimpressed:* the audit trail that now has to explain two debits for one QR
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> TC-027 (QR re-scan) and TC_MYINFO_PERSDETAILS_06 (oversized photo upload) both have "the action is blocked" as part of their expected result. Why isn't "upload blocked" or "payment blocked" a complete, precise expected result on its own?</summary>
+
+Because "blocked" describes the negative — what didn't happen — but a precise expected result (the "P" in CRISP-TRAM) has to specify the *positive*, verifiable evidence too: for TC-027, that means confirming exactly one SUCCESS transaction and one ledger credit exist, not just that a second popup didn't appear. For TC_MYINFO_PERSDETAILS_06, it means a *specific* size-related error message is shown (not a generic "upload failed") and the form's prior state is untouched. A tester who only checks "did it get blocked?" can pass both test cases even if the system quietly created a duplicate record or showed the wrong error — precise expected results close exactly that gap. BUG-HRM-7038 is proof this isn't theoretical: the size check existed, it just wasn't actually checking size.
+
+</details>
+
+---
+
 ## 6.3 Test Scenario vs Test Case
 
 ### Definitions with Examples
@@ -406,6 +547,30 @@ graph TD
 |-------|-----------|----------|
 | TC_PAY_017 | Request full refund for delivered order — verify refund amount matches original payment | High |
 | TC_PAY_018 | Request partial refund (return 1 of 3 items) — verify correct partial amount refunded | High |
+
+### Real Example: Scenarios to Test Cases — BBPS Payment Rail Selection
+
+The same "one scenario → many test cases" pattern from the Payment Module walkthrough above shows up in [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s actual `regression-checklist.md`, built around a genuinely tricky business rule: a merchant with an active Payout/Connected Banking service pays a **lower fee** by routing through that internal rail instead of the external Payment Gateway.
+
+**Test Scenario:** *Verify the correct payment rail (internal vs. external) is selected and the correct fee is charged*
+
+| TC ID | Test Case | Priority |
+|-------|-----------|----------|
+| TC-016 | Merchant with active Payout/Connected Banking service — payment routes through the internal rail, lower service charge applied | High |
+| TC-017 | Merchant with no active internal rail — payment routes through the external Gateway (PhonePe PG/Razorpay PG/Cashfree PG), standard fee applied | High |
+| TC-018 | Correct, distinct fee is displayed *before* payment confirmation for each merchant type — never the wrong rail's fee | High |
+| TC-019 | Rail choice is accurately attributed in Reports (which rail, which fee) | Medium |
+| TC-020 | Internal rail unavailable for an eligible merchant — either a defined fallback to the Gateway occurs, or a clear error is shown (never a silent hang or double-charge) | Critical |
+| TC-021 | Merchant eligibility change (service deactivated) is reflected on the *very next* payment — no stale "eligible" state | High |
+
+Six atomic test cases from one scenario, exactly like the generic Payment Module walkthrough above — except TC-020 and TC-021 exist specifically because *state can change between the moment a merchant becomes eligible and the moment they actually pay*, which is precisely the kind of case a purely happy-path tester would never think to write.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> TC-020 and TC-021 above don't test the payment rail logic itself — they test what happens when eligibility <em>changes</em>. Why does that deserve its own test cases instead of being covered "for free" by TC-016 and TC-017?</summary>
+
+Because TC-016 and TC-017 each test a static snapshot — a merchant that is *already* eligible, or *already* not eligible, at the moment of payment. Neither one exercises the transition between those two states, and transitions are exactly where real defects hide: a cached eligibility flag, a stale session, a rail resolved at page-load time that isn't re-checked at payment time. It's the same logic behind why "Login with valid credentials" and "Login with locked account" don't automatically cover "account gets locked while the user has the login page open" — state-change scenarios need their own explicit test cases; they're never a side effect of testing the two end states alone.
+
+</details>
 
 ---
 
@@ -541,6 +706,29 @@ For complex UI interactions, include annotated screenshots showing:
 
 Track changes to test cases over time. When requirements change, update test cases and increment the version number. Maintain a change log.
 
+### Real-World Application: These Best Practices in an Actual Checklist
+
+A few of the practices above are easiest to see by pointing at where they're actually followed in real, published regression checklists:
+
+- **Practice #3 (positive + negative cases) in action:** [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s bill-fetch flow has exactly this shape — TC-002 (valid reference, happy path), TC-003 (invalid reference, negative), TC-004 (biller timeout, negative/edge), and TC-006 (stale amount at payment time, negative/edge). One positive case, three negative/edge cases — closer to the "2-3 negative per positive" rule of thumb than most real suites manage.
+- **Practice #9 (specific, verifiable test data) in action:** [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s upload test cases don't say "upload a large file" — TC_MYINFO_PERSDETAILS_05 and TC_MYINFO_PERSDETAILS_06 specify **exactly** "under 1 MB" and "over 1 MB" as the test data, because the 1 MB line is the entire point of the two test cases.
+- **Practice #11 (prioritize) in action:** [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s own checklist explicitly ranks Login, Dashboard, Collection, Transaction Search, Transaction Details, and Settlement as the six highest-priority flows — automated first specifically because "they form the primary merchant regression path and are run on every release," while collection-type edge cases and UI-consistency checks are named as the *next* tier, not dropped, just sequenced later.
+
+> [!TIP]
+> **🎭 Meme Break — Expanding Brain**
+>
+> 🧠 *Level 1: Writing one test case — "user can pay a bill."*  
+> 🧠🧠 *Level 2: Adding a negative case — "invalid reference is rejected."*  
+> 🧠🧠🧠 *Level 3: Adding an edge case — "biller times out."*  
+> 🧠🧠🧠🧠 *Level 4: Adding the case nobody asks for — "user fetches the bill, goes to make a coffee, comes back four minutes later, and THEN pays."*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> BBPS's bill-fetch flow has one positive test case and three negative/edge ones (TC-003, TC-004, TC-006). Why does a business-critical flow like this usually need MORE negative coverage than positive, not equal amounts?</summary>
+
+Because there's typically only one way for a flow to succeed but many independent ways for it to fail, and each failure mode is a distinct code path that needs its own verification: invalid input (TC-003), a downstream dependency being unavailable (TC-004, biller timeout), and a timing/state problem where the input was valid but is no longer trustworthy (TC-006, stale amount). Testing only the happy path proves the system works when everything cooperates — the easiest, least valuable thing to prove. The negative and edge cases are what actually protect the business, which is why the rule of thumb skews 2-3 negative cases for every positive one, not 1:1.
+
+</details>
+
 ---
 
 ## 6.5 Test Data Management
@@ -615,6 +803,23 @@ Test data directly affects the quality of testing — if the data doesn't cover 
 | **PCI-DSS** (Payment Cards) | No real card numbers in test environments; use test card numbers (e.g., Stripe test cards) |
 | **CCPA** (California) | Consumer personal information must be masked; consumers can request data deletion |
 | **SOX** (Financial) | Audit trail for all data access; segregation of test and production environments |
+
+### Real Example: Dummy Data Conventions Across These Portfolio Projects
+
+Every regression checklist referenced in this Part follows the data-privacy discipline described above in practice, not just in policy: [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) uses `test@dummybank` as its VPA and an explicit "dummy merchant ID," [BBPS](https://github.com/ghanendra-sdet/bbps-bill-payment-platform) uses a "dummy valid consumer number" instead of a real utility account, and [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform) uses ESS accounts explicitly documented as "dummy/sample" test users. None of these checklists reference a real customer, a real bank, or a real employee — every ID, VPA, and file name is synthetic **Valid Data** or **Invalid Data** from the table above, built specifically so the checklist itself is safe to publish and share.
+
+> [!WARNING]
+> **🎭 Meme Break — This Is Fine**
+>
+> 🔥 *"I'll just copy a few real customer rows into the QA database, it's faster than generating fake ones."*  
+> 🐶☕ *— A tester about to become the subject of the next GDPR/PCI-DSS finding, sitting in a room that is very much not fine.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> None of the real regression checklists referenced in this Part use a real merchant, employee, or consumer number — even though they document genuinely detailed test scenarios. Why does that matter for a portfolio project specifically?</summary>
+
+Because a regression checklist is meant to be shared — with reviewers, with this playbook, with anyone evaluating the work — and doing that safely means the underlying data has to be synthetic from the start, not real data that got masked after the fact. It's the same principle as the Data Masking section above, just applied one step earlier: instead of generating real data and then anonymizing it, these checklists were designed around dummy VPAs, dummy consumer numbers, and dummy ESS accounts from day one, so there's no PII to accidentally leak in the first place — the safest masking is the data that was never real.
+
+</details>
 
 ---
 
@@ -735,6 +940,48 @@ Update the RTM whenever requirements change, new test cases are added, or defect
 > [!TIP]
 > Even if your team uses a test management tool, export RTM data to Excel for stakeholder presentations. Not all stakeholders have access to testing tools, but everyone can read a spreadsheet.
 
+### Real RTM Example: BBPS Bill Payment Flow → Requirements → Test Cases
+
+The RTM concept above maps directly onto a real feature flow. [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)'s README describes its **How It Works — Bill Payment Flow** as: Bill Categories → Bill Fetch → Payment Rail Resolved (internal vs. external) → Bill Payment → Transaction Status → Settlement → Reports. Each stage of that flow maps to one or more requirements, each requirement maps to real test case IDs from the project's `regression-checklist.md`, and one row maps all the way through to a real defect:
+
+| Req ID | Requirement Description | Priority | Test Case IDs | Test Status | Defect IDs | Coverage |
+|--------|------------------------|----------|---------------|-------------|-----------|----------|
+| REQ-BBPS-CAT-001 | Platform shall list all supported bill categories (electricity, water, gas, DTH, etc.) | Medium | TC-001 | TC-001: Pass | None | 100% |
+| REQ-BBPS-FETCH-001 | Platform shall fetch the live outstanding amount for a valid biller reference | High | TC-002 | TC-002: Pass | None | 100% |
+| REQ-BBPS-FETCH-002 | Platform shall reject an invalid biller reference with a clear error, no amount shown | High | TC-003 | TC-003: Pass | None | 100% |
+| REQ-BBPS-FETCH-003 | Platform shall never silently charge a stale fetched amount once the freshness window elapses | Critical | TC-006 | TC-006: Fail → Retest: Pass | BUG-BBPS-1104 | 100% |
+| REQ-BBPS-RAIL-001 | Platform shall route payment through the internal Payout/Connected Banking rail (lower fee) when the merchant is eligible | High | TC-016, TC-018 | TC-016: Pass, TC-018: Pass | None | 100% |
+| REQ-BBPS-RAIL-002 | Platform shall route payment through the external Gateway (standard fee) when no internal rail is active | High | TC-017, TC-018 | TC-017: Pass, TC-018: Pass | None | 100% |
+| REQ-BBPS-PAY-001 | Platform shall complete bill payment and track it to a definitive success/failure transaction status | Critical | TC-005, TC-007, TC-008 | TC-005: Pass, TC-007: Pass, TC-008: Pass | None | 100% |
+| REQ-BBPS-SETL-001 | Settlement totals shall reconcile exactly against payment totals for a given date range | Critical | TC-009 | TC-009: Pass | None | 100% |
+| REQ-BBPS-RPT-001 | Downloaded reports shall match on-screen payment data exactly | Medium | TC-010 | TC-010: Pass | None | 100% |
+
+**Real RTM Summary Analysis:**
+
+| Metric | Value |
+|--------|-------|
+| Total Requirements | 9 |
+| Requirements with Test Cases | 9 (100%) |
+| Requirements with a Defect Found During Testing | 1 (11%) — REQ-BBPS-FETCH-003 |
+| Total Test Cases Mapped | 11 |
+| Requirements Traceable to a README Flow Stage | 9 (100%) |
+
+`REQ-BBPS-FETCH-003` is the row where the whole process actually earns its keep: TC-006 failed on first execution, produced a real defect — **BUG-BBPS-1104** ("Payment charges a stale bill amount after biller updates the balance mid-session") — and the RTM row preserves both the failure and the retest pass, so that history doesn't disappear once the bug is fixed. Forward traceability (the requirement had a test case) and the audit trail (the defect that test case caught) live in the same row.
+
+> [!NOTE]
+> **🎭 Meme Break — Galaxy Brain**
+>
+> 🧠 *Small brain: "We have test cases."*  
+> 🧠✨ *Glowing brain: "We have test cases mapped to requirements."*  
+> 🧠🌌 *Galactic brain: "We have test cases mapped to requirements, and when TC-006 failed, the RTM told us in five seconds exactly which requirement, which flow stage, and which real defect (BUG-BBPS-1104) was behind it — before anyone had to ask."*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> REQ-BBPS-FETCH-003 in the RTM above still shows 100% Coverage even though its test case initially failed and produced a real defect. Why doesn't a failure drop coverage to 0%?</summary>
+
+Because Coverage measures whether a requirement <em>has</em> a test case exercising it — not whether that test case currently passes. Those are two different questions, and the RTM's own Summary Analysis pattern (seen earlier in this section too) deliberately keeps "Requirements with Test Cases" separate from "Requirements Fully Tested" and "Requirements with Failures." A requirement showing 100% coverage with a Fail status is the RTM working exactly as intended — it's telling you the gap was found, not that there is no gap. If a failed test case dropped coverage to 0%, you'd lose the very traceability that let you link the failure back to BUG-BBPS-1104 in the first place.
+
+</details>
+
 ---
 
 ## 6.7 Test Case Review Process
@@ -841,6 +1088,27 @@ After review is complete and all comments are addressed:
 3. **Baseline created** — Test cases are versioned and locked for the current test cycle
 4. **Distribution** — Approved test cases are distributed to the execution team
 
+### Real Example: What Review Actually Catches
+
+This isn't hypothetical. [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s own `regression-checklist.md` carries this note at the top of the file:
+
+> *"Cleaned up and structured from the original test case sheet — one duplicate test case ID in the source data (`TC_MYINFO_LOGIN_03` used twice) has been corrected below (`TC_MYINFO_LOGIN_04`)."*
+
+Two different login test cases — "invalid username, valid password" and "invalid username, invalid password" — had originally been assigned the *same* ID, `TC_MYINFO_LOGIN_03`. That's Review Checklist item #24 ("Is this test case a duplicate of another?") catching a **format/ID defect**, not a functional one — the test coverage itself was fine, but two test cases sharing one ID breaks traceability (which test result does "`TC_MYINFO_LOGIN_03`: Pass" actually refer to?), breaks the RTM, and breaks defect linkage if either one ever fails. It's exactly the kind of issue a fresh pair of eyes catches in minutes, and an author who wrote both test cases back-to-back can stare right past.
+
+> [!TIP]
+> **🎭 Meme Break — Drake Hotline Bling**
+>
+> ❌ *Skipping peer review because "it's just a straightforward login test suite, what could go wrong."*  
+> ✅ *Peer review catching that two entirely different negative-login test cases have been silently sharing one ID this whole time.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> The HRMS duplicate-ID issue (two test cases both named TC_MYINFO_LOGIN_03) didn't cause either test case to test the wrong thing. Why is it still worth fixing before the test cases are baselined?</summary>
+
+Because the damage isn't in what the test case verifies — it's in everything downstream that assumes IDs are unique keys. An RTM row that links `TC_MYINFO_LOGIN_03` to a requirement can't tell you which of the two test cases it means. A test management tool logging "`TC_MYINFO_LOGIN_03`: Fail" doesn't tell you which scenario failed. A defect report referencing `TC_MYINFO_LOGIN_03` is ambiguous. None of that shows up as a functional bug in the *application* — it shows up as confusion in the *test documentation*, which is exactly the class of problem test case review exists to catch before it reaches execution and traceability tooling downstream.
+
+</details>
+
 ---
 
 ## 6.8 Test Case Prioritization
@@ -914,6 +1182,28 @@ Prioritize test cases that cover the most **unique code paths** or **requirement
 > 3. Tests for areas with high risk of regression
 > 4. High-priority test cases from the full suite
 > 5. Medium and low-priority test cases (if time permits)
+
+### Real Example: Risk-Based Prioritization Applied — Fintech Collection Engine
+
+[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s own regression checklist doesn't just list test cases — it explicitly ranks them by risk in a "Priority Automation Candidates" section, in this order: **Login → Dashboard → Collection → Transaction Search → Transaction Details → Settlement**. Mapped onto the Risk Score table format from above:
+
+| Flow | Business Impact (1-5) | Failure Probability (1-5) | Risk Score | Why |
+|---|:--:|:--:|:--:|---|
+| Collection (UPI/QR/VAM/Link/Manual) | 5 | 4 | 20 | Direct money-in path; 5 independent initiation flows, each with its own failure surface |
+| Settlement | 5 | 3 | 15 | Must reconcile to the ledger, net of commercial + GST, correct to the paisa |
+| Transaction Details | 4 | 3 | 12 | Every field must match the Search row exactly — a common source of cross-screen drift defects |
+| Login / Dashboard | 4 | 2 | 8 | Gate to everything else; Dashboard totals must never be stale vs. live transaction data |
+| Transaction Search | 3 | 2 | 6 | High usage, but lower financial-correctness risk than Collection/Settlement |
+| Collection-type edge cases (re-scan, VAM mismatch, expiry) | 4 | 2 | 8 | High impact when they occur, but lower frequency than the core path — next automation tier, not skipped |
+
+This is the real reason UI Consistency checks and collection-type-specific edge cases (re-scan blocking, VAM over/underpayment, QR expiry) are explicitly named as the **next priority tier** in the source checklist rather than first: they matter, but the core merchant path — the six flows above — is what runs on *every single release*, so it earns automation and execution priority first.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> In the table above, Collection-type edge cases (QR re-scan, VAM mismatch) score an 8 — the same as Login/Dashboard — yet the source checklist still treats them as a lower automation priority than Login. What does the Risk Score table leave out that explains this?</summary>
+
+Frequency of execution. Login and Dashboard are exercised by literally every regression run and every merchant session, so a defect there is both high-impact AND immediately, constantly visible. A collection-type edge case like QR re-scan is high-impact <em>when it occurs</em>, but it's a narrower slice of overall traffic — most transactions are simple happy-path collections, not double-scan attempts. Risk-based prioritization isn't just Business Impact × Failure Probability in isolation; in practice, teams also weigh how often the path is actually exercised in production, which is why two flows can share a Risk Score on paper and still land in different priority tiers in the real checklist.
+
+</details>
 
 ---
 
@@ -990,6 +1280,42 @@ graph TD
     style A fill:#d97706,stroke:#b45309,color:#fff
     style I fill:#059669,stroke:#047857,color:#fff
 ```
+
+### Real Example: Evidence of a Suite That Actually Evolved
+
+You can see test case maintenance happen just by looking at the ID numbering in [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s `regression-checklist.md`: the core flow and commercial/GST cases run TC-001 through TC-020, collection-type-specific cases (UPI/QR/VAM/Payment Link/Manual Deposit) run TC-021 through TC-039 — and then **TC-040** ("Late-succeeding transaction after settlement cutoff — must roll into the *next* settlement cycle automatically, never silently dropped") sits appended at the end of the Negative & Edge Cases section, and **TC-059 through TC-064** (an entire UI Consistency category) appear even further out, with a large ID gap between TC-040 and TC-059.
+
+That gap is exactly what Practice #16 (Version Control Test Cases) and the maintenance-triggers table above look like in a real suite: nobody renumbered TC-001 through TC-040 to make room — new test cases got appended with new IDs as new risk categories (a late-settlement edge case, then an entire cross-screen UI-consistency category) were identified over time, almost certainly *after* the original suite was baselined and already in use for regression. Renumbering existing, already-executed, already-referenced-in-RTM test case IDs is exactly the kind of churn Practice #16 exists to avoid.
+
+> [!CAUTION]
+> **🎭 Meme Break — Is This a Pigeon**
+>
+> 🦋 *A test suite that hasn't been touched in 8 months while the app shipped 12 releases*  
+> 🧑 *QA lead, squinting:* "Is this... still our regression suite?"
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> TC-040 and TC-059–TC-064 have IDs far outside the original TC-001–TC-020 core-flow range, instead of being renumbered to sit next to related cases. Why is that the correct call, not sloppy organization?</summary>
+
+Because test case IDs are load-bearing outside the checklist document itself — they're referenced in the RTM, in past execution history, in defect reports, and possibly in automation scripts. Renumbering TC-040 to slot neatly between TC-020 and TC-021 would silently break every one of those external references the moment it shipped. Appending new IDs at the end (even leaving numbering "gaps" that look untidy) preserves every existing reference and is exactly the version-control discipline Practice #16 describes — the checklist's organization can look a little messy over time; its traceability can't.
+
+</details>
+
+---
+
+## 📌 Fact Sheet — Part 6 in 60 Seconds
+
+- A **test case** is a detailed spec of inputs, steps, and expected results for one specific condition; a **test scenario** is the one-line "what" it derives from — one scenario typically fans out into many atomic test cases (e.g. one UPI status scenario → TC-021 through TC-024).
+- Good test cases are **CRISP-TRAM**: Clear, Reusable, Independent, Specific, Precise expected results, Traceable, Repeatable, Atomic, Maintainable.
+- The single most common test case defect is a **vague expected result** — "should work correctly" is not verifiable; "blocked" alone isn't either, as TC-027 (QR re-scan) and TC_MYINFO_PERSDETAILS_06 (oversized upload) both show — you must specify the positive evidence too, not just the absence of failure.
+- A complete test case template includes ID, module, title, description, preconditions, steps, test data, expected/actual results, status, priority, severity, test type, requirement ID, and version — not just "steps and expected result."
+- **Test Case ID naming conventions** (e.g. `TC_<Module>_<Number>`) exist so IDs stay stable, unique keys — real suites append new IDs at the end (TC-040, TC-059–TC-064 in Fintech Collection Engine) rather than renumbering, because IDs are referenced externally in RTMs, defect reports, and automation.
+- **Test data must be specific and verifiable** — "enter a large file" is not test data; "1.4 MB, over the 1 MB limit" is. HRMS's TC_MYINFO_PERSDETAILS_05/06 pair is a real Boundary Value example either side of that exact limit.
+- **Never use real production data in test environments** — every real checklist referenced in this Part (Collection Engine, BBPS, HRMS) uses synthetic VPAs, consumer numbers, and ESS accounts by design, not masked-after-the-fact real data.
+- The **Requirement Traceability Matrix (RTM)** links requirements ↔ test cases in both directions — forward traceability catches coverage gaps, backward traceability catches orphan test cases. A requirement can show 100% coverage even with a failed test case — coverage means "has a test case," not "currently passes."
+- **Peer review before execution** catches issues a solo author misses — HRMS's real checklist had a genuine duplicate ID (`TC_MYINFO_LOGIN_03` used twice) caught and corrected before baseline, a pure traceability defect with zero functional impact on the app itself.
+- **Prioritize by risk** (Business Impact × Failure Probability), but also weigh execution frequency — Collection Engine's core six flows (Login → Dashboard → Collection → Transaction Search → Transaction Details → Settlement) get first automation priority because they run on *every* release, even when an edge case scores an equal risk number.
+- **Test cases are living documents** — update on requirement change, bug fix, UI change, or new feature; deprecate rather than hard-delete in regulated contexts; never renumber baselined IDs.
+- Real defects (BUG-BBPS-1104 stale amount, BUG-HRM-7038 unchecked upload size, BUG-COL-1105 settlement/ledger mismatch) all trace back to a specific, findable gap in test case coverage — which is the entire point of writing test cases this rigorously in the first place.
 
 ---
 

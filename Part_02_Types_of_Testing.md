@@ -27,6 +27,7 @@
 - [E. Specific Non-Functional Testing Types](#e-specific-non-functional-testing-types)
 - [F. Other Specialized Testing Types](#f-other-specialized-testing-types)
 - [Decision Flowchart: When to Use Which Testing Type](#decision-flowchart-when-to-use-which-testing-type)
+- [📌 Fact Sheet — Part 2 in 60 Seconds](#fact-sheet-part-2-in-60-seconds)
 - [Common Interview Questions](#common-interview-questions)
 
 ---
@@ -121,6 +122,40 @@ The system accepts ages from 18 to 65 for a standard life insurance policy.
 
 > [!TIP]
 > **BVA and EP work together.** EP identifies the partitions; BVA identifies the critical values within and around those partitions. Always use both techniques together for thorough test coverage.
+
+**The Same Idea, Real Money on the Line — Transfer-Mode Limits (Fintech Payout Engine)**
+
+The insurance-age example above is the textbook version. Here's the same technique against a
+target where getting the boundary wrong moves real money: the
+[Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine) sends merchant
+funds out via **IMPS, NEFT, or RTGS**, and — critically — each mode has independent limits and
+commercial rules, so *the same amount can be valid on one mode and invalid on another*. That
+single fact is a BVA test design in disguise.
+
+| Test Case | Boundary | Test Value | Expected Result |
+|-----------|----------|:----------:|-----------------|
+| TC-032 | IMPS — at the exact per-transaction ceiling | Configured limit | **Accepted**; one paisa above is rejected |
+| — | IMPS — one paisa above the ceiling | limit + ₹0.01 | Rejected |
+| TC-035 | RTGS — at the exact minimum threshold | Configured minimum | **Accepted**; one paisa below is rejected |
+| — | RTGS — one paisa below the minimum | minimum − ₹0.01 | Rejected |
+| TC-036 | RTGS — outside bank operating hours | N/A (a boundary in *time*, not amount) | Clear operating-hours error; IMPS stays available for the same merchant at the same moment |
+
+Note the last row: it's a boundary in **time**, not amount — and the regression suite explicitly
+checks that breaking RTGS doesn't take IMPS or NEFT down with it (**mode isolation**, TC-037). A
+defect this kind of thinking actually caught in practice: **BUG-PAY-3042** — a ₹1000 IMPS payout
+(configured fee ₹5) was charged ₹8, the *NEFT* fee slab, because the commercial engine defaulted
+to the merchant's most-recently-used mode instead of the mode selected on that specific
+transaction. No amount boundary was crossed at all — the dividing line that broke was between two
+adjacent *modes*, which is exactly what BVA thinking generalizes to once you stop assuming
+boundaries only live on a number line.
+
+> → Real example from [Fintech Payout Engine](https://github.com/ghanendra-sdet/fintech-payout-engine)
+
+> [!TIP]
+> **🎭 Meme Break — Distracted Boyfriend**
+>
+> 👀 *Tester, walking past:* Testing ₹0.01 below the RTGS minimum threshold  
+> 😍 *Also tester, turning back around:* Testing that breaking RTGS validation doesn't take IMPS and NEFT down with it too
 
 ##### 3. Decision Table Testing
 
@@ -395,6 +430,25 @@ A tester knows:
 | TC2: Verify order total calculation | POST an order with 3 items | 1. API returns correct total (**black box**) 2. Query DB to verify `total` matches sum of `order_items.price * quantity` (**white box knowledge**) |
 | TC3: Test status transition | Update order status from "Created" to "Shipped" (skipping "Confirmed") | 1. API should return 400 Bad Request (**black box**) 2. Verify `status` in DB hasn't changed (**white box knowledge**) |
 
+#### The Same Grey-Box Approach, Real Domain — BBPS Bill Fetch/Pay APIs
+
+A grey-box tester on the [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)
+knows:
+- The bill-fetch endpoint calls out live to an external biller for the current outstanding amount
+- The payment-rail resolution logic: an internal Payout/Connected Banking rail if the merchant has
+  one active (lower fee), otherwise an external gateway (PhonePe/Razorpay/Cashfree PG, standard fee)
+- The core invariant: the amount charged at payment time must always match the amount fetched — if
+  time passes between fetch and payment, the platform must re-validate or flag it as potentially
+  stale, never silently charge an outdated figure
+
+| Test Case | Action | Verification |
+|-----------|--------|---------------|
+| Fetch then pay immediately | Fetch a bill, pay within the same session | 1. API returns the fetched amount (**black box**) 2. Payment amount charged == fetched amount, and correct rail's fee applied (**grey-box knowledge of the rail-resolution rule**) |
+| Fetch, wait, then pay | Fetch a bill, artificially delay, then pay | 1. API either re-fetches or flags the amount as stale (**black box**) 2. No silent charge of an outdated figure (**grey-box knowledge of the staleness rule**) |
+| Biller timeout during fetch | Simulate a biller-side timeout | 1. API returns a clear error, not a stale cached amount (**black box**) 2. No transaction record is created for a failed fetch (**grey-box: verifying nothing silently persisted**) |
+
+> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)
+
 #### Comprehensive Comparison: Black Box vs. White Box vs. Grey Box
 
 | Aspect | Black Box | White Box | Grey Box |
@@ -418,6 +472,21 @@ A tester knows:
 > - **White Box** tests from the inside — examining every code path. Best for unit testing.
 > - **Grey Box** uses partial knowledge — understanding architecture without reading every line. Best for API and integration testing.
 > - In practice, most testing involves a **combination** of approaches. A system tester may use primarily black box techniques but also check the database (grey box) to verify data integrity.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Grey-box testing of the BBPS bill-pay API checks that the charged amount matches the fetched amount. Which real defect from the Payout Engine's BVA example is doing almost the same conceptual job, just for transfer mode instead of bill amount?</summary>
+
+BUG-PAY-3042: the commercial engine defaulted to the merchant's most-recently-used mode instead of
+reading the mode selected *on this specific transaction*. Both cases are the same principle wearing
+different clothes — **don't let a value that should be re-verified at the moment of truth quietly
+fall back to a stale or cached one.** In BBPS that's "the fetched bill amount vs. the amount
+actually charged"; in Payout it's "the mode selected on this transaction vs. the merchant's
+last-used mode." Grey-box testers are specifically positioned to catch this class of bug because
+they know enough about the internals (the rail-resolution rule, the fee-lookup logic) to ask
+"which value is this reading, and when?" — a pure black-box tester would only see "the fee was
+wrong" without any way to know why.
+
+</details>
 
 ---
 
@@ -655,6 +724,38 @@ A small internal tool with 5 modules (UI, Auth, Database, Reports, Notifications
 | **Testing start** | All modules ready | Top module ready | Bottom modules ready | Both ends ready |
 | **Effort** | Low | Medium | Medium | High |
 
+#### Real-World Integration Boundary — Settlement Calculation Service → Ledger Service
+
+Textbook integration testing picks two adjacent layers (UI → API, API → DB). In a real
+microservice platform, the harder part is knowing *which* of dozens of service boundaries actually
+deserves dedicated integration test coverage. The
+[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine) documents
+its integration test boundaries explicitly rather than leaving them implicit:
+
+| Boundary | What to Verify |
+|---|---|
+| Collection Type Service → Payment Processing Service | Each collection type (UPI/QR/VAM/Payment Link/Manual Deposit) hands off to the shared processor with the right payload shape |
+| Payment Processing Service → Settlement Calculation Service | Successful payments correctly trigger commercial/GST calculation |
+| **Settlement Calculation Service → Ledger Service** | **Every settlement produces a matching ledger entry** — flagged as *"a historically common defect theme"* |
+| Transaction services → Reports Service | Reports reflect the same data visible in Transaction Search/Details, with no drift |
+
+The Settlement → Ledger boundary is called out by name because it's where the earlier
+**BUG-COL-1042** defect theme actually lives architecturally — settlement calculation completes
+correctly, but the event that should also write a ledger debit entry doesn't fire from the same
+trigger. A unit test on Settlement Calculation Service in isolation would pass (it calculated the
+right number); a unit test on Ledger Service in isolation would also pass (it correctly records
+whatever debit event it receives). Only a test spanning *both* services — a true integration test
+— can catch "the second service never received an event at all."
+
+> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
+
+> [!IMPORTANT]
+> **🎭 Meme Break — "This Is Fine" Dog**
+>
+> 🔥 *Settlement Calculation Service: "My numbers are correct."*  
+> 🔥 *Ledger Service: "Every debit event I receive gets recorded correctly."*  
+> 🐶☕ *QA, watching the settlement and ledger totals silently drift apart because nobody tested the boundary between the two: "This is fine."*
+
 ---
 
 ### System Testing
@@ -786,6 +887,31 @@ Before deploying a new CRM system:
 | **Timing** | Before beta | After alpha, before GA | Before final payment | Before market release | Before deployment |
 | **Example** | Google dogfooding | iOS public beta | Government IT contract | FDA drug system approval | CRM disaster recovery |
 
+#### Real-World Example — UAT-Style Validation on a Travel Marketplace
+
+Not every "does this meet business needs" check maps neatly onto Alpha/Beta/Contract/Regulation/OAT
+— but the underlying UAT question ("would a real business stakeholder or real user accept this?")
+applies just as directly to the
+[Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform). Its
+core business promise, stated in the product's own docs, is that only one traveler can ever
+successfully confirm a booking against a given limited inventory unit, and that the amount charged
+at payment time must always match the fare-locked price shown at selection time.
+
+A UAT-style acceptance pass here isn't abstract — it's a business stakeholder (or, Beta-testing
+style, a real early user) attempting exactly the scenario the business cannot tolerate failing:
+
+| UAT-Style Scenario | Business Acceptance Criteria | Why It's a UAT Concern, Not Just QA |
+|---|---|---|
+| Two travelers race to book the last seat on a flight | Exactly one booking succeeds; the other sees "sold out," never a false confirmation | A double-booked seat is a broken promise to a paying customer, not a cosmetic bug |
+| Fare price moves between search and payment (supplier updates it) | Traveler is charged the fare-locked price, not the new live price | Charging more than quoted is a trust and possibly regulatory problem, not just a UI mismatch |
+| Fare-lock hold window expires before payment | Payment is blocked; traveler is told to re-search, not silently charged a stale price | Business cannot accept "we charged them anyway to avoid friction" as a workaround |
+
+This is the essence of UAT even outside its five formal categories: a business stakeholder isn't
+asking "does the fare-lock code pass its unit tests?" — they're asking **"can I stand behind this
+system in front of a customer who just got charged the wrong price?"**
+
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
+
 ### Key Takeaways — Section B
 
 > [!TIP]
@@ -794,6 +920,22 @@ Before deploying a new CRM system:
 > - **Stubs** simulate lower-level modules (Top-Down); **Drivers** simulate upper-level modules (Bottom-Up).
 > - **UAT** is the final checkpoint — it validates business needs, not just technical correctness.
 > - Different **UAT types** serve different purposes: Alpha (internal), Beta (external), Contract (legal), Regulation (compliance), OAT (operations).
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> A unit test on Settlement Calculation Service passes, and a unit test on Ledger Service passes. Why did BUG-COL-1042 (missing ledger debit entry) still slip through, and which testing level was actually responsible for catching it?</summary>
+
+Because unit tests only verify a component against its own inputs and outputs in isolation — each
+service did exactly what it was individually asked to do. The defect lived in the *handoff*
+between them: the event that should trigger a ledger write from a completed settlement never
+fired. Only **Integration Testing** — specifically targeting the Settlement Calculation Service →
+Ledger Service boundary — could catch a defect that only exists in the gap between two
+individually-correct components. This is exactly why the Fintech Collection Engine's QA strategy
+documents integration boundaries explicitly by name rather than assuming "if each service's unit
+tests pass, the system is fine" — the boundary itself is a first-class test target, the same way
+the Travel Marketplace treats "does the charged price match the fare-locked price" as a UAT-level
+acceptance criterion that no unit test on the payment service could ever catch alone.
+
+</details>
 
 ---
 
@@ -841,6 +983,44 @@ Functional testing is based on the **specification** — the defined behavior of
 | **Order Management** | View order history | Medium |
 | | Cancel order within 30 minutes | High |
 | | Track order status | Medium |
+
+#### The Same Checklist Idea, Real Fields — HRMS Employee Self-Service (ESS)
+
+The e-commerce checklist above is the generic pattern. Here's what functional testing looks like
+against a real, narrower-but-deeper target: the
+[HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)'s Employee Self-Service (ESS /
+MyInfo) module — the form every employee in a company fills out to manage their own personal
+details. Because this single form is used by *every* employee, field-level correctness carries
+outsized weight.
+
+| Field | Control Type | Functional Test | Priority |
+|---|---|---|:---:|
+| Employee ID | Text (HR-managed) | Confirm field renders **disabled** — employee cannot self-edit | High |
+| Date of Birth | Date (HR-managed) | Confirm field renders **disabled** | High |
+| Full Name / Nick Name | Text (employee-editable) | Confirm field is **enabled** and accepts input | Medium |
+| Marital Status / Nationality | Combo box | Confirm single-select behavior — only one item selectable at a time | Medium |
+| Gender | Radio button | Confirm mutual exclusivity — selecting one option deselects the other | Medium |
+| License Expiry Date | Date picker | Confirm selected date populates the associated text box correctly | Medium |
+| Personal Details Save | Save action | Edit + Save → confirmation message shown, values persist on reload | Critical |
+| Profile Picture Upload | File upload | Upload jpg/png/gif under 1MB → accepted; over 1MB → rejected with a specific error | High |
+
+The real regression suite behind this runs **14 fields** through enabled/disabled verification
+alone — not because 14 checks are inherently interesting, but because this form is filled out by
+every employee, so a single misconfigured field (an HR-only field left editable, for example) is a
+company-wide data-integrity problem, not a one-user inconvenience. Manual functional + API testing
+(Postman + direct SQL validation) on this module identified **30%+ of critical defects
+pre-release**, and the team shipped with **zero critical defects escaping to production** across
+payroll-adjacent modules.
+
+> → Real example from [HRMS Platform](https://github.com/ghanendra-sdet/hrms-platform)
+
+> [!NOTE]
+> **🎭 Meme Break — Expanding Brain**
+>
+> 🧠 *Level 1: "Functional testing means clicking Save and checking it worked."*  
+> 🧠🧠 *Level 2: Also checking the confirmation message text is right.*  
+> 🧠🧠🧠 *Level 3: Checking Employee ID is disabled, not just checking Full Name works when enabled.*  
+> 🧠🧠🧠🧠 *Level 4: Writing all 14 fields into a table before writing a single test case, because "the enabled/disabled form" is really 14 independent functional contracts wearing one UI.*
 
 ---
 
@@ -902,6 +1082,22 @@ mindmap
 > - Non-functional requirements should be **quantifiable** ("response time < 2s" not "system should be fast").
 > - Non-functional testing often requires **specialized tools** and expertise.
 
+<details>
+<summary>🧠 <strong>Quick Check:</strong> On the HRMS ESS form, why does testing "Employee ID renders as disabled" count as functional testing, not cosmetic GUI testing?</summary>
+
+Because it's validating a business rule, not an appearance. The ESS module's whole design intent
+is that certain fields (Employee ID, Date of Birth, Driver's License Number) are HR-managed and
+must never be employee-editable — that's a data-governance requirement, not a styling preference.
+If that field were accidentally left enabled, an employee could self-edit a value HR is supposed to
+own exclusively — a functional failure (the system did something it's specifically required not to
+allow), even though the only visible symptom is "a text box that shouldn't be clickable is
+clickable." This is the same reasoning as the functional-vs-non-functional split in this section:
+the question is never "does it look right," it's "does the system enforce what the requirements
+say it must enforce" — and enabled/disabled state is very often encoding a real business rule, not
+just a UI choice.
+
+</details>
+
 ---
 
 ## D. Specific Functional Testing Types
@@ -944,6 +1140,28 @@ The term comes from electronics: when you power on a new circuit board, if it do
 > [!NOTE]
 > **If ANY smoke test fails, the build is rejected and returned to development.** The team does not proceed with detailed testing on an unstable build, as it would waste time and resources.
 
+#### Real-World Example — Post-Deployment Smoke Check (Reseller Management Platform)
+
+The [Reseller Management Platform](https://github.com/ghanendra-sdet/reseller-management-platform)
+runs a post-deployment health check after every release — the smoke-testing pattern applied to a
+genuinely multi-tenant system, where "critical path" means something slightly sharper than in a
+single-tenant app: it's not enough that the dashboard loads, it has to load *scoped correctly*.
+
+| # | Smoke Check | Why It's "Smoke," Not Full Regression |
+|---|---|---|
+| 1 | Reseller can log in and reach the dashboard | Basic availability — the build isn't dead on arrival |
+| 2 | Dashboard summary tiles render (merchants, volume, revenue) | Confirms the reseller-scoping layer initializes, without validating every number |
+| 3 | Merchant Management screen loads with the reseller's own merchant list | Confirms data isolation is *wired up at all* — deep isolation testing comes later, in regression |
+| 4 | Service Management toggles are visible per merchant | Confirms the core feature surface renders |
+| 5 | Reports screen loads without error | Confirms the reporting pipeline is connected |
+
+If check #3 fails — the merchant list doesn't load, or (far worse) loads but shows another
+reseller's merchants — the build is rejected immediately. Nobody proceeds to detailed
+multi-tenancy regression testing on a build where the basic scoping layer is visibly broken;
+that's the equivalent of checking paint color on a car that won't start.
+
+> → Real example from [Reseller Management Platform](https://github.com/ghanendra-sdet/reseller-management-platform)
+
 ---
 
 ### Sanity Testing
@@ -982,6 +1200,30 @@ The term "sanity" implies a quick check to determine if the system is "sane" eno
 | 4 | Apply 50% coupon to ₹200 order | Related area | Total = ₹100.00 ✓ |
 | 5 | Stack two coupons (if allowed) | Related area | Correct cumulative discount ✓ |
 | 6 | Order without any coupon | Related area | Full price charged ✓ |
+
+#### Real-World Example — Sanity Check After a Reseller Isolation Fix
+
+**Bug Reported:** A reseller's Merchant Management screen briefly showed a merchant belonging to a
+*different* reseller after a service-toggle update — a cross-tenant data-isolation leak, the
+single highest-risk defect category for this platform.
+
+**Fix Deployed:** The merchant-list query is corrected to always re-apply the reseller-scope filter
+after any service-toggle write, not just on initial page load.
+
+**Sanity Test (narrow, deep, on exactly the changed area and its immediate neighbors):**
+
+| # | Test Case | Area | Expected Result |
+|---|-----------|------|-----------------|
+| 1 | Toggle a service for a merchant, then reload Merchant Management | Direct fix | Only this reseller's own merchants shown ✓ |
+| 2 | Toggle a service, then check Reports (also merchant-scoped) | Related area | Reports remain scoped correctly, no leak ✓ |
+| 3 | Toggle a service, then check Revenue calculation | Related area | Revenue still attributes to the correct reseller ✓ |
+| 4 | A *different* reseller logs in immediately after | Related area | Sees only their own merchants — no cross-contamination from the first reseller's session ✓ |
+
+Notice this sanity test does **not** re-run the entire onboarding-to-revenue-reporting suite — that
+would be regression testing. It stays narrow: the toggle fix itself, plus the two or three screens
+that share the same underlying scoping query.
+
+> → Real example from [Reseller Management Platform](https://github.com/ghanendra-sdet/reseller-management-platform)
 
 ### Detailed Comparison: Smoke Testing vs. Sanity Testing
 
@@ -1047,6 +1289,60 @@ Since running the entire test suite for every change may not be feasible (time, 
 | Notification/email tests | 10 | Transfer notifications should fire |
 | **Unrelated** (user registration, profile) | 0 | Not impacted by this change |
 | **Total regression suite** | **125** | Instead of the full 1,200 test suite |
+
+#### The Same Idea at Real Scale — Fintech Collection Engine's 64-Case Regression Suite
+
+The banking-app table above illustrates *why* teams scope down from "run everything" to "run
+what's actually impacted." The
+[Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)'s real
+regression suite shows what that scoping looks like once you stop hand-waving and actually write
+the 64 test cases out. Its highest-priority "Merchant Regression Flow" runs on every release,
+annotated with what's actually being validated at each step — because the real defect pattern in
+this module is data drift *between* steps, not isolated screen bugs:
+
+```
+Login
+  │  authenticates the merchant session
+  ▼
+Dashboard
+  │  summary tiles must match live transaction data — never a stale/cached value
+  ▼
+Collection ──▶ UPI · QR · VAM · Payment Link · Manual Deposit
+  │             5 independent initiation flows, each with its own failure surface
+  ▼
+Transaction Search ──▶ Transaction Details
+  │  every field must match the Search row exactly — no drift
+  ▼
+Settlement
+  │  reconciles to the Ledger, net of Commercial fee + GST, correct to the paisa
+  ▼
+Reports
+     exported totals must match Settlement + Transaction data byte-for-byte
+```
+
+The 64 cases break down roughly as:
+
+| Category | Example Test IDs | What Regression Is Protecting |
+|---|---|---|
+| Core regression flow | TC-001 – TC-010 | Login → Dashboard → Search → Details → Settlement → Reports never silently drift from each other |
+| Collection-type-specific | TC-021 – TC-039 | Each of UPI/QR/VAM/Payment Link/Manual Deposit keeps its own failure surface (expiry, decline, overpayment, duplicate) working independently |
+| Commercial & GST | TC-011 – TC-014 | Fee and GST math, and the ledger debit entry, stay correct after every change |
+| Negative & edge cases | TC-015 – TC-020, TC-040 | A transaction succeeding *just after* a settlement cutoff still rolls into the next cycle, never silently dropped |
+| UI consistency | TC-059 – TC-064 | The same transaction's status badge, currency formatting, and terminology stay identical across Dashboard, Search, Details, and exported Reports |
+
+Only 6 of the ~13 checklist categories (Login, Dashboard, Collection, Transaction Search,
+Transaction Details, Settlement) are automated so far — the rest exist as documented manual test
+cases, a realistic snapshot of where most regression suites actually sit: partially automated,
+prioritized by the highest-traffic path first.
+
+> → Real example from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
+
+> [!WARNING]
+> **🎭 Meme Break — "This Is Fine" Dog**
+>
+> 🔥 *Release manager: "We only changed the Reports export button, right? Should be a quick regression pass."*  
+> 🔥 *Also the change: a shared currency-formatting utility used by Dashboard, Transaction Details, AND Reports.*  
+> 🐶☕ *QA, watching TC-060 (currency formatting consistency) about to fail in three places at once: "This is fine."*
 
 #### Regression Testing Best Practices
 
@@ -1131,6 +1427,21 @@ New Build Deployed
 > - The sequence is: **Smoke → Sanity/Retest → Regression → Detailed Testing**
 > - Smoke and Regression are prime candidates for **automation**
 
+<details>
+<summary>🧠 <strong>Quick Check:</strong> The Reseller Platform's post-deployment smoke check includes "Merchant Management screen loads with the reseller's own merchant list." Why is this framed as a smoke check rather than saved for full regression, given that deep multi-tenancy testing is this platform's highest-risk area?</summary>
+
+Because smoke testing asks "is the build even testable?", not "is every edge case correct?" — and
+for a multi-tenant platform, a scoping layer that's completely broken (blank screen, 500 error, or
+an obviously wrong tenant's data) makes every subsequent regression test meaningless, since you'd
+be regression-testing on top of a build that's fundamentally not working. The smoke check only
+confirms the isolation layer is *wired up at all*; it deliberately does not attempt to verify every
+cross-tenant leak scenario — that deeper verification belongs to regression, and to the sanity
+check run specifically after an isolation-related fix (like the toggle-fix example above). It's the
+same Wide-and-Shallow vs. Narrow-and-Deep split as the generic Smoke vs. Sanity comparison table,
+just applied to a real risk area instead of an abstract one.
+
+</details>
+
 ---
 
 ## E. Specific Non-Functional Testing Types
@@ -1156,6 +1467,33 @@ Non-functional testing types evaluate the quality attributes of the software —
 | **CPU Utilization** | Percentage of CPU used during operations | < 80% | Server CPU at 65% under load |
 | **Memory Utilization** | Percentage of RAM used | < 80% | Application uses 6GB of 8GB RAM |
 | **Latency** | Delay before data transfer begins | < 100ms | Network latency of 45ms |
+
+#### Real-World Example — Performance Metrics From Two Fintech Platforms
+
+Generic targets ("< 2 seconds," "< 1% error rate") are a starting point. Here's what the same
+metrics look like measured against two real portfolio systems — deliberately different products
+with different performance profiles, both load-tested with JMeter:
+
+| Metric | Fintech Collection Engine | Connected Banking Platform |
+|---|:---:|:---:|
+| Test duration | 3 hours | 1 hour 26 minutes |
+| Transactions processed | 180,000 | 405,067 |
+| Stable throughput | ~42–45 TPS | ~80.2 TPS (100 TPS at peak) |
+| Error rate | 0.01% | 0.001% |
+| P90 latency | 95 ms | 82 ms |
+| P95 latency | 240 ms | 319 ms |
+| P99 latency | 900 ms | 1,500 ms |
+
+Two things worth noticing reading these side by side: first, **P99 tells a different story than
+the average** — Connected Banking's P90 (82ms) looks excellent, but its P99 (1,500ms) is nearly
+20x that, meaning the slowest 1% of transactions had a materially worse experience than the
+headline number suggests. Second, **the bottleneck in both cases was infrastructure, not
+application code** — Collection Engine hit database connection pool saturation; Connected Banking
+hit Redis queue memory saturation. Neither report blamed the business logic, and both explicitly
+called that out as a capacity-planning finding rather than a code defect.
+
+> → Real examples from [Fintech Collection Engine](https://github.com/ghanendra-sdet/fintech-collection-engine)
+> and [Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)
 
 ---
 
@@ -1184,6 +1522,24 @@ Non-functional testing types evaluate the quality attributes of the software —
 | Endurance | 10,000 | 24 hours | No memory leaks, response time stable over time |
 
 **Tools:** JMeter, Gatling, k6, LoadRunner, Locust
+
+#### The Same Load Test, Real Numbers (Connected Banking Platform)
+
+| Test | Concurrency | Duration | Result |
+|------|:-----:|:--------:|-----------------|
+| Sustained load | 25 concurrent threads | 1 hr 26 min | 405,067 transactions, 80.2 TPS stable, 99.99% success rate |
+| Peak burst | — | Start of run | Peaked at ~100 TPS before settling to steady-state |
+
+The report frames this explicitly as load and stability testing under **constrained
+infrastructure** — a single application node, no auto-scaling, one central DB shard plus three
+shards — deliberately not over-provisioned, specifically so the test would surface a real capacity
+limit instead of masking it. It found one: the Redis queue backing the async workers hit its
+memory ceiling, at which point the team stopped the test to prevent cascading failure rather than
+pushing further. That's the load-testing discipline working as intended — validate normal/peak
+load, and stop at the first sign of exceeding it, rather than wandering into stress-test territory
+mid-run.
+
+> → Real example from [Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)
 
 ---
 
@@ -1214,6 +1570,35 @@ Non-functional testing types evaluate the quality attributes of the software —
 | 400,000 (4x) | Significant degradation | ⚠️ 15s buffering, 8% stream failures |
 | 500,000 (5x) | **Breaking point** | ❌ Load balancer overwhelmed, 40% streams dropped |
 | Back to 100,000 | Full recovery | ✅ System recovers within 3 minutes |
+
+#### What a Real Breaking Point Looks Like (Even From a Load Test)
+
+The streaming-service table above is the textbook shape of a stress test: push past normal, watch
+it degrade, find the breaking point, confirm recovery. The
+[Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)'s
+load test wasn't designed as a stress test — but its termination event is a genuine real-world
+example of exactly the "breaking point" concept this section is about:
+
+| Stress-Testing Concept | What Actually Happened |
+|---|---|
+| Breaking Point | Redis queue reached its memory limit after sustained 80+ TPS load |
+| Failure Mode | **Graceful, not catastrophic** — queue backlog grew, a small number of transactions saw latency spikes; no data corruption, no JVM crash, no application hang |
+| Root Cause Isolation | Confirmed as infrastructure capacity (Redis memory), explicitly **not** application logic, database limits, or CPU/memory saturation at the app layer |
+| Decision | Test stopped deliberately, *before* cascading failure, once the ceiling was identified |
+
+The report's own conclusion doubles as a good stress-testing takeaway: *"This is a capacity
+planning issue, not a software defect."* Knowing how to tell those two things apart — and to keep
+digging until you can name the actual bottleneck instead of stopping at "it broke" — is the real
+skill stress testing is meant to build.
+
+> → Real example from [Connected Banking Platform](https://github.com/ghanendra-sdet/fintech-connected-banking-platform)
+
+> [!CAUTION]
+> **🎭 Meme Break — Galaxy Brain**
+>
+> 🌌 *Small brain: "The system crashed at 500,000 concurrent streams. Stress test failed."*  
+> 🌌🌌 *Regular brain: "The system crashed at 500,000 concurrent streams. Now we know the ceiling."*  
+> 🌌🌌🌌 *Galaxy brain: "The system didn't crash at all — it degraded to a queue backlog, we stopped the test on purpose, and now we know the ceiling AND that the failure mode is graceful. That's not a failed test, that's the test doing its job."*
 
 ---
 
@@ -1270,6 +1655,37 @@ The **Open Web Application Security Project (OWASP)** defines the top 10 most cr
 | **Risk Assessment** | Identifying and prioritizing security risks | Medium | Threat modeling (STRIDE, DREAD) |
 | **Security Review** | Evaluating security architecture and policies | Medium | Manual review against standards |
 
+#### Real-World Example — Consent Revocation Integrity (YOBO Account Aggregator)
+
+Most of the OWASP Top 10 above is about keeping attackers *out*. The
+[YOBO](https://github.com/ghanendra-sdet/yobo) Account Aggregator platform has an additional,
+narrower security surface that's just as critical: making sure data stops flowing to a party the
+user *explicitly, correctly authorized* the instant they revoke that authorization.
+
+**Real defect — BUG-YOBO-3011 (Critical):** "Data fetch under a consent completes successfully
+after the consent was revoked mid-fetch." The revocation check only ran at fetch *initiation*, not
+continuously through the fetch's lifecycle — so a fetch that started one second before revocation
+still delivered data to the requesting app (FIU) after the user had already said no.
+
+| Security Property Tested | Question Asked | Why It's Security Testing, Not Just Functional |
+|---|---|---|
+| Consent-boundary integrity | Does data sharing stop the *instant* consent is revoked, not just for *future* requests? | An in-flight data leak after explicit revocation is a direct trust/regulatory violation, not a UX gap |
+| Audit trail distinctness | Are "Revoked" (user action) and "Expired" (passive timeout) visually and textually distinguishable? | A compliance reviewer must be able to verify a user's own revocation was honored (BUG-YOBO-3024 — both showed an identical grey "Inactive" badge) |
+| Consent artifact transparency | Is the purpose, data scope, date range, and duration always explicit *before* approval? | Hidden or vague consent scope defeats the entire informed-consent model |
+
+The fix for BUG-YOBO-3011 — adding a revocation check immediately before data hand-off, not only at
+fetch initiation — is a small code change with an outsized effect: it turns revocation from
+something that can only block *future* requests into something that can interrupt an *in-flight*
+one, which is the actual guarantee the product promises its users.
+
+> → Real example from [YOBO](https://github.com/ghanendra-sdet/yobo)
+
+> [!WARNING]
+> **🎭 Meme Break — Drake Hotline Bling**
+>
+> ❌ *Testing that a revoked consent blocks the NEXT data request*  
+> ✅ *Testing that a revoked consent kills a data request that's already halfway through being served*
+
 ---
 
 ### Usability Testing
@@ -1292,6 +1708,29 @@ The **Open Web Application Security Project (OWASP)** defines the top 10 most cr
 | 8 | **Aesthetic and minimalist design** | No irrelevant information | Cluttered dashboard with 50 widgets | Clean dashboard with key metrics and drill-down |
 | 9 | **Help users recognize errors** | Clear error messages in plain language | "Error 0x80070005" | "You don't have permission to access this page. Please contact your administrator." |
 | 10 | **Help and documentation** | Provide searchable help | No help section | Contextual tooltips and a searchable knowledge base |
+
+#### Real-World Example — Usability Meets Integrity (LMS Platform)
+
+Usability testing usually asks "is this pleasant and intuitive to use?" The
+[LMS Platform](https://github.com/ghanendra-sdet/lms-platform) is a good illustration of usability
+testing colliding with a *correctness* concern, because its output is a credential: the platform
+must be able to prove a learner genuinely engaged with material, not just that a progress bar
+visually reached 100%.
+
+| Nielsen Heuristic | LMS-Specific Application | Real Defect It Would Have Caught |
+|---|---|---|
+| Visibility of system status | Progress percentage must reflect *genuine* consumption, not just playhead position | A learner who seeks/skips to a video's end without watching had the lesson falsely marked complete — the progress bar actively lying about the learner's own state |
+| Error prevention | Assessment scoring should treat an unanswered question consistently | A scoring-denominator defect inflated scores when a question was left unanswered — the displayed score didn't match actual performance |
+| Help users recognize errors | Certification gate should clearly show *which* of the two gates (content consumed / assessment passed) is still unmet | Certificate withheld with no clear explanation would leave a learner unable to tell what's still required |
+
+The product's own design principle makes the usability angle explicit: content-consumption
+completion and passing-score completion are two independent gates — a certificate must never be
+issued on partial satisfaction of either one. A usability tester's job here isn't just "does the
+progress bar look nice" — it's "does what the progress bar communicates match what actually
+happened," because a misleading progress indicator on a certification platform isn't a cosmetic
+flaw, it's a false statement about a credential.
+
+> → Real example from [LMS Platform](https://github.com/ghanendra-sdet/lms-platform)
 
 ---
 
@@ -1346,6 +1785,29 @@ The **Open Web Application Security Project (OWASP)** defines the top 10 most cr
 | Samsung Internet | N/A | N/A | N/A | ✅ |
 
 **Tools:** BrowserStack, Sauce Labs, LambdaTest, CrossBrowserTesting
+
+#### Real-World Example — Cross-Device Price Consistency (Travel Marketplace)
+
+Compatibility testing isn't only "does the button render correctly on Safari." On the
+[Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform), the
+same booking has to look and behave identically whether a traveler is on a laptop browser or a
+phone browser — because price, booking status, and fare-lock countdown all have to agree
+everywhere, on every device, or the platform's core promise (charged price == fare-locked price)
+becomes unverifiable to the user.
+
+| Compatibility Check | What Could Silently Break Across Devices/Browsers |
+|---|---|
+| Price/currency formatting | A fare shown as "₹4,999" on desktop rendering as "₹4999.00" or truncated on a smaller mobile viewport |
+| Fare-lock countdown timer | A hold-window timer that doesn't render or update correctly on a browser with restricted background-tab JS execution — traveler may not realize their hold expired |
+| Booking-status labeling | The same booking's status badge terminology must read identically across every screen and device — not "Confirmed" on desktop and "Booked" on mobile |
+
+This is why the platform lists Cross-Browser Testing as one of its explicit testing types
+alongside Functional and Concurrency testing, rather than treating it as an afterthought: a
+booking platform reselling third-party inventory it doesn't own has to be *especially* consistent
+about what it displays, since it's already asking users to trust numbers sourced from an external
+supplier API.
+
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform)
 
 ---
 
@@ -1429,6 +1891,21 @@ The **Open Web Application Security Project (OWASP)** defines the top 10 most cr
 > - **Usability Testing** uses **Nielsen's 10 Heuristics** as a framework.
 > - **Accessibility Testing** follows **WCAG 2.1** guidelines (A, AA, AAA levels).
 > - **Compatibility** and **Localization/Globalization** testing ensure the software works for all users, everywhere.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> The Connected Banking load test showed a P90 latency of just 82ms but a P99 of 1,500ms — nearly 20x higher. Why should a QA engineer care about P99 at all if 90% of requests are that fast?</summary>
+
+Because averages and low percentiles hide exactly the transactions most likely to become a support
+ticket or a lost customer. P90 tells you how the *typical* request performed; P99 tells you how the
+*worst-case-but-still-common* request performed — and at real volume (405,067 transactions in this
+test), even 1% is thousands of real transactions experiencing 1.5-second-plus latency. This is the
+same reasoning behind BUG-YOBO-3011: aggregate behavior ("revocation generally blocks new
+requests") looked fine, but the tail case — a fetch already in flight at the moment of revocation
+— was exactly where the real risk lived. Good performance and security testing both specifically
+hunt in the tail, not just the average, because the tail is where the expensive incidents come
+from.
+
+</details>
 
 ---
 
@@ -1698,6 +2175,26 @@ All Users ──────────┤                                     
 
 **Tools:** Cypress, Playwright, Selenium, Appium (mobile)
 
+#### Real-World Example — Fetch-to-Settlement E2E (BBPS Bill Payment Platform)
+
+| Step | System/Component Involved | What's Verified |
+|------|---------------------------|-----------------|
+| 1. User selects a bill category | UI → Category Service | Correct billers listed for that category |
+| 2. Platform fetches the live bill | Bill Fetch Service → external Biller API | Real-time amount returned, or a clear error on biller timeout — never a stale cached amount |
+| 3. Payment rail resolved | Rail Resolution Service | Internal Payout/Connected Banking rail used if active (lower fee); otherwise external PG (PhonePe/Razorpay/Cashfree) |
+| 4. User pays | Payment Service → resolved rail | Amount charged matches the fetched amount exactly, correct fee applied for the rail used |
+| 5. Status tracked | Transaction Status Service | Tracked to a definitive success/failure state, not left ambiguous |
+| 6. Settlement | Settlement Service | Funds settle between platform and biller |
+| 7. Reports | Reports Service | Payment history and fee breakdown by rail reconcile correctly |
+
+This is a genuine end-to-end chain spanning a service the platform doesn't control (the external
+biller's own system) — which is exactly what makes E2E testing here different from system testing:
+a system test could stub the biller response and still pass; an E2E test has to prove the real
+fetch-to-settlement chain holds together when the amount, the rail, and the fee all have to agree
+by the time money actually moves.
+
+> → Real example from [BBPS Bill Payment Platform](https://github.com/ghanendra-sdet/bbps-bill-payment-platform)
+
 ### Key Takeaways — Section F
 
 > [!TIP]
@@ -1707,6 +2204,21 @@ All Users ──────────┤                                     
 > - **Mutation Testing** tests your tests — it measures test suite quality, not software quality.
 > - **A/B Testing** is data-driven decision-making — let users tell you which version is better.
 > - **E2E Testing** validates the complete user journey across all systems.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Why would a System Test of the BBPS platform potentially miss the exact defect class the platform's own regression suite calls out — a stale bill amount being charged at payment time?</summary>
+
+Because System Testing is typically run against a staging environment that may stub or mock
+external dependencies — including the live biller API. If the biller integration is mocked to
+always return instantly and consistently, there's no window in which "time passes between fetch
+and payment" can ever occur, so the staleness scenario never actually gets exercised. Only
+End-to-End Testing, hitting the real (or realistically time-delayed) biller integration, can
+surface a race between "amount fetched" and "amount charged." This is the same lesson as the
+Connected Banking P99 finding: the failure mode that matters often only shows up once you stop
+approximating the real system and start testing the real timing, the real external dependency, or
+the real tail of the distribution.
+
+</details>
 
 ---
 
@@ -1766,6 +2278,25 @@ graph TD
 | **Exploratory** | Unknown risks | Variable | Any phase | Experienced Testers | No |
 | **E2E** | Complete user journeys | Deep | Before release | QA Team | Yes |
 | **A/B** | Feature variants | Medium | Post-release | Product Team | Yes |
+
+---
+
+## 📌 Fact Sheet — Part 2 in 60 Seconds
+
+- **Black Box** = no code knowledge (EP/BVA/Decision Tables/State Transition). **White Box** = full code knowledge (Statement/Branch/Path/Condition coverage). **Grey Box** = partial knowledge (API + DB validation) — the BBPS bill-pay API example shows all three lenses on one endpoint.
+- **BVA** isn't just numeric limits — the Payout Engine's BUG-PAY-3042 (wrong fee charged with no amount boundary crossed) proves "boundary" also means mode-to-mode and time-of-day dividing lines.
+- Testing levels progress **Unit → Integration → System → UAT**; Stubs simulate lower modules (Top-Down), Drivers simulate upper modules (Bottom-Up).
+- Integration testing exists to catch bugs that live *between* two individually-correct components — the Fintech Collection Engine's Settlement Calculation Service → Ledger Service boundary is the real-world example (root cause of BUG-COL-1042).
+- **Functional** = does it work (what the HRMS ESS form's 14-field enabled/disabled matrix tests). **Non-Functional** = how well does it work (speed, security, usability, compatibility).
+- **Smoke** = wide + shallow, every build (Reseller Platform's post-deployment health check). **Sanity** = narrow + deep, after a specific fix. **Regression** = broad, previously-passing tests (Collection Engine's real 64-case suite). **Retesting** = re-run the one test that previously failed.
+- **Performance** is the umbrella; **Load** (expected/peak conditions) and **Stress** (beyond limits, find the breaking point) are specific types — real JMeter data from two platforms: Collection Engine (~45 TPS, P99 900ms) and Connected Banking (405,067 transactions, 80.2 TPS, P99 1,500ms).
+- A load test can accidentally surface a real stress-testing finding — Connected Banking's Redis queue memory saturation was a genuine breaking point, and the report correctly separated "infrastructure capacity issue" from "application defect."
+- **Security Testing** covers the OWASP Top 10, but domain-specific risks matter too — YOBO's consent-revocation defect (BUG-YOBO-3011) shows that "blocking future requests" isn't the same guarantee as "interrupting an in-flight one."
+- **Usability Testing** uses Nielsen's 10 Heuristics — the LMS Platform shows usability and correctness can be the same bug: a progress bar that reaches 100% via seeking, not watching, is a heuristic violation AND a false statement about a credential.
+- **Compatibility Testing** matters most when the same number (price, status, fare-lock countdown) has to agree across every device — the Travel Marketplace's cross-device price consistency is the real stakes.
+- **UAT** isn't only Alpha/Beta/Contract/Regulation/OAT — the Travel Marketplace's "does the charged price match the fare-locked price" is a pure business-acceptance question a unit test could never answer alone.
+- Standard sequence after any new build: **Smoke → Sanity/Retest → Regression → Functional (new features) → Non-Functional → Exploratory → E2E → UAT → Production.**
+- E2E Testing proves a chain the platform doesn't fully control still holds together — BBPS's fetch-to-settlement flow spans a live external biller API, which System Testing (often run against stubs) can miss entirely.
 
 ---
 

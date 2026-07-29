@@ -37,6 +37,14 @@ A logistics company developed a fleet management system without a formal test pl
 - UAT was scheduled for 1 week, but 150+ test scenarios needed execution — an impossible timeline
 - The release was delayed by 2 months, costing the company ₹500,000 in delayed ROI
 
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): the same "we never assigned an owner to it" failure mode shows up here as **overbooking** — a booking marketplace resells flight/hotel inventory it doesn't own, sourced live from third-party supplier APIs whose price and availability can change at any moment. Skip a formal test plan and it's easy to treat "two travelers book the same last room" as an edge case nobody explicitly owns, rather than the **first-class, highest-priority regression category** it actually is (see `regression-checklist.md` section 3, "Overbooking Prevention"). A real defect from exactly this gap: **BUG-TRV-2011**, filed **Critical** — "Two travelers can both confirm a booking for the last available hotel room," because the fare-lock check ran only at initial selection, never re-verified atomically at payment completion. No test plan means no one is explicitly on the hook for a scenario like that until a customer is holding two confirmed bookings for a room that only exists once.
+
+> [!TIP]
+> **🎭 Meme Break — Drake Hotline Bling**
+>
+> ❌ *Test plan scope: "verify the booking flow works."*  
+> ✅ *Test plan scope: "verify that when Traveler A and Traveler B both fare-lock the last hotel room within milliseconds of each other, exactly one of them ends up with a PNR — not two, not zero."*
+
 ### Who Creates the Test Plan?
 
 | Role | Responsibility |
@@ -72,6 +80,13 @@ graph LR
     style D fill:#4CAF50,color:#fff
     style F fill:#2196F3,color:#fff
 ```
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Why does "test the booking flow" fail as a test plan scope statement for the Travel Marketplace platform, while "verify only one traveler ever wins a race for the same last inventory unit" succeeds?</summary>
+
+Because the first statement describes a happy-path *feature*, while the second describes the actual *risk* — and a test plan's job is to make risk explicit and assign it an owner. "Test the booking flow" would pass code review even if overbooking (BUG-TRV-2011) shipped, because a single traveler booking a single room in isolation works fine. Only a scope statement that names the concurrency scenario directly forces someone to build fare-lock race-condition tests before release, which is exactly what turns an invisible architectural gap into a caught defect instead of a customer holding two confirmed bookings for one room.
+
+</details>
 
 ---
 
@@ -165,6 +180,8 @@ This document serves as the master test plan and will be supplemented by level-s
 - SEO testing (responsibility of the marketing team)
 - Data migration from v2.5 to v3.0 (covered by separate migration test plan)
 - Localization/internationalization (planned for v3.5)
+
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): scope decisions here follow the exact same shape as ShopEasy's — "third-party payment gateway internal testing" is out-of-scope for both, covered by vendor SLA rather than owned QA effort. The difference is what a booking marketplace has to explicitly pull *in* scope that a typical e-commerce app doesn't: **fare-lock integrity** (the price a traveler pays must always match the price they were quoted) and **overbooking prevention** (no two travelers can ever win the same inventory unit), because the platform doesn't own the inventory it's selling. A full worked scope, entry/exit criteria, and risk table for this platform appears at the end of this section.
 
 ##### Project Overview
 
@@ -598,6 +615,78 @@ gantt
 
 ---
 
+### Real-World Worked Example: Test Plan Excerpt — Travel Marketplace Platform
+
+The ShopEasy plan above is a complete IEEE 829 document built for a generic e-commerce app. Below is a shorter, **real** excerpt built the same way — Scope, Entry/Exit Criteria, and a Risk table — for the [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform), a booking marketplace that resells flight/hotel/package inventory sourced live from third-party supplier APIs (GDS/hotel systems). Notice how the *shape* of the template doesn't change — it's still Scope → Risk → Entry/Exit Criteria — but the content is driven entirely by what makes this specific system risky: the platform doesn't control the prices or inventory it sells.
+
+#### Scope
+
+**In-Scope:**
+- Search & Discovery across flight/hotel/package suppliers, including filter accuracy and the "no matching results" empty state
+- Fare Lock / Hold mechanism — reserving a quoted price and inventory unit for a defined hold window
+- Payment processing at the fare-locked price (charged amount must exactly match the quoted amount)
+- Booking Confirmation (PNR/booking reference generation)
+- **Overbooking Prevention** — concurrent booking attempts on the same limited inventory unit (highest-priority regression category per `regression-checklist.md`)
+- Cancellation & Refund — refund quote accuracy against fare-type-specific policy tiers, and quote-vs-actual reconciliation
+- Itinerary Management (view, manage, cancel existing bookings)
+- UI Consistency across Search, Selection, Payment, and Itinerary screens (booking-status labels, price formatting, fare-lock countdown accuracy)
+- API testing (search responses, fare-lock payloads, booking confirmations) via Postman
+- Concurrency/load testing via k6, specifically to reproduce overbooking defects that sequential UI testing cannot catch
+- Cross-browser testing
+
+**Out-of-Scope:**
+- Supplier-side GDS/hotel system internals (pricing engines, inventory management) — covered by the supplier's own SLA, not this platform's QA effort
+- Payment gateway's internal PCI DSS certification — vendor responsibility; the platform tests the *integration*, not the gateway's internals
+- Marketing/content accuracy for supplier listings — content team responsibility
+
+#### Entry Criteria
+
+| # | Criterion | Why It Matters Here |
+|---|-----------|---------------------|
+| 1 | Staging environment available with **mocked/stubbed supplier responses** | Fare-lock and overbooking tests need deterministic, repeatable price/availability data — testing against a live GDS feed makes race-condition tests flaky and non-reproducible |
+| 2 | Payment sandbox configured and reachable | Fare-lock-to-payment integrity tests require a controllable payment environment |
+| 3 | k6 concurrency test scripts ready for overbooking simulation | Overbooking is a timing-sensitive defect class — it can't be caught by manual sequential testing at all |
+| 4 | Postman collection validated against the latest fare-lock/booking API contract | Fare-lock payload and booking-confirmation structure must be locked down before functional testing starts |
+| 5 | Smoke test passes: search → select → fare-lock → pay → confirm | Confirms the critical path is stable enough to test edge cases against |
+
+#### Exit Criteria
+
+| # | Criterion | Target |
+|---|-----------|--------|
+| 1 | Full regression checklist executed (7 categories: Search & Discovery, Fare Lock & Booking, Overbooking Prevention, Cancellation & Refund, Itinerary Management, Payment Gateway Integration, UI Consistency) | 100% |
+| 2 | **Fare-lock integrity holds under concurrent load** — charged price always equals the fare-locked price, verified via k6 | 100% pass, zero exceptions |
+| 3 | **Overbooking prevention holds under concurrent load** — across every simulated simultaneous-booking run, exactly one traveler ever wins a given inventory unit | 0 double-confirmations in any k6 run |
+| 4 | Open Critical defects (e.g. any BUG-TRV-2011-class overbooking defect) | 0 |
+| 5 | Hold-expiry enforcement verified server-side, independent of the client-side countdown display | 100% pass (regression-checklist TC-007) |
+| 6 | UI consistency verified across Search/Selection/Payment/Itinerary | 100% pass (regression-checklist TC-014–TC-017) |
+
+#### Risk Table
+
+| Risk ID | Risk Description | Likelihood | Impact | Severity | Mitigation Strategy |
+|---------|------------------|------------|--------|----------|---------------------|
+| TRV-R01 | Supplier API changes price/availability mid-booking, between search and payment | High | Critical | **Critical** | Fare-lock/hold service reserves price + inventory for a defined window; hold-expiry check enforced **server-side** at payment, never relying on the client-side countdown alone |
+| TRV-R02 | Two travelers concurrently confirm a booking for the same last inventory unit (overbooking) | Medium | Critical | **Critical** | k6-driven concurrency tests simulating simultaneous fare-lock attempts; atomic inventory-unit lock or optimistic-concurrency check enforced at confirmation time, not just at initial selection |
+| TRV-R03 | Supplier API timeout or downtime during search | High | Medium | High | Clear "temporarily unavailable" messaging; stale cached results are never rendered as current; automated supplier-timeout simulation in the regression suite |
+| TRV-R04 | Fare-lock countdown timer (client-side) drifts from the actual server-enforced expiry | Medium | Medium | Medium | Automated comparison of displayed countdown vs. server-side expiry timestamp on every regression run |
+| TRV-R05 | Refund amount quoted before confirmation doesn't match the amount actually refunded | Low | High | High | Refund policy engine tested against every fare-type tier; automated quote-vs-actual reconciliation check |
+
+> [!TIP]
+> **🎭 Meme Break — Expanding Brain**
+>
+> 🧠 *Level 1: "The price at checkout should match the price on the search page."*  
+> 🧠🧠 *Level 2: Locking the price for a few minutes after selection so it can't drift.*  
+> 🧠🧠🧠 *Level 3: Realizing the lock has to be enforced server-side at the exact moment payment is submitted, not just shown as a countdown on the screen.*  
+> 🧠🧠🧠🧠 *Level 4: Realizing the hold window itself is a second race condition — two travelers can each hold a valid lock on the same room until one of them actually pays, so the real fix is an atomic check at confirmation, not at selection.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> The Travel Marketplace entry criteria specify a staging environment with <em>mocked</em> supplier responses rather than a live connection to the real GDS/hotel APIs. Why is that the right call for an entry criterion, given the risks in the table above?</summary>
+
+Because TRV-R01 and TRV-R02 — stale pricing and overbooking — are both **timing- and race-condition-dependent** defects. To reliably reproduce "two travelers fare-lock the same room within milliseconds" or "the supplier changes the price between search and payment," the test data has to be controllable and repeatable — you need to be able to force a stale price or force two simultaneous requests on demand. A live third-party supplier feed can't guarantee that: its prices and availability genuinely change on their own schedule, which would make these tests flaky (sometimes catching the bug, sometimes not) rather than deterministic. Mocking the supplier layer for staging turns "maybe reproduce it" into "reliably reproduce it every single run" — exactly what a k6 concurrency suite needs to be trustworthy as an exit-criterion gate.
+
+</details>
+
+---
+
 ## 10.3 Test Strategy Document
 
 ### What Is Test Strategy?
@@ -694,6 +783,15 @@ TEST STRATEGY DOCUMENT
 > [!TIP]
 > In practice, most organizations use a **combination** of strategies. For example, a fintech company might use an analytical strategy for risk identification, process-compliant strategy for regulatory features, and a reactive strategy for exploratory testing sessions.
 
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform) and [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform): both are **Analytical** at their core (test effort follows a risk analysis), but the analysis produces very different priorities. Travel Marketplace layers in a **Model-Based** strategy on top — the search → fare-lock → payment → confirmation → cancellation flow is modeled as an explicit state machine, and tests are designed to cover every valid and invalid transition (a hold that expires before payment, a payment attempted after expiry, a confirmed booking that gets cancelled). Healthcare Insurance Platform layers in a **Process-Compliant** strategy instead — its four entity portals (Provider/Payer/Employer/Member) exist inside a regulated, auditable claims process, so the strategy explicitly requires a maintained **Requirement Traceability Matrix (RTM)** and **data-level testing** (validating claim status directly against the database, not just what a screen displays) so every regulatory requirement traces to a specific test on record.
+
+> [!NOTE]
+> **🎭 Meme Break — Galaxy Brain**
+>
+> 🌌 *Small brain: "Our test strategy is: test everything."*  
+> 🌌🌌 *Glowing brain: "Our test strategy is risk-based — we prioritize by likelihood × impact."*  
+> 🌌🌌🌌 *Galaxy brain: "Our test strategy is risk-based AND model-based for the booking state machine AND process-compliant for the regulated claims workflow — because 'risk-based' means something different depending on whether the risk is 'wrong price charged' or 'PHI visible to the wrong portal.'"*
+
 ### Example Test Strategy (Excerpt)
 
 **Test Automation Strategy Section for a SaaS Company:**
@@ -727,6 +825,13 @@ TEST STRATEGY DOCUMENT
   - UI tests: 60% automated (focus on critical paths)
   - Performance tests: 100% automated (scheduled runs)
 ```
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Why does Travel Marketplace's test strategy need a Model-Based layer on top of risk-based analysis, while Healthcare Insurance Platform needs a Process-Compliant layer instead?</summary>
+
+Because "risk-based" only tells you *where* to focus effort — it doesn't tell you *how* to design the tests once you get there. Travel Marketplace's highest risk (overbooking, stale pricing) is fundamentally about a booking moving through a sequence of states (searched → selected → held → paid → confirmed → cancelled) under timing pressure, so modeling that sequence as a state machine is the only way to systematically cover every valid and invalid transition. Healthcare Insurance Platform's highest risk (PHI inconsistency and audit failure across four portals) isn't a timing problem at all — it's a regulatory-traceability problem, so the strategy needs an RTM linking every requirement to a specific test, which a state-transition model wouldn't produce on its own. Same risk-based foundation, two different structural techniques layered on top because the underlying risk shape is different.
+
+</details>
 
 ---
 
@@ -880,6 +985,8 @@ Where:
 - With 95% confidence (±2 SD), the effort will be between 88.4 - 2(15.7) = **57h** and 88.4 + 2(15.7) = **119.8h**
 - For planning purposes, use the expected estimate + 1 SD = **104.1 hours** (13 person-days) for a ~84% confidence level
 
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): the same three-point technique applies to estimating a task like "build the k6 concurrency suite that reproduces the overbooking race condition." Optimistic (O) might be 8h if the fare-lock API is already well-documented; Most Likely (M) 16h once you account for tuning simultaneous request timing; Pessimistic (P) 32h if the hold-expiry logic turns out to be enforced inconsistently across flight vs. hotel bookings and needs separate scripts. E = (8 + 4×16 + 32) / 6 ≈ **17.3 hours** — a single number a Test Lead can actually put on a schedule, instead of a guess that's either too optimistic (and gets blown through the moment the first flaky run shows up) or padded so heavily it's not trusted.
+
 ---
 
 ### Use Case Point Method
@@ -1006,6 +1113,19 @@ After 3 rounds, estimates converged (range: 88h–100h, spread ≈ 12%):
 | **Wideband Delphi** | High | Medium (requires expert panels, multiple rounds) | Complex projects; when consensus is needed | Time-consuming; requires available experts |
 | **Experience-Based** | Low-Medium | Low (quick assessment) | Quick estimates; familiar projects | Subjective; prone to bias; unreliable for novel projects |
 
+> [!WARNING]
+> **🎭 Meme Break — "This Is Fine" Dog**
+>
+> 🔥 *The estimate says the overbooking test suite takes 8 hours.*  
+> 🔥🐕☕ *It's day 3 and you're still debugging why your two "simultaneous" k6 virtual users aren't actually simultaneous.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> For the k6 overbooking-suite estimate above (O=8h, M=16h, P=32h), why is the Pessimistic estimate so much further from Most Likely than Optimistic is?</summary>
+
+Because uncertainty in testing effort is rarely symmetric — it's driven by unknowns that can only make things *worse*, not better. The optimistic case (8h) assumes everything about the fare-lock API is already understood, so there's a floor to how much time can be saved. But the pessimistic case has to account for open-ended unknowns: what if flight and hotel bookings enforce hold-expiry through completely different code paths and need two separate test scripts instead of one? That's not a small overrun, it's a different scope of work — which is exactly why PERT weights the Most Likely estimate 4x in the formula: it pulls the expected value away from the long, uncertain pessimistic tail while still acknowledging that tail exists.
+
+</details>
+
 ---
 
 ## 10.5 Risk-Based Testing
@@ -1115,6 +1235,21 @@ After assessment, risks are ranked by severity (likelihood × impact):
 └────────────────────────┴─────────────────────────────────────────┘
 ```
 
+> → Real-world contrast from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform): the generic PatientCare risk register above ranks risks *within* a single system. This platform's four entity types (Provider/Payer/Employer/Member) force a different kind of risk-based planning — the same underlying risk shows up differently depending on which portal is looking at it. The platform's own README names it directly: *"a claim status shown as 'Final' to the Member but still 'Need Review' on the Payer's side is a much more damaging bug than any single-portal UI issue."* That reframes the top risk-based-testing priority away from "which module is riskiest" and toward "which cross-entity comparison is riskiest" — which is why the QA approach allocates dedicated effort to **data-level testing** (validating claim status directly against the database across all four portals) rather than treating each portal's risk register as independent. It's also why "Need Review" and "Rejected" claim outcomes get their own dedicated risk focus even though they're not the happy path — a claim that silently never resolves out of "Need Review" is, functionally, a lost claim.
+
+> [!TIP]
+> **🎭 Meme Break — Distracted Boyfriend**
+>
+> 👀 *QA team, distracted by: "let's make sure the happy-path claim (submitted → approved → paid) works perfectly."*  
+> 🚶 *Walking past: the Provider portal, the Payer portal, the Employer's plan rules, and the Member's app, all showing a different status for the exact same claim.*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> In a single-portal system, the risk assessment matrix ranks risk by likelihood × impact per feature. Why doesn't that same per-feature ranking work cleanly for Healthcare Insurance Platform's four-entity model?</summary>
+
+Because likelihood × impact assumes the thing you're scoring is a single feature with a single "correct" state — but a claim in this platform doesn't have one state, it has four *views* of the same state (Provider, Payer, Employer, Member) that all have to agree. A defect isn't just "claim status is wrong," it's "claim status is wrong *relative to another portal*," which isn't a property any single feature's risk score can capture. That's why the real risk register has to explicitly include cross-entity consistency as its own risk category — scoring "Payer portal" and "Member portal" separately would miss the exact defect class (data drift between them) that the platform's own documentation calls out as the central testing challenge.
+
+</details>
+
 ---
 
 ## 10.6 Test Schedule Planning
@@ -1194,6 +1329,15 @@ graph LR
 | Test environment unstable | Switch to local testing environment if possible; escalate to DevOps; document lost time |
 | UAT finds critical issues | Extend UAT by 2–3 days; fast-track fixes; prioritize retesting of critical issues |
 
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): the "Buffer Time Allocation" guidance above (15–25% for complexity/new technology) applies almost literally here — this platform's schedule risk isn't just internal complexity, it's that fare-lock and overbooking tests depend on **timing behavior that's genuinely hard to schedule around**: a k6 concurrency run that looks fine on paper can still surface flaky timing issues that need days of investigation, not hours. Scheduling this module's testing with only a 10% buffer (the "well-defined requirements, experienced team" tier) would systematically under-budget the one category of work — concurrency/race-condition testing — most likely to blow past estimate.
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> Which buffer-time tier from the table above should Travel Marketplace's overbooking-prevention testing use, and why not the lowest (10%) tier even with an experienced team?</summary>
+
+At minimum the "moderate complexity, some new technology" tier (15%), and arguably higher — because the 10% tier assumes low *uncertainty*, not just team experience. Even an experienced team can't fully predict how long it takes to debug a timing-sensitive concurrency defect, since the bug's reproducibility itself is uncertain (that's the nature of a race condition — it doesn't fail the same way every run). Buffer size should track uncertainty in the *work*, not just confidence in the *people* doing it, and fare-lock/overbooking testing has real uncertainty baked into what it's testing.
+
+</details>
+
 ---
 
 ## 10.7 Resource Planning
@@ -1248,6 +1392,21 @@ A general guideline for test team sizing:
 | **Training** | Cypress training, security training | ₹5,000 |
 | **Contingency** (10%) | | ₹17,515 |
 | **Total** | | **₹192,660** |
+
+> → Real example from [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform): the generic team-sizing ratios above (3:1 to 5:1 dev:tester) are exactly the kind of guideline this platform's own README flags as too coarse for a regulated, multi-portal system — it explicitly notes that healthcare and finance often need 2:1 or even 1:1 ratios. The real resourcing picture here isn't just headcount, it's **skill mix**: the platform's QA function combines Playwright + TypeScript UI automation, REST Assured/Postman API testing, and direct **SQL data-level testing** (validating claim status straight against the database, not just the UI) — a skill most generic "QA Analyst" role descriptions in the Skill Requirements table above wouldn't call out at all. That mix is exactly why the team achieved 85%+ automation coverage across critical claim workflows, a 40% reduction in API regression cycle time, and maintained a Requirement Traceability Matrix every sprint — none of which happens from headcount alone without the right skills on the roster.
+
+> [!NOTE]
+> **🎭 Meme Break — Distracted Boyfriend**
+>
+> 👀 *Resource plan, distracted by: "we need 3 QA Analysts for a team this size."*  
+> 🚶 *Walking past: "does even one of them know how to query the claims table directly instead of trusting whatever the Member portal happens to render?"*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> The Resource Allocation Matrix earlier in this section plans staffing by sprint and module. What's missing from that model if you tried to apply it directly to Healthcare Insurance Platform's four-portal structure?</summary>
+
+The generic matrix allocates testers to *modules* (Module A, Module B...), which implicitly assumes each module can be tested and signed off independently. But Healthcare Insurance Platform's highest-value defects live *between* portals (a claim's status disagreeing across Provider/Payer/Employer/Member views), not within any single one — so a resourcing model that assigns one tester per portal and calls it done would systematically under-resource the cross-entity data-level testing that actually catches the platform's central risk. The fix isn't more testers, it's making sure someone on the team owns cross-portal reconciliation as its own line item, backed by the SQL/data-level skill to actually verify it against the database rather than trusting what four different UIs happen to display.
+
+</details>
 
 ---
 
@@ -1360,6 +1519,38 @@ Agile favors **"just enough" documentation** — enough to be useful, not so muc
 
 > [!TIP]
 > A good test for documentation quality: **Give your test cases to a new team member and see if they can execute them without asking questions.** If they can, your documentation is good. If they can't, simplify and add missing context.
+
+> → Real example from [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform): the "Informal defect reports" row in the Common Documentation Mistakes table above (*"Search is broken" — no steps, no environment, no evidence*) has a concrete, correctly-done counterexample in this platform's own `sample-defect-report.md`. **BUG-TRV-2011** — "Two travelers can both confirm a booking for the last available hotel room" — isn't reported as "overbooking is broken." It's filed with a specific severity (Critical), a specific module (Overbooking Prevention), numbered Steps to Reproduce, an Expected Result sourced directly from the architecture doc, an Actual Result that names the exact root cause (the fare-lock check runs only at selection, not re-verified at confirmation), a stated business Impact (customer trust, compensation liability), and a Suggested Fix (atomic inventory-unit lock at confirmation time). That's the difference a template makes: a new team member could pick up BUG-TRV-2011 and understand not just *that* something's broken, but exactly what to go fix — which is the same bar the "give it to a new team member" documentation-quality test above is checking for.
+
+> [!TIP]
+> **🎭 Meme Break — Drake Hotline Bling**
+>
+> ❌ *Defect report: "Booking page lets you double-book somehow, pls fix."*  
+> ✅ *Defect report: BUG-TRV-2011, Critical, Steps to Reproduce (3 steps), Expected Result (cited from the architecture doc), Actual Result (root cause named), Impact (customer trust + liability), Suggested Fix (atomic lock at confirmation).*
+
+<details>
+<summary>🧠 <strong>Quick Check:</strong> BUG-TRV-2011's "Actual Result" field states the root cause ("the fare-lock check happens only at initial selection, not re-verified atomically at payment completion") rather than just describing the symptom. Why does that matter for documentation quality, beyond just being "more detail"?</summary>
+
+Because a symptom-only report ("both travelers get confirmed bookings") tells a developer *what* to reproduce but leaves them to rediscover *why* it happens from scratch — repeating investigation work the tester already did. Naming the root cause (selection-time check vs. confirmation-time check) turns the report into something actionable: it points directly at the Suggested Fix (make the check atomic at confirmation) instead of leaving the developer to guess whether the bug is in the UI, the API contract, or the booking service. This is the same principle behind the "give it to a new team member" documentation test — a report a new engineer can act on without asking clarifying questions is doing its job; a report that just restates the symptom isn't.
+
+</details>
+
+---
+
+## 📌 Fact Sheet — Part 10 in 60 Seconds
+
+- A **test plan** answers four questions: WHAT will be tested, HOW, WHO does it, and WHEN — no test plan means no one owns the risky edge cases (see: Travel Marketplace's BUG-TRV-2011 overbooking defect).
+- **IEEE 829** defines the formal test plan structure (18 sections: Identifier → References → Scope → Risk → Entry/Exit Criteria → Deliverables → Schedule → Approvals); Agile uses lighter versions of the same skeleton.
+- **In-scope vs. out-of-scope** isn't just a list — it's a liability boundary. Both ShopEasy and Travel Marketplace push third-party payment/supplier internals out of scope, but a booking marketplace has to explicitly pull fare-lock integrity and overbooking prevention *into* scope precisely because it doesn't own its own inventory.
+- **Entry criteria** gate the start of testing (e.g. mocked supplier responses so race-condition tests are reproducible); **exit criteria** gate release (e.g. zero open Critical defects, fare-lock integrity holding under k6 concurrent load).
+- A **test strategy** is the organization-wide "constitution"; a **test plan** is the project-specific "legislation" that implements it — Travel Marketplace layers Model-Based testing on top of risk-based strategy; Healthcare Insurance Platform layers Process-Compliant (RTM, data-level testing) on top of the same foundation.
+- Six estimation techniques exist for a reason — **WBS** decomposes tasks, **Three-Point (PERT)** handles uncertainty (E = (O+4M+P)/6), **Wideband Delphi** converges expert opinion, **Experience-Based** leans on history — pick based on how much uncertainty and time you have, not habit.
+- **Risk = Likelihood × Impact.** Risk-Based Testing spends the most effort where that product is highest — but "highest risk" can mean different *shapes* of risk: a single risky module (generic PatientCare example) vs. a cross-entity data-consistency risk that no single module's score would catch (Healthcare Insurance Platform's four-portal claim views).
+- **Buffer time isn't just about team experience** — it should track uncertainty in the work itself; timing-sensitive concurrency/race-condition testing (Travel Marketplace's overbooking suite) deserves a bigger buffer than its team's experience level alone would suggest.
+- **Resource planning is skill mix, not just headcount** — Healthcare Insurance Platform's real value came from testers who could query claims directly via SQL, not just click through four UIs and trust what each one displayed.
+- **Suspension/resumption criteria** exist to stop testing from burning effort against an unstable build or environment, and define exactly what "stable again" means before resuming.
+- A defect report is only as good as its **root cause**, not just its symptom — BUG-TRV-2011's value isn't "two bookings happened," it's "the check runs at selection, not at confirmation," because that's what actually points to the fix.
+- **Real repos referenced in this chapter:** [Travel Marketplace Platform](https://github.com/ghanendra-sdet/travel-marketplace-platform) (fare-lock/overbooking as a worked test plan example) and [Healthcare Insurance Platform](https://github.com/ghanendra-sdet/healthcare-insurance-platform) (four-entity risk and resourcing contrast).
 
 ---
 
