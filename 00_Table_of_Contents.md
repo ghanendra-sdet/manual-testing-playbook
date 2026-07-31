@@ -5,7 +5,7 @@
 ---
 
 > **Author**: AI-Focused Study Guide by Ghanendra Yadav  
-> **Target Audience**: Manual Testing professionals (5+ years experience)  
+> **Target Audience**: 0 to 5 years of experience — whether you're starting from scratch, upskilling, or prepping for interviews, this is complete and job-ready  
 > **Last Updated**: May 2026  
 > **Total Content**: 12 Parts | ~1.14 MB | 15,000+ lines of detailed content
 

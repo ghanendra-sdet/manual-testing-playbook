@@ -127,4 +127,4 @@ This project is 100% static, making it perfectly suited for free hosting on GitH
 
 ---
 
-*This guide was compiled as a comprehensive resource for manual testing professionals with 5+ years of experience to master fundamentals, study templates, prep for interviews, and keep up with modern trends.*
+*This guide was compiled as a comprehensive resource for manual testing professionals -- 0 to 5 years of experience -- to master fundamentals, study templates, prep for interviews, and land the job.*
