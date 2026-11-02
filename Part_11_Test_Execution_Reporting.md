@@ -68,6 +68,17 @@ flowchart TD
     R --> S["Go/No-Go Decision"]
     S --> T["Exit Criteria Verification"]
     T --> U["Test Closure"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,E,H,I,J,K,M,N,P,Q,R,S,T step
+    class C,G,L,O decision
+    class D,F bad
+    class U good
 ```
 
 ### Test Execution Best Practices

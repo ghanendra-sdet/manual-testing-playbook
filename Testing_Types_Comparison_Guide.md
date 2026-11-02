@@ -211,11 +211,11 @@ UAT              ██                                              Once, final
 - The **frequency pyramid** explains automation priority: automate what repeats constantly
   (Smoke, Sanity, Regression) before what happens once (UAT) — frequency, not importance, drives
   that order.
-- Every real-world example on this page is drawn from an actual defect or checklist across this
-  account's portfolio projects — cross-reference [Part 2](./Part_02_Types_of_Testing.md) for the
+- Every real-world example on this page is drawn from an actual defect or checklist in a real
+  portfolio project — cross-reference [Part 2](Part_02_Types_of_Testing.md) for the
   full deep-dive on each type individually.
 
 ---
 
-*Companion to [Part 2: Types of Testing](./Part_02_Types_of_Testing.md). Part of the
-[Manual Testing Playbook](./00_Table_of_Contents.md).*
+*Companion to [Part 2: Types of Testing](Part_02_Types_of_Testing.md). Part of the
+[Manual Testing Playbook](00_Table_of_Contents.md).*

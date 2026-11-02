@@ -193,6 +193,13 @@ graph LR
     C --> D["Sprint Review<br/>(2-4 hours)"]
     D --> E["Sprint Retrospective<br/>(1.5-3 hours)"]
     E --> A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B,C,D,E step
 ```
 
 1. **Sprint Planning:** The team selects user stories from the product backlog and plans the work for the sprint. Testers identify test scenarios, estimate testing effort, and clarify acceptance criteria.
@@ -324,6 +331,15 @@ graph TD
     A["Portfolio Level<br/>Strategic themes, Epics, Lean budgets"] --> B["Large Solution Level<br/>Solution trains, Capabilities"]
     B --> C["Program Level / ART<br/>Agile Release Trains, Features, PI Planning"]
     C --> D["Team Level<br/>Scrum/Kanban teams, User Stories, Sprints"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C step
+    class D good
 ```
 
 **Testing in SAFe:**
@@ -518,7 +534,7 @@ During exploratory testing of a ride-sharing app:
 - **Compatibility Testing:** Cross-browser, cross-device, cross-OS testing
 
 **Characteristics:**
-- Require **specialized tools** (JMeter, Gatling, OWASP ZAP, Burp Suite)
+- Require **specialized tools** (JMeter, Gatling, ZAP, Burp Suite)
 - Often require **dedicated environments** that mirror production
 - Results need expert interpretation
 - Typically done by specialists or specialized teams
@@ -576,6 +592,15 @@ graph TD
     F --> I["Estimate testing<br/>effort"]
     F --> J["Identify test data<br/>& environment needs"]
     F --> K["Clarify ambiguities<br/>with PO"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,F step
+    class E,G,H,I,J,K good
 ```
 
 #### Tester's Role in Sprint Planning
@@ -638,6 +663,15 @@ graph TD
     B["Learner passes final assessment"] --> C
     C -->|"BOTH true"| D["Certificate issued"]
     C -->|"Only one true"| E["No certificate —<br/>partial completion must<br/>NOT be treated as done"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B start
+    class C decision
+    class D,E good
 ```
 
 **Sprint Planning — Tester's Contributions:**
@@ -714,6 +748,15 @@ graph LR
     F --> G["Automated<br/>Smoke Tests"]
     G -->|Pass| H["Manual Testing<br/>& Exploratory Testing"]
     G -->|Fail| E
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,F,G step
+    class E,H good
 ```
 
 #### Pair Testing
@@ -1451,7 +1494,7 @@ The **Definition of Done (DoD)** is a shared understanding within the team of wh
 | 13 | Regression test suite updated with new test cases | Testing |
 | 14 | API documentation updated (if APIs changed) | Documentation |
 | 15 | User-facing documentation updated (help articles, tooltips) | Documentation |
-| 16 | Accessibility check passed (WCAG 2.1 AA) | Compliance |
+| 16 | Accessibility check passed (WCAG 2.2 AA) | Compliance |
 | 17 | Feature deployed to staging environment | Deployment |
 | 18 | Product Owner has reviewed and accepted the story | Acceptance |
 
@@ -1511,6 +1554,14 @@ graph LR
     A["🔴 RED<br/>Write a failing test"] --> B["🟢 GREEN<br/>Write minimum code<br/>to pass the test"]
     B --> C["🔵 REFACTOR<br/>Improve the code<br/>(tests still pass)"]
     C --> A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A bad
+    class B,C step
 ```
 
 **Detailed Steps:**
@@ -1551,6 +1602,16 @@ graph TD
     L -->|"Yes"| N{"More behaviors<br/>to implement?"}
     N -->|"Yes"| B
     N -->|"No"| O["Done!"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,Yes,No,F,G,I,J,K,M step
+    class D,H,L,N decision
+    class E,O good
 ```
 
 ### Benefits of TDD
@@ -1919,7 +1980,7 @@ Requirements → Design → Development → Testing → Deploy → ████�
 | **Integration Testing** | Postman/Newman, RestAssured, Karate | API and service tests |
 | **UI Automation** | Selenium, Cypress, Playwright, Appium | Browser and mobile automation |
 | **Performance Testing** | JMeter, Gatling, k6, Locust | Load and stress testing |
-| **Security Testing** | OWASP ZAP, SonarQube, Snyk, Checkmarx | Vulnerability scanning |
+| **Security Testing** | ZAP, SonarQube, Snyk, Checkmarx | Vulnerability scanning |
 | **Code Quality** | SonarQube, ESLint, Pylint, Checkstyle | Static code analysis |
 | **Monitoring** | Datadog, New Relic, Grafana, PagerDuty | Production monitoring |
 | **Test Management** | TestRail, Zephyr, qTest, Xray | Test case and result management |

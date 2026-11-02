@@ -27,7 +27,7 @@
 - [E. Specific Non-Functional Testing Types](#e-specific-non-functional-testing-types)
 - [F. Other Specialized Testing Types](#f-other-specialized-testing-types)
 - [Decision Flowchart: When to Use Which Testing Type](#decision-flowchart-when-to-use-which-testing-type)
-- [📌 Fact Sheet — Part 2 in 60 Seconds](#fact-sheet-part-2-in-60-seconds)
+- [📌 Fact Sheet — Part 2 in 60 Seconds](#-fact-sheet--part-2-in-60-seconds)
 - [Common Interview Questions](#common-interview-questions)
 
 ---
@@ -1068,7 +1068,7 @@ mindmap
 | **Pass/Fail** | Yes/No (binary) | Measured on a scale (response time, throughput) |
 | **Who** | Testers, business users | Performance engineers, security analysts, UX researchers |
 | **Timing** | Throughout testing phases | Typically during system testing |
-| **Tools** | Selenium, manual testing | JMeter, OWASP ZAP, Lighthouse, BrowserStack |
+| **Tools** | Selenium, manual testing | JMeter, ZAP, Lighthouse, BrowserStack |
 
 ### Key Takeaways — Section C
 
@@ -1622,28 +1622,28 @@ Unlike load testing (which focuses on concurrent users), volume testing focuses 
 
 > **Security Testing** evaluates the system's ability to **protect data and maintain functionality** in the face of malicious attacks, unauthorized access, and vulnerabilities.
 
-#### OWASP Top 10 (2021)
+#### OWASP Top 10 (2025)
 
-The **Open Web Application Security Project (OWASP)** defines the top 10 most critical web application security risks:
+The **Open Worldwide Application Security Project (OWASP)** publishes the ten most critical web application security risks. The current edition is **OWASP Top 10:2025**, which replaced the 2021 list. Plenty of tools and interviewers still use 2021 numbering, so the last column maps each item back.
 
-| # | Risk | Description | Test Example |
-|---|------|-------------|-------------|
-| A01 | **Broken Access Control** | Users can act outside their intended permissions | Can a regular user access admin pages by changing the URL? |
-| A02 | **Cryptographic Failures** | Sensitive data exposed due to weak or missing encryption | Are passwords stored as plain text or hashed? Is data in transit encrypted (HTTPS)? |
-| A03 | **Injection** | Malicious input interpreted as code (SQL, NoSQL, OS, LDAP) | Does entering `' OR '1'='1` in the login form bypass authentication? |
-| A04 | **Insecure Design** | Missing or ineffective security controls in the design | Can a user enumerate all account numbers by incrementing IDs? |
-| A05 | **Security Misconfiguration** | Default configs, unnecessary services, improper permissions | Are default admin credentials still active? Are error messages exposing stack traces? |
-| A06 | **Vulnerable Components** | Using outdated libraries with known vulnerabilities | Is the application using Log4j < 2.17.0 (vulnerable to Log4Shell)? |
-| A07 | **Authentication Failures** | Weak authentication, credential stuffing, session fixation | Is there a lockout after 5 failed login attempts? Are session tokens rotated after login? |
-| A08 | **Data Integrity Failures** | Trusting untrusted data (deserialization, CI/CD integrity) | Can a user modify the "price" field in a hidden form to change the order total? |
-| A09 | **Logging & Monitoring Failures** | Insufficient logging prevents detection of breaches | Are failed login attempts logged? Are security events alerting? |
-| A10 | **Server-Side Request Forgery** | Application fetches a remote resource without validating the URL | Can an attacker make the server fetch internal resources (e.g., `http://localhost/admin`)? |
+| # | Risk | Description | Test Example | 2021 equivalent |
+|---|------|-------------|-------------|---|
+| A01 | **Broken Access Control** | Users can act outside their intended permissions; now also covers **SSRF** | Can a regular user access admin pages by changing the URL? Can a "webhook URL" field make the server fetch `http://localhost/admin`? | A01 + A10 (SSRF) |
+| A02 | **Security Misconfiguration** | Default configs, unnecessary services, improper permissions | Are default admin credentials still active? Are error messages exposing stack traces? | A05 |
+| A03 | **Software Supply Chain Failures** 🆕 | Vulnerable or untrusted dependencies, build tools, CI/CD, and package sources | Is the application using Log4j < 2.17.0 (vulnerable to Log4Shell)? Are dependency versions pinned in a lockfile? | Widens A06 (Vulnerable Components) |
+| A04 | **Cryptographic Failures** | Sensitive data exposed due to weak or missing encryption | Are passwords stored as plain text or hashed? Is data in transit encrypted (HTTPS)? | A02 |
+| A05 | **Injection** | Malicious input interpreted as code (SQL, NoSQL, OS, LDAP) | Does entering `' OR '1'='1` in the login form bypass authentication? | A03 |
+| A06 | **Insecure Design** | Missing or ineffective security controls in the design | Can a user enumerate all account numbers by incrementing IDs? | A04 |
+| A07 | **Authentication Failures** | Weak authentication, credential stuffing, session fixation | Is there a lockout after 5 failed login attempts? Are session tokens rotated after login? | A07 (renamed) |
+| A08 | **Software or Data Integrity Failures** | Trusting untrusted data (deserialization, CI/CD integrity) | Can a user modify the "price" field in a hidden form to change the order total? | A08 |
+| A09 | **Security Logging & Alerting Failures** | Insufficient logging, or logs nobody is alerted on | Are failed login attempts logged? Does a burst of them raise an alert? | A09 (renamed) |
+| A10 | **Mishandling of Exceptional Conditions** 🆕 | Poor error handling, logic errors, and "failing open" | If the fraud-check service times out, does the payment get blocked, or quietly approved? | New |
 
 #### Types of Security Testing
 
 | Type | Description | Depth | Tools |
 |------|------------|:-----:|-------|
-| **Vulnerability Scanning** | Automated scan for known vulnerabilities | Low | Nessus, OWASP ZAP, Qualys |
+| **Vulnerability Scanning** | Automated scan for known vulnerabilities | Low | Nessus, ZAP (formerly "OWASP ZAP"), Qualys |
 | **Security Auditing** | Manual review of code, configuration, and architecture | Medium | Manual review, SonarQube |
 | **Penetration Testing** | Simulated real-world attack by ethical hackers | High | Burp Suite, Metasploit, Kali Linux |
 | **Risk Assessment** | Identifying and prioritizing security risks | Medium | Threat modeling (STRIDE, DREAD) |
@@ -1732,7 +1732,7 @@ flaw, it's a false statement about a credential.
 
 #### Definition
 
-> **Accessibility Testing** ensures the software is usable by people with disabilities, including visual, auditory, motor, and cognitive impairments, in compliance with standards like **WCAG 2.1** (Web Content Accessibility Guidelines).
+> **Accessibility Testing** ensures the software is usable by people with disabilities, including visual, auditory, motor, and cognitive impairments, in compliance with standards like **WCAG 2.2** (Web Content Accessibility Guidelines; 2.1 is still the version many laws cite).
 
 #### Key Accessibility Testing Areas
 
@@ -1883,7 +1883,7 @@ supplier API.
 > - **Load Testing** = expected load. **Stress Testing** = beyond limits. **Volume Testing** = large data.
 > - **Security Testing** should cover the **OWASP Top 10** at minimum.
 > - **Usability Testing** uses **Nielsen's 10 Heuristics** as a framework.
-> - **Accessibility Testing** follows **WCAG 2.1** guidelines (A, AA, AAA levels).
+> - **Accessibility Testing** follows **WCAG 2.2** guidelines (A, AA, AAA levels); a page that meets 2.2 AA also meets 2.1 AA.
 > - **Compatibility** and **Localization/Globalization** testing ensure the software works for all users, everywhere.
 
 <details>
@@ -2030,7 +2030,7 @@ Unlike monkey testing (which is random), fuzz testing is more systematic — it 
 | Negative numbers | `{"quantity": -5}` | Business validation error | Order created with negative quantity |
 | Deeply nested | `{"a": {"b": {"c": ... × 100}}}` | Handled gracefully | Stack overflow |
 
-**Tools:** AFL (American Fuzzy Lop), Peach Fuzzer, Boofuzz, OWASP ZAP (API fuzzing)
+**Tools:** AFL (American Fuzzy Lop), Peach Fuzzer, Boofuzz, ZAP (API fuzzing)
 
 ---
 
@@ -2128,7 +2128,7 @@ All Users ──────────┤                                     
 
 | Domain | Standard | What's Verified |
 |--------|---------|-----------------|
-| Web Accessibility | WCAG 2.1 AA | Screen reader support, keyboard navigation, color contrast |
+| Web Accessibility | WCAG 2.2 AA (2.1 AA as legal floor) | Screen reader support, keyboard navigation, color contrast |
 | Payment Processing | PCI-DSS | Card data encryption, secure transmission, access controls |
 | Healthcare | HIPAA | Patient data privacy, audit trails, access controls |
 | Financial | SOX | Financial reporting integrity, internal controls |
@@ -2441,18 +2441,20 @@ There's also **Volume Testing** (testing with large data sets), **Endurance/Soak
 
 "Security Testing evaluates a system's ability to protect data, maintain functionality, and resist malicious attacks. It covers authentication, authorization, data protection, input validation, and more.
 
-The OWASP Top 10 (2021) are the most critical web application security risks:
+The current list is the OWASP Top 10:2025, which replaced the 2021 edition:
 
-1. **Broken Access Control** — Users acting outside their permissions (e.g., accessing other users' data by changing the URL parameter)
-2. **Cryptographic Failures** — Sensitive data exposed due to weak encryption (e.g., passwords stored in plain text)
-3. **Injection** — Malicious input executed as code (SQL injection, XSS)
-4. **Insecure Design** — Flawed security architecture (e.g., no rate limiting on password reset)
-5. **Security Misconfiguration** — Default passwords, unnecessary services enabled, verbose error messages
-6. **Vulnerable Components** — Using libraries with known vulnerabilities (e.g., Log4Shell)
+1. **Broken Access Control** — Users acting outside their permissions (e.g., accessing other users' data by changing the URL parameter); SSRF is now folded in here
+2. **Security Misconfiguration** — Default passwords, unnecessary services enabled, verbose error messages
+3. **Software Supply Chain Failures** — Vulnerable or untrusted dependencies and build pipelines (e.g., Log4Shell)
+4. **Cryptographic Failures** — Sensitive data exposed due to weak encryption (e.g., passwords stored in plain text)
+5. **Injection** — Malicious input executed as code (SQL injection, XSS)
+6. **Insecure Design** — Flawed security architecture (e.g., no rate limiting on password reset)
 7. **Authentication Failures** — Weak passwords, no lockout policy, credential stuffing
-8. **Data Integrity Failures** — Trusting untrusted data (e.g., client-side price modification)
-9. **Logging & Monitoring Failures** — No alerts on suspicious activities
-10. **Server-Side Request Forgery** — Making the server fetch internal resources via manipulated URLs
+8. **Software or Data Integrity Failures** — Trusting untrusted data (e.g., client-side price modification)
+9. **Security Logging & Alerting Failures** — Suspicious activity not logged, or logged with no alert
+10. **Mishandling of Exceptional Conditions** — Error paths that fail open (e.g., a payment approved when the fraud check times out)
+
+If the interviewer quotes the 2021 list, the big differences are that SSRF merged into Broken Access Control, Vulnerable Components widened into Supply Chain, and Exceptional Conditions is new.
 
 For manual security testing, I typically focus on: testing authentication bypasses, trying SQL injection on input fields, checking authorization by accessing resources of different user roles, verifying HTTPS usage, and checking for sensitive data in error messages."
 
@@ -2509,7 +2511,7 @@ Beta testing is crucial because it exposes the software to real-world conditions
 
 "Accessibility Testing ensures that software is usable by people with disabilities, including visual, auditory, motor, and cognitive impairments.
 
-The primary standard is **WCAG 2.1** (Web Content Accessibility Guidelines), which has three levels:
+The primary standard is **WCAG** (Web Content Accessibility Guidelines). The current version is **2.2** (October 2023), which adds criteria like a 24×24px minimum target size and focus that's never hidden behind sticky headers; many laws still cite 2.1 AA, and meeting 2.2 AA covers both. WCAG has three levels:
 - **Level A:** Minimum accessibility (must have)
 - **Level AA:** Addresses most common barriers (industry standard — most legal requirements target this)
 - **Level AAA:** Highest accessibility (aspirational, rarely required)

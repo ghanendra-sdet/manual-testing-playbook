@@ -77,7 +77,7 @@ This curated reference lists practical tools and services commonly used by testi
 
 ### Security & Vulnerability Testing
 
-- OWASP ZAP — Free — Open-source web app security scanner
+- ZAP — Free — Open-source web app security scanner
 - Burp Suite — Community / Pro — Manual security testing toolkit
 - Snyk — Free tier / Paid — Dependency & container scanning
 

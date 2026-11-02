@@ -14,7 +14,7 @@
 5. [1.5 Error, Defect, Bug, Failure — Definitions with Examples](#15-error-defect-bug-failure--definitions-with-examples)
 6. [1.6 Seven Testing Principles (ISTQB)](#16-seven-testing-principles-istqb)
 7. [1.7 Psychology of Testing](#17-psychology-of-testing)
-8. [📌 Fact Sheet — Part 1 in 60 Seconds](#fact-sheet-part-1-in-60-seconds)
+8. [📌 Fact Sheet — Part 1 in 60 Seconds](#-fact-sheet--part-1-in-60-seconds)
 9. [Common Interview Questions](#common-interview-questions)
 
 ---
@@ -954,9 +954,9 @@ mindmap
     ("2. Exhaustive testing<br/>is impossible")
     ("3. Early testing<br/>saves time & money")
     ("4. Defects<br/>cluster together")
-    ("5. Pesticide<br/>paradox")
+    ("5. Tests<br/>wear out")
     ("6. Testing is<br/>context-dependent")
-    ("7. Absence-of-errors<br/>is a fallacy")
+    ("7. Absence-of-defects<br/>fallacy")
 ```
 
 ---
@@ -1134,11 +1134,11 @@ Defects are not evenly distributed across the software. Certain modules tend to 
 
 ---
 
-### Principle 5: Pesticide Paradox
+### Principle 5: Tests Wear Out (the "Pesticide Paradox")
 
 > **"If the same tests are repeated over and over again, eventually these tests no longer find any new defects. To detect new defects, existing tests and test data need to be changed, and new tests need to be written."**
 
-The name comes from agriculture: if you use the same pesticide repeatedly, pests develop resistance. Similarly, if you run the same tests repeatedly, the software "resists" — you only catch the same defects (which have been fixed) and never find new ones.
+ISTQB's v4.0 syllabus calls this principle **"tests wear out"**; older syllabi and most interviewers still call it the **pesticide paradox**, so know both names. The older name comes from agriculture: if you use the same pesticide repeatedly, pests develop resistance. Similarly, if you run the same tests repeatedly, the software "resists" — you only catch the same defects (which have been fixed) and never find new ones.
 
 #### Explanation
 
@@ -1214,7 +1214,9 @@ There is no "one size fits all" approach to testing. The testing strategy, techn
 
 ---
 
-### Principle 7: Absence-of-Errors Is a Fallacy
+### Principle 7: The Absence-of-Defects Fallacy
+
+*Older syllabi call this the "absence-of-errors fallacy"; it's the same principle.*
 
 > **"Finding and fixing a large number of defects does not help if the system built is unusable and does not fulfill the users' needs and expectations."**
 
@@ -1265,9 +1267,9 @@ The software was virtually defect-free, but it was a **failure** because it didn
 | 2 | Exhaustive testing impossible | Must use smart test design | Single text field has 10⁵⁹ possible inputs |
 | 3 | Early testing | Find defects early to save cost | 2-hour review prevents 3 weeks of rework |
 | 4 | Defect clustering | 80% of defects in 20% of modules | Payment module has 4.5x defect density vs. average |
-| 5 | Pesticide paradox | Same tests stop finding new bugs | 500-test suite finds 0 bugs for 6 months |
+| 5 | Tests wear out (pesticide paradox) | Same tests stop finding new bugs | 500-test suite finds 0 bugs for 6 months |
 | 6 | Context-dependent | No one-size-fits-all | E-commerce app vs. aircraft control system |
-| 7 | Absence-of-errors fallacy | Bug-free ≠ successful | Google Wave: technically good, user failure |
+| 7 | Absence-of-defects fallacy | Bug-free ≠ successful | Google Wave: technically good, user failure |
 
 ### Key Takeaways — Section 1.6
 
@@ -1521,7 +1523,7 @@ Not by arguing that users definitely do this — that's exactly the "users would
 - The chain is **Error (human mistake) → Defect (flaw in an artifact) → Failure (observable malfunction)**. Not every defect causes a failure; not every failure is caused by a defect.
 - **The 1-10-100 rule:** cost to fix a defect grows roughly exponentially the later it's found — requirements (1x) → design (5-6x) → coding (10x) → testing (15-50x) → production (100x+). The exact ratio matters less than the shape of the curve.
 - **Testing paradox (Dijkstra):** testing can prove defects are present, never that they're absent. Release sign-off is a risk-based judgment call, not a guarantee of zero bugs.
-- ISTQB's **seven principles**: (1) testing shows presence not absence of defects, (2) exhaustive testing is impossible, (3) early testing saves money (shift-left), (4) defects cluster (~80/20), (5) pesticide paradox (stale tests stop finding new bugs), (6) testing is context-dependent, (7) absence-of-errors is a fallacy (bug-free ≠ successful).
+- ISTQB's **seven principles**: (1) testing shows presence not absence of defects, (2) exhaustive testing is impossible, (3) early testing saves money (shift-left), (4) defects cluster (~80/20), (5) tests wear out, a.k.a. the pesticide paradox (stale tests stop finding new bugs), (6) testing is context-dependent, (7) the absence-of-defects fallacy (bug-free ≠ successful).
 - A missing ledger debit entry (real defect: **BUG-COL-1042**, Fintech Collection Engine) looks like nothing on the UI but breaks the audit trail — proof that "the screen looks fine" is not the same as "the system is correct," especially in fintech.
 - Cross-portal data drift (real defect: **BUG-HIP-6014**, Healthcare Insurance Platform — a Member portal showing "Final" while the Payer portal still shows "Need Review") shows why multi-entity platforms treat cross-view consistency as their top testing risk, not any single screen.
 - Consent-revocation timing (real project: **YOBO**, Account Aggregator) is a live example of tester-mindset thinking: "what happens to a fetch already in flight when the user revokes access?" — the kind of question breaking-mode testers ask by instinct.
@@ -1637,11 +1639,11 @@ Important nuances:
 
 4. **Defect clustering:** About 80% of defects are found in 20% of modules. We should focus testing on high-risk, defect-prone areas.
 
-5. **Pesticide paradox:** Repeating the same tests eventually stops finding new bugs. We must regularly update test cases and use different testing techniques.
+5. **Tests wear out (the pesticide paradox):** Repeating the same tests eventually stops finding new bugs. We must regularly update test cases and use different testing techniques.
 
 6. **Testing is context-dependent:** Testing a pacemaker requires a completely different approach than testing a mobile game. Strategy must match context.
 
-7. **Absence-of-errors is a fallacy:** A bug-free system that doesn't meet user needs is still a failure. Validation is as important as verification."
+7. **Absence-of-defects fallacy:** A bug-free system that doesn't meet user needs is still a failure. Validation is as important as verification."
 
 ---
 
@@ -1649,7 +1651,7 @@ Important nuances:
 
 **Model Answer:**
 
-"The Pesticide Paradox states that running the same set of tests repeatedly will eventually stop finding new defects, similar to how pests develop resistance to the same pesticide.
+"The Pesticide Paradox, which the ISTQB v4.0 syllabus now calls 'tests wear out,' states that running the same set of tests repeatedly will eventually stop finding new defects, similar to how pests develop resistance to the same pesticide.
 
 This happens because:
 - Fixed bugs won't be found again by the same tests

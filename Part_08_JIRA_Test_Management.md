@@ -38,8 +38,8 @@ For **QA and testing professionals**, JIRA serves as:
 | **2017** | JIRA Cloud introduced — SaaS model with regular automatic updates |
 | **2020** | Atlassian announces end-of-life for JIRA Server — pushes customers toward Cloud or Data Center |
 | **2021** | JIRA Server licenses discontinued for new customers |
-| **2024** | JIRA Server reaches end-of-support — all customers must migrate to Cloud or Data Center |
-| **2025** | JIRA Cloud dominates with AI-powered features (Atlassian Intelligence), improved automation, and enhanced integration ecosystem |
+| **2024** | JIRA Server reaches end-of-support (Feb) — all customers must migrate to Cloud or Data Center. Jira Software and Jira Work Management are merged into a single product, simply called **Jira** (announced May, migration from late 2024) |
+| **2025** | Rovo AI (successor to the "Atlassian Intelligence" branding) included in all paid JIRA Cloud plans; improved automation, and enhanced integration ecosystem |
 
 ---
 
@@ -49,40 +49,40 @@ For **QA and testing professionals**, JIRA serves as:
 |---------|-----------|---------------------------|-----------------|
 | **Hosting** | Hosted by Atlassian (SaaS) | Self-hosted on your own server | Self-hosted (clustered) |
 | **Updates** | Automatic, continuous releases | Manual updates by admin | Manual updates by admin |
-| **Availability (2025)** | ✅ Available — Primary offering | ❌ Discontinued (Feb 2024) | ✅ Available for enterprise |
+| **Availability** | ✅ Available — Primary offering | ❌ Discontinued (Feb 2024) | ✅ Available for enterprise |
 | **Infrastructure** | Managed by Atlassian | Managed by your IT team | Managed by your IT team |
 | **Scalability** | Auto-scales (Atlassian manages) | Limited to single server | Horizontally scalable (cluster) |
 | **Customization** | Marketplace apps, limited deep customization | Full customization, custom plugins | Full customization, custom plugins |
 | **Performance** | Depends on plan tier | Depends on your hardware | High performance (multi-node) |
-| **AI Features** | ✅ Atlassian Intelligence (AI) | ❌ No AI features | Limited AI features |
+| **AI Features** | ✅ Rovo / Atlassian AI (all paid plans) | ❌ No AI features | Limited AI features |
 | **Best For** | Small to large teams wanting hassle-free management | (Legacy — not available for new customers) | Large enterprises with strict compliance/data residency needs |
 | **Cost Model** | Per-user monthly subscription | One-time license (discontinued) | Annual license based on user count |
 
 > [!IMPORTANT]
-> **As of 2025**, most organizations are on **JIRA Cloud**. JIRA Server is no longer supported. If you're in an interview, be familiar with JIRA Cloud — it's the industry standard.
+> Most organizations are now on **JIRA Cloud**; JIRA Server is no longer supported. Two naming changes worth knowing for interviews: Atlassian has styled the product **"Jira"** (not "JIRA") since 2017, and since 2024 **"Jira Software" is just "Jira"** after its merger with Jira Work Management. This guide keeps the familiar "JIRA" spelling.
 
 ---
 
-### JIRA Pricing and Licensing (2025 Context)
+### JIRA Pricing and Licensing
 
 | Plan | Users | Price (Per User/Month) | Key Features |
 |------|-------|----------------------|--------------|
-| **Free** | Up to 10 users | ₹0 | Basic Scrum/Kanban boards, backlog, 2 GB storage |
-| **Standard** | Up to 50,000 users | ~₹8.15/user/month | Audit logs, 250 GB storage, project roles, advanced permissions |
-| **Premium** | Up to 50,000 users | ~₹16/user/month | Advanced roadmaps, sandbox environment, unlimited storage, IP allow-listing, SLA guarantee (99.9%) |
-| **Enterprise** | Unlimited | Custom pricing | Unlimited sites, Atlassian Intelligence, advanced security (SAML SSO, SCIM), data residency, 24/7 support |
+| **Free** | Up to 10 users | Free | Basic Scrum/Kanban boards, backlog, 2 GB storage |
+| **Standard** | Up to 50,000 users | ~US$8/user/month | Audit logs, 250 GB storage, project roles, advanced permissions |
+| **Premium** | Up to 50,000 users | ~US$15/user/month | Advanced roadmaps, sandbox environment, unlimited storage, IP allow-listing, SLA guarantee (99.9%) |
+| **Enterprise** | Unlimited | Custom pricing | Unlimited sites, highest Rovo AI usage quota, advanced security (SAML SSO, SCIM), data residency, 24/7 support |
 
 > [!NOTE]
-> Prices are approximate and subject to change. Atlassian uses a tiered pricing model where the per-user cost decreases with larger team sizes. For the latest pricing, check <a href="https://www.atlassian.com/software/jira/pricing" target="_blank" rel="noopener noreferrer">atlassian.com/software/jira/pricing</a>.
+> Prices are approximate, quoted in US dollars as Atlassian lists them, and change often (India billing adds GST). Since 2025, Atlassian's AI features (**Rovo**, which absorbed the older "Atlassian Intelligence" branding) are included in every paid plan, with larger usage quotas on higher tiers. Atlassian uses a tiered pricing model where the per-user cost decreases with larger team sizes. For the latest pricing, check <a href="https://www.atlassian.com/software/jira/pricing" target="_blank" rel="noopener noreferrer">atlassian.com/software/jira/pricing</a>.
 
 ---
 
 ### Why JIRA is the Industry Standard
 
 **Market Dominance:**
-- JIRA holds approximately **70-75% market share** in project/issue tracking tools as of 2025
-- Used by over **65,000 companies** globally, including 85% of Fortune 500 companies
-- Over **10 million monthly active users** worldwide
+- The default issue tracker in most software organizations, and the one QA job descriptions name far more often than any alternative
+- Used by companies of every size, from startups to most of the Fortune 500
+- Market-share figures quoted online vary widely and are rarely sourced; in an interview, "industry standard" is the safe claim, not a specific percentage
 
 **Why Teams Choose JIRA:**
 
@@ -95,7 +95,7 @@ For **QA and testing professionals**, JIRA serves as:
 | **Powerful Querying** | JQL (JIRA Query Language) enables complex searches and custom reports |
 | **Reporting** | Built-in dashboards with gadgets, custom reports, and exportable data |
 | **Scalability** | From 10-person startups to 100,000-person enterprises |
-| **Atlassian Intelligence** | AI-powered features: auto-summarization, smart suggestions, natural language JQL |
+| **Rovo (Atlassian AI)** | AI-powered features (formerly branded "Atlassian Intelligence"): auto-summarization, smart suggestions, natural language JQL |
 
 ---
 
@@ -790,7 +790,7 @@ h2. Additional Notes
 ```
 
 > [!TIP]
-> In JIRA Cloud (2025), you can also use **issue templates** via Marketplace apps like "Issue Templates for Jira" or use **Automation rules** to auto-populate fields when a Bug is created.
+> In JIRA Cloud, you can also use **issue templates** via Marketplace apps like "Issue Templates for Jira" or use **Automation rules** to auto-populate fields when a Bug is created.
 
 ---
 
@@ -1384,7 +1384,10 @@ graph TD
 **Overview:**
 Zephyr is one of the oldest and most popular test management plugins for JIRA. It comes in two versions: **Zephyr Squad** (for smaller teams) and **Zephyr Scale** (formerly TM4J — for enterprise teams).
 
-**Zephyr Squad vs Zephyr Scale:**
+> [!NOTE]
+> **SmartBear has renamed both editions.** Zephyr Scale is now just **"Zephyr"**, and Zephyr Squad became **"Zephyr Essential"** (April 2025). The Atlassian Marketplace and SmartBear docs use the new names; job descriptions and most teams still say "Zephyr Scale" and "Zephyr Squad," which is why this section keeps them.
+
+**Zephyr Squad (now Zephyr Essential) vs Zephyr Scale (now Zephyr):**
 
 | Feature | Zephyr Squad | Zephyr Scale (formerly TM4J) |
 |---------|-------------|----------------------------|
@@ -1479,7 +1482,7 @@ Because the *capability* exists (issue links are real, bidirectional relationshi
 
 ---
 
-## 8.9 JIRA Best Practices for Testing (2025)
+## 8.9 JIRA Best Practices for Testing
 
 ### 15+ Best Practices
 
@@ -1542,8 +1545,8 @@ Schedule monthly "Bug Backlog Grooming" sessions to review deferred and aging bu
 **13. Use Fix Version Religiously**
 Always set the **Fix Version** during triage. This ties every bug to a release and enables "Release Notes" generation. After release, run `fixVersion = "v2.5.0" AND resolution = Unresolved` to find missed bugs.
 
-**14. Leverage Atlassian Intelligence (AI)**
-In 2025, JIRA Cloud offers AI features:
+**14. Leverage Atlassian AI (Rovo)**
+JIRA Cloud's built-in AI features (branded Rovo, formerly "Atlassian Intelligence") include:
 - **Smart summarization** — AI summarizes long bug discussions
 - **Natural language JQL** — Type "show me critical bugs from last week" and AI converts to JQL
 - **Work suggestions** — AI suggests related issues and potential duplicates
@@ -1668,7 +1671,7 @@ Yes — and it happens. Severity is an objective statement about technical/busin
 
 ## 📌 Fact Sheet — Part 8 in 60 Seconds
 
-- **JIRA** is Atlassian's issue-tracking-turned-work-management platform — the industry standard, used by ~85% of Fortune 500 companies, dominant in JIRA Cloud form as of 2025.
+- **JIRA** is Atlassian's issue-tracking-turned-work-management platform — the industry standard, used by most of the Fortune 500, and now overwhelmingly run as JIRA Cloud.
 - Every **Project** has a short **Project Key** (`COL`, `PAY`, `HIP` in this playbook's real examples) that prefixes every issue ID and drives routing, permissions, and JQL filtering.
 - The **Issue hierarchy** runs Initiative → Epic → Story/Task/Bug → Sub-task; testers live mostly in the **Bug** issue type.
 - A **Workflow** defines the statuses and transitions an issue moves through; a real QA-specific workflow adds statuses like Ready for QA, In Testing, Test Failed, Test Passed, and UAT beyond the default To Do/In Progress/Done.
@@ -1981,7 +1984,7 @@ The overarching principle is: JIRA should reflect reality. If the dashboard show
 > [!IMPORTANT]
 > **Summary of Part 8 — JIRA for Test Management**
 
-1. **JIRA is the industry standard** for project management and issue tracking, used by 85% of Fortune 500 companies. As of 2025, JIRA Cloud is the primary offering with AI-powered features (Atlassian Intelligence).
+1. **JIRA is the industry standard** for project management and issue tracking, used by most of the Fortune 500. JIRA Cloud is the primary offering, with built-in AI features (Rovo) on every paid plan.
 
 2. **Core concepts** include Projects (organized by product/team), Issues (Epics → Stories → Tasks → Sub-tasks → Bugs), Workflows (defining how issues flow through statuses), and Boards (Scrum for sprint-based work, Kanban for continuous flow).
 

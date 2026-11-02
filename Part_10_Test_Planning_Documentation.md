@@ -96,6 +96,9 @@ Because the first statement describes a happy-path *feature*, while the second d
 
 The **IEEE 829** standard (formally known as IEEE Standard for Software and System Test Documentation) defines the structure and content of a test plan. While modern Agile projects may use lighter versions, understanding the full standard is essential for interviews and formal projects.
 
+> [!NOTE]
+> **IEEE 829 has been superseded.** IEEE 829-2008 was replaced by **ISO/IEC/IEEE 29119-3** (Test Documentation), first published in 2013 and revised in 2021. The 829 outline is still what most interviewers and many regulated-industry templates mean by "a formal test plan," and 29119-3 covers the same ground (scope, risks, approach, entry/exit criteria, deliverables, schedule, approvals), so the template below remains a sound starting point. Cite 29119-3 when a client asks which standard you follow.
+
 Below is a **complete test plan** with all sections filled in using an **e-commerce web application (ShopEasy)** as the example project.
 
 ---
@@ -173,7 +176,7 @@ This document serves as the master test plan and will be supplemented by level-s
 - API testing (RESTful APIs for mobile app integration)
 - Security testing (OWASP Top 10, PCI DSS compliance)
 - Performance testing (up to 10,000 concurrent users)
-- Accessibility testing (WCAG 2.1 AA)
+- Accessibility testing (WCAG 2.2 AA)
 
 **Out-of-Scope:**
 - Mobile native application testing (covered by separate test plan TP-SHOPEASY-MOB-001)
@@ -306,8 +309,8 @@ The project follows a hybrid Agile approach (SAFe) with 2-week sprints and quart
 | **Regression Testing** | Verify existing functionality after changes | Every sprint | Automated (Cypress + API tests) |
 | **UAT** | Business users validate the system meets their needs | Final 2 weeks before release | Manual (by business users) |
 | **Performance Testing** | Load, stress, and endurance testing | Dedicated testing sprint | JMeter, Grafana |
-| **Security Testing** | OWASP Top 10, penetration testing, PCI DSS compliance | Continuous (automated) + dedicated sprint (manual) | OWASP ZAP, Burp Suite |
-| **Accessibility Testing** | WCAG 2.1 AA compliance | Every sprint (automated checks) + dedicated review | axe DevTools, WAVE, manual keyboard testing |
+| **Security Testing** | OWASP Top 10, penetration testing, PCI DSS compliance | Continuous (automated) + dedicated sprint (manual) | ZAP, Burp Suite |
+| **Accessibility Testing** | WCAG 2.2 AA compliance | Every sprint (automated checks) + dedicated review | axe DevTools, WAVE, manual keyboard testing |
 | **Compatibility Testing** | Cross-browser, cross-device testing | Every sprint (critical browsers) + dedicated phase | BrowserStack |
 | **Exploratory Testing** | Unscripted testing based on tester experience | Every sprint | Session-based (SBTM) |
 
@@ -324,6 +327,15 @@ graph TD
     C --> G["Run on every PR merge<br/>< 15 minutes"]
     D --> H["Run nightly + before release<br/>< 60 minutes"]
     E --> I["Run every sprint<br/>Scheduled sessions"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E step
+    class F,G,H,I good
 ```
 
 **Automation Strategy:**
@@ -372,7 +384,7 @@ graph TD
 | 6 | Defect leakage rate | < 5% | — |
 | 7 | Regression test suite passing | 100% | — |
 | 8 | Performance benchmarks met | Response time < 3s at 10K users | — |
-| 9 | Security scan (no critical/high vulnerabilities) | Clean OWASP ZAP report | — |
+| 9 | Security scan (no critical/high vulnerabilities) | Clean ZAP report | — |
 | 10 | UAT sign-off received | Signed by business stakeholders | — |
 | 11 | Test summary report published | Approved by Test Manager | — |
 
@@ -465,7 +477,7 @@ Testing will resume when:
 | Cypress | 13.x | UI test automation | Free |
 | JMeter | 5.6 | Performance testing | Free |
 | Postman | Latest | API testing | Team plan (₹12/user/month) |
-| OWASP ZAP | Latest | Security testing | Free |
+| ZAP | Latest | Security testing | Free |
 | BrowserStack | Cloud plan | Cross-browser/device testing | Enterprise (₹249/month) |
 | TestRail | Cloud | Test case management | Professional (₹36/user/month) |
 | JIRA | Cloud | Defect tracking and project management | Premium |
@@ -524,7 +536,7 @@ Testing will resume when:
 | 5 | OWASP Top 10 and security testing basics | All QA team | 1 day | June 12, 2026 |
 | 6 | PCI DSS compliance requirements | Senior testers | Half day | June 10, 2026 |
 | 7 | BrowserStack cloud testing | All QA Analysts | Half day | June 10, 2026 |
-| 8 | Accessibility testing (WCAG 2.1 AA) | Maria Garcia, James Wilson | 1 day | June 15, 2026 |
+| 8 | Accessibility testing (WCAG 2.2 AA) | Maria Garcia, James Wilson | 1 day | June 15, 2026 |
 
 ---
 
@@ -816,7 +828,7 @@ TEST STRATEGY DOCUMENT
   - UI Testing: Cypress (web), Appium (mobile)
   - API Testing: Postman/Newman (functional), k6 (performance)
   - Unit Testing: Jest (frontend), JUnit (backend)
-  - Security: OWASP ZAP (DAST), SonarQube (SAST)
+  - Security: ZAP (DAST), SonarQube (SAST)
   - Visual Regression: Percy
   
 4.3 Automation Framework Standards
@@ -1068,6 +1080,16 @@ graph TD
     E --> F{"6. Estimates<br/>converge?"}
     F -->|"No (spread > 20%)"| D
     F -->|"Yes (spread ≤ 20%)"| G["7. Final estimate =<br/>average of all estimates"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,No,Yes step
+    class F decision
+    class G good
 ```
 
 **Example:**
@@ -1157,6 +1179,13 @@ graph TD
     D --> E["5. Execute Tests<br/>Test high-risk areas first<br/>with most rigor"]
     E --> F["6. Monitor & Review<br/>Update risk register<br/>as testing progresses"]
     F --> A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B,C,D,E,F step
 ```
 
 **Risk Identification Methods:**
@@ -1299,6 +1328,15 @@ graph LR
     
     G --> L["Performance<br/>Testing<br/>(Day 20-27)"]
     L --> I
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,F,G,H,I,J,L step
+    class K good
 ```
 
 **Critical Path:** Test Plan → Test Case Design → Test Case Review → Functional Testing → Integration Testing → Regression Testing → UAT → Sign-off
@@ -1558,7 +1596,7 @@ Because a symptom-only report ("both travelers get confirmed bookings") tells a 
 ## 📌 Fact Sheet — Part 10 in 60 Seconds
 
 - A **test plan** answers four questions: WHAT will be tested, HOW, WHO does it, and WHEN — no test plan means no one owns the risky edge cases (see: Travel Marketplace's BUG-TRV-2011 overbooking defect).
-- **IEEE 829** defines the formal test plan structure (18 sections: Identifier → References → Scope → Risk → Entry/Exit Criteria → Deliverables → Schedule → Approvals); Agile uses lighter versions of the same skeleton.
+- **IEEE 829** (now superseded by **ISO/IEC/IEEE 29119-3**) is the classic formal test plan structure (the template in 10.2 uses 18 sections: Identifier → References → Scope → Risk → Entry/Exit Criteria → Deliverables → Schedule → Approvals); Agile uses lighter versions of the same skeleton.
 - **In-scope vs. out-of-scope** isn't just a list — it's a liability boundary. Both ShopEasy and Travel Marketplace push third-party payment/supplier internals out of scope, but a booking marketplace has to explicitly pull fare-lock integrity and overbooking prevention *into* scope precisely because it doesn't own its own inventory.
 - **Entry criteria** gate the start of testing (e.g. mocked supplier responses so race-condition tests are reproducible); **exit criteria** gate release (e.g. zero open Critical defects, fare-lock integrity holding under k6 concurrent load).
 - A **test strategy** is the organization-wide "constitution"; a **test plan** is the project-specific "legislation" that implements it — Travel Marketplace layers Model-Based testing on top of risk-based strategy; Healthcare Insurance Platform layers Process-Compliant (RTM, data-level testing) on top of the same foundation.

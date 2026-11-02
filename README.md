@@ -28,7 +28,6 @@ This dashboard converts standard Markdown source files into a premium, responsiv
 ├── index.html                               # Dashboard entry point
 ├── styles.css                               # Layout, themes, typography, and responsive styles
 ├── app.js                                   # Routing, search, rendering, and progress logic
-├── .nojekyll                                # Prevents GitHub Pages Jekyll build errors
 ├── README.md                                # Project documentation
 ├── 00_Table_of_Contents.md                  # Main index of parts
 ├── Part_01_Software_Testing_Fundamentals.md # QA Fundamentals
@@ -43,7 +42,8 @@ This dashboard converts standard Markdown source files into a premium, responsiv
 ├── Part_10_Test_Planning_Documentation.md   # IEEE 829 Test Plans
 ├── Part_11_Test_Execution_Reporting.md      # Metrics, Execution, TSR
 ├── Part_12_QA_Best_Practices_Modern_Trends.md # Shift-Left, AI, Careers
-└── Resources.md                             # Tools & resources for testers (free/premium/enterprise)
+├── Resources.md                             # Tools & resources for testers (free/premium/enterprise)
+└── Testing_Types_Comparison_Guide.md        # Side-by-side comparison of 11 testing types
 ```
 
 ---

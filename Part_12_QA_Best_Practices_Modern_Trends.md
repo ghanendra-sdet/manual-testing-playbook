@@ -1,4 +1,4 @@
-# Part 12: QA Best Practices & Modern Trends (2025)
+# Part 12: QA Best Practices & Modern Trends
 
 ---
 
@@ -351,6 +351,13 @@ flowchart TD
     F --> G["Report Risk Coverage"]
     G --> H["Reassess Risks Continuously"]
     H --> A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B,C,D,E,F,G,H step
 ```
 
 ### Product Risk Assessment
@@ -493,6 +500,14 @@ flowchart TD
     E --> F["Create New Charters Based on Findings"]
     F --> A
     E --> G["Generate Session Report"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B,C,D,E,F step
+    class G good
 ```
 
 #### Charter Creation Template
@@ -873,7 +888,7 @@ Because the defect wasn't in either question alone — it was in the AI incorrec
 
 ---
 
-## 12.6 QA Metrics and KPIs for 2025
+## 12.6 QA Metrics and KPIs
 
 ### Essential Metrics for Modern QA Teams
 
@@ -1068,7 +1083,7 @@ The opposite — it means newer features deserve *more* scrutiny for exactly thi
 
 ---
 
-## 12.8 Quality Assurance Best Practices for 2025
+## 12.8 Quality Assurance Best Practices
 
 ### 20+ Best Practices
 
@@ -1145,7 +1160,7 @@ In each case, the team let the *actual risk profile of the real system* — not 
 
 ---
 
-## 12.9 AI in Testing (2025 Trends)
+## 12.9 AI in Testing: Current Trends
 
 ### AI-Powered Test Generation
 
@@ -1215,7 +1230,7 @@ Generated Automation (pseudocode):
 9. assert_text("product_price", "₹349.90")
 ```
 
-### AI Testing Tools Landscape (2025)
+### AI Testing Tools Landscape
 
 | Tool | Primary Focus | Pricing Model | Best For |
 |------|-------------|--------------|---------|
@@ -1702,16 +1717,18 @@ The **OWASP Top 10** is the most widely recognized list of the most critical web
 
 | # | Vulnerability | Description | Manual Testing Approach |
 |---|-------------|-------------|----------------------|
-| 1 | **Broken Access Control** | Users access unauthorized functions or data | Test role-based access, URL manipulation, direct object references |
-| 2 | **Cryptographic Failures** | Sensitive data exposed due to weak/missing encryption | Check HTTPS, inspect stored passwords, verify sensitive data handling |
-| 3 | **Injection** | Untrusted data sent to an interpreter (SQL, OS, LDAP) | Test input fields with SQL injection payloads, special characters |
-| 4 | **Insecure Design** | Missing or ineffective security controls in design | Review architecture for security patterns |
-| 5 | **Security Misconfiguration** | Default configs, unnecessary features enabled | Check default credentials, error messages, directory listing |
-| 6 | **Vulnerable Components** | Using components with known vulnerabilities | Check library versions against CVE databases |
+| 1 | **Broken Access Control** (now includes SSRF) | Users access unauthorized functions or data, or make the server fetch internal URLs | Test role-based access, URL manipulation, direct object references; point URL input fields at internal addresses |
+| 2 | **Security Misconfiguration** | Default configs, unnecessary features enabled | Check default credentials, error messages, directory listing |
+| 3 | **Software Supply Chain Failures** 🆕 | Vulnerable or untrusted dependencies, build tools, and package sources | Check library versions against CVE databases; confirm dependencies are pinned and come from trusted registries |
+| 4 | **Cryptographic Failures** | Sensitive data exposed due to weak/missing encryption | Check HTTPS, inspect stored passwords, verify sensitive data handling |
+| 5 | **Injection** | Untrusted data sent to an interpreter (SQL, OS, LDAP) | Test input fields with SQL injection payloads, special characters |
+| 6 | **Insecure Design** | Missing or ineffective security controls in design | Review architecture for security patterns |
 | 7 | **Authentication Failures** | Broken authentication and session management | Test password policies, session timeouts, brute force protection |
-| 8 | **Software/Data Integrity Failures** | Code and infrastructure that doesn't protect against integrity violations | Verify update mechanisms, check for unsigned packages |
-| 9 | **Logging & Monitoring Failures** | Insufficient logging and detection | Verify security events are logged, audit logs exist |
-| 10 | **Server-Side Request Forgery (SSRF)** | Application fetches remote resources without validation | Test URL input fields with internal addresses |
+| 8 | **Software or Data Integrity Failures** | Code and infrastructure that doesn't protect against integrity violations | Verify update mechanisms, check for unsigned packages |
+| 9 | **Security Logging & Alerting Failures** | Insufficient logging, or logs with no alert attached | Verify security events are logged *and* trigger an alert someone sees |
+| 10 | **Mishandling of Exceptional Conditions** 🆕 | Error paths that fail open, poor error handling, logic errors | Force a dependency to fail (timeout, bad response) and confirm the action is blocked, not silently allowed |
+
+*This is the 2025 edition. Compared with 2021: SSRF merged into #1, "Vulnerable Components" widened into Supply Chain (#3), and Exceptional Conditions (#10) is new.*
 
 ### Basic Security Testing Checklist for Manual Testers
 
@@ -1790,7 +1807,7 @@ Test these payloads in:
 
 | Tool | Type | Cost | Best For |
 |------|------|------|---------|
-| **OWASP ZAP** | Web application scanner | Free/Open-source | Automated vulnerability scanning |
+| **ZAP** | Web application scanner | Free/Open-source | Automated vulnerability scanning |
 | **Burp Suite** | Web application testing | Community (free) / Pro (₹449/yr) | Manual & automated security testing |
 | **Nikto** | Web server scanner | Free/Open-source | Server configuration testing |
 | **SQLMap** | SQL injection tool | Free/Open-source | Automated SQL injection testing |
@@ -1824,6 +1841,16 @@ flowchart TD
     G --> K["Staff Engineer / Architect"]
     J --> L["Director of Quality / VP of Engineering"]
     K --> L
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,D,E,F,G,H,J,K step
+    class C decision
+    class I,L good
 ```
 
 ### Career Progression Detail
@@ -2307,7 +2334,7 @@ Congratulations on completing this comprehensive QA study guide. Throughout Part
 | Parts 8-9 | Defect Management & Agile Testing | Effective defect management and Agile QA practices |
 | Part 10 | Test Management & Leadership | Team management and stakeholder communication |
 | Part 11 | Test Execution & Reporting | Data-driven reporting and Go/No-Go decision support |
-| Part 12 | Best Practices & Modern Trends | Future-ready skills for 2025 and beyond |
+| Part 12 | Best Practices & Modern Trends | Future-ready skills |
 
 ### Recommended Next Steps
 
@@ -2332,6 +2359,6 @@ Congratulations on completing this comprehensive QA study guide. Throughout Part
 
 ---
 
-*End of Part 12: QA Best Practices & Modern Trends (2025)*
+*End of Part 12: QA Best Practices & Modern Trends*
 
 *End of the Manual Testing Study Guide Series*

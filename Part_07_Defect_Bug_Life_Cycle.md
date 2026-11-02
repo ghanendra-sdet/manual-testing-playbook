@@ -503,6 +503,17 @@ flowchart TD
     I -->|Valid Defect| J["Reopen & Reassign"]
     I -->|Not a Defect| K["Close with<br/>Documented Rationale"]
     I -->|Requirement Gap| L["Create Requirement<br/>Change Request"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,E,I decision
+    class C,F,J bad
+    class D,G,H step
+    class K,L good
 ```
 
 **Example Scenario:**
@@ -820,6 +831,15 @@ flowchart LR
     D --> E["CLOSED"]
     D -->|Fix Failed| B
     A -->|Not a Bug| E
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D step
+    class E good
 ```
 
 **Key Differences from Standard:**
@@ -861,6 +881,17 @@ flowchart TD
     E --> Q
     G --> Q
     F -.->|Next Sprint| D
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,D,F,G,H,I,J,K,L,M,N,P step
+    class C decision
+    class E,O bad
+    class Q good
 ```
 
 **Key Additions in Enterprise:**
@@ -1001,7 +1032,7 @@ flowchart TD
 
 ### Real Defect Theme Taxonomies — What Actually Recurs in Production QA
 
-Severity and Priority tell you how bad and how urgent a *single* defect is. But after enough regression cycles on a real product, defects stop looking random — they cluster into a handful of recurring **themes** tied to that product's specific risk areas. Several of this account's portfolio project repos maintain an explicit defect theme taxonomy inside their `sample-defect-report.md`, used to tag and trend defects over time:
+Severity and Priority tell you how bad and how urgent a *single* defect is. But after enough regression cycles on a real product, defects stop looking random — they cluster into a handful of recurring **themes** tied to that product's specific risk areas. Several real portfolio project repos maintain an explicit defect theme taxonomy inside their `sample-defect-report.md`, used to tag and trend defects over time:
 
 | Project | Domain Risk Area | Recurring Defect Themes |
 |---|---|---|
@@ -1273,7 +1304,7 @@ During the multi-step checkout process, when a user completes the Shipping Addre
 
 ### Real Bug Reports — Pulled Directly from Production QA Portfolio Repos
 
-The three sample reports above use realistic-but-invented data to teach the template. The reports below are drawn **directly** from this account's real portfolio project repos — same template, same level of detail, different (real) defect themes. Worth comparing side-by-side with BUG-1042/1078/1091 above: notice how the "Impact" field in each one ties straight back to a specific business risk (audit trail, overbooking, cross-portal trust) rather than a generic "affects user experience."
+The three sample reports above use realistic-but-invented data to teach the template. The reports below are drawn **directly** from real portfolio project repos — same template, same level of detail, different (real) defect themes. Worth comparing side-by-side with BUG-1042/1078/1091 above: notice how the "Impact" field in each one ties straight back to a specific business risk (audit trail, overbooking, cross-portal trust) rather than a generic "affects user experience."
 
 #### Sample Bug Report 4: Missing Ledger Debit Entry (Fintech / Ledger Integrity)
 
@@ -1766,6 +1797,17 @@ flowchart TD
     G --> M["Close & Link"]
     H --> N["Back to Reporter"]
     I --> J
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,D,F,G,H,I step
+    class C decision
+    class E bad
+    class J,K,L,M,N good
 ```
 
 ### Triage Meeting Format

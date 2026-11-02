@@ -35,12 +35,19 @@ Regardless of the specific model, most SDLC implementations include these core p
 
 ```mermaid
 flowchart LR
-    A["1. Planning &\nRequirement\nAnalysis"] --> B["2. System\nDesign"]
-    B --> C["3. Implementation\n(Coding)"]
+    A["1. Planning &<br/>Requirement<br/>Analysis"] --> B["2. System<br/>Design"]
+    B --> C["3. Implementation<br/>(Coding)"]
     C --> D["4. Testing"]
     D --> E["5. Deployment"]
-    E --> F["6. Maintenance\n& Support"]
+    E --> F["6. Maintenance<br/>& Support"]
     F -.->|"Feedback Loop"| A
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B,C,D,E,F step
 ```
 
 | Phase | Key Activities | Key Output | Key Stakeholders |
@@ -692,32 +699,41 @@ Each spiral (iteration) passes through four quadrants:
 ```mermaid
 flowchart TD
     subgraph Spiral1["Spiral 1: Concept"]
-        A1["Planning:\nDefine objectives"] --> A2["Risk Analysis:\nIdentify risks"]
-        A2 --> A3["Engineering:\nPrototype 1"]
-        A3 --> A4["Evaluation:\nCustomer review"]
+        A1["Planning:<br/>Define objectives"] --> A2["Risk Analysis:<br/>Identify risks"]
+        A2 --> A3["Engineering:<br/>Prototype 1"]
+        A3 --> A4["Evaluation:<br/>Customer review"]
     end
 
     subgraph Spiral2["Spiral 2: Requirements"]
-        B1["Planning:\nRefine requirements"] --> B2["Risk Analysis:\nAnalyze alternatives"]
-        B2 --> B3["Engineering:\nPrototype 2"]
-        B3 --> B4["Evaluation:\nCustomer feedback"]
+        B1["Planning:<br/>Refine requirements"] --> B2["Risk Analysis:<br/>Analyze alternatives"]
+        B2 --> B3["Engineering:<br/>Prototype 2"]
+        B3 --> B4["Evaluation:<br/>Customer feedback"]
     end
 
     subgraph Spiral3["Spiral 3: Design"]
-        C1["Planning:\nDetailed design plan"] --> C2["Risk Analysis:\nTechnical risks"]
-        C2 --> C3["Engineering:\nDetailed design + code"]
-        C3 --> C4["Evaluation:\nIntegration testing"]
+        C1["Planning:<br/>Detailed design plan"] --> C2["Risk Analysis:<br/>Technical risks"]
+        C2 --> C3["Engineering:<br/>Detailed design + code"]
+        C3 --> C4["Evaluation:<br/>Integration testing"]
     end
 
     subgraph Spiral4["Spiral 4: Implementation"]
-        D1["Planning:\nDeployment plan"] --> D2["Risk Analysis:\nOperational risks"]
-        D2 --> D3["Engineering:\nFull system + testing"]
-        D3 --> D4["Evaluation:\nUAT + deployment"]
+        D1["Planning:<br/>Deployment plan"] --> D2["Risk Analysis:<br/>Operational risks"]
+        D2 --> D3["Engineering:<br/>Full system + testing"]
+        D3 --> D4["Evaluation:<br/>UAT + deployment"]
     end
 
     A4 --> B1
     B4 --> C1
     C4 --> D1
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A1 start
+    class A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,C4,D1,D2,D3 step
+    class D4 good
 ```
 
 ### Advantages and Disadvantages
@@ -803,6 +819,15 @@ flowchart LR
     A5 -->|"Feedback"| B1
     B5 -->|"Feedback"| C1
     C5 -->|"Release"| D["Final Product"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A1 start
+    class A2,A3,A4,A5,B1,B2,B3,B4,B5,C1,C2,C3,C4,C5 step
+    class D good
 ```
 
 ### How It Differs from Waterfall
@@ -868,11 +893,11 @@ The key idea is **partial implementation**: instead of delivering the entire sys
 
 ```mermaid
 flowchart TD
-    A["Full System\nRequirements"] --> B["Divide into\nIncrements"]
-    B --> C["Increment 1:\nCore Features"]
-    B --> D["Increment 2:\nSecondary Features"]
-    B --> E["Increment 3:\nAdvanced Features"]
-    B --> F["Increment 4:\nOptimization"]
+    A["Full System<br/>Requirements"] --> B["Divide into<br/>Increments"]
+    B --> C["Increment 1:<br/>Core Features"]
+    B --> D["Increment 2:<br/>Secondary Features"]
+    B --> E["Increment 3:<br/>Advanced Features"]
+    B --> F["Increment 4:<br/>Optimization"]
 
     C --> G["Design → Build → Test → Deploy"]
     D --> H["Design → Build → Test → Deploy"]
@@ -886,6 +911,15 @@ flowchart TD
     I --> M["Release 3"]
     M --> J
     J --> N["Final Release"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,F,G,H,I,J,K,L,M step
+    class N good
 ```
 
 ### Difference Between Iterative and Incremental
@@ -1102,7 +1136,7 @@ flowchart LR
 | **Unit Tests** | JUnit, pytest, Jest, NUnit | Verify individual components |
 | **Code Quality** | SonarQube, ESLint, Checkstyle | Static code analysis, code smell detection |
 | **Integration Tests** | RestAssured, Postman/Newman, Karate | Verify component interactions |
-| **Security Scans** | OWASP ZAP, Snyk, Trivy | Vulnerability detection |
+| **Security Scans** | ZAP, Snyk, Trivy | Vulnerability detection |
 | **Deploy to Staging** | Kubernetes, Docker, Terraform | Deploy to pre-production environment |
 | **E2E Tests** | Selenium, Cypress, Playwright | End-to-end functional verification |
 | **Deploy to Production** | ArgoCD, Spinnaker, AWS CodeDeploy | Production deployment |
@@ -1732,4 +1766,4 @@ The Agile Testing Pyramid is a framework that describes the ideal distribution o
 
 *Previous: [← Part 3: Software Testing Life Cycle (STLC)](Part_03_STLC.md)*
 
-*Next: [Part 5: Test Case Design Techniques →](Part_05_Test_Case_Design.md)*
+*Next: [Part 5: Test Design Techniques →](Part_05_Test_Design_Techniques.md)*

@@ -275,17 +275,27 @@ Exit criteria define when Requirement Analysis is considered **complete**:
 
 ```mermaid
 flowchart TD
-    A["Receive Requirements\n(SRS/BRS/User Stories)"] --> B["Study and Understand\nRequirements"]
-    B --> C["Prepare Queries\nand Clarifications"]
-    C --> D["Conduct Requirement\nReview Meeting"]
-    D --> E{"All Queries\nResolved?"}
+    A["Receive Requirements<br/>(SRS/BRS/User Stories)"] --> B["Study and Understand<br/>Requirements"]
+    B --> C["Prepare Queries<br/>and Clarifications"]
+    C --> D["Conduct Requirement<br/>Review Meeting"]
+    D --> E{"All Queries<br/>Resolved?"}
     E -- No --> C
-    E -- Yes --> F["Identify Testable\nRequirements"]
-    F --> G["Identify Types\nof Testing"]
+    E -- Yes --> F["Identify Testable<br/>Requirements"]
+    F --> G["Identify Types<br/>of Testing"]
     G --> H["Initiate RTM"]
-    H --> I["Conduct Automation\nFeasibility Analysis"]
-    I --> J["Get Sign-off\nfrom Test Lead"]
-    J --> K["Phase 1 Complete\n→ Move to Test Planning"]
+    H --> I["Conduct Automation<br/>Feasibility Analysis"]
+    I --> J["Get Sign-off<br/>from Test Lead"]
+    J --> K["Phase 1 Complete<br/>→ Move to Test Planning"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,F,G,H,I,J step
+    class E decision
+    class K good
 ```
 
 ### Real-World Example: Analyzing Requirements for an Online Banking Application
@@ -505,7 +515,7 @@ Uses optimistic (O), most likely (M), and pessimistic (P) estimates:
 | Automation (Web) | Selenium, Cypress, Playwright | Browser coverage, language support, community |
 | Automation (API) | Postman, RestAssured, Karate | Ease of use, assertion capabilities |
 | Performance | JMeter, Gatling, k6 | Protocol support, scripting ease, reporting |
-| Security | OWASP ZAP, Burp Suite | Vulnerability coverage, compliance requirements |
+| Security | ZAP, Burp Suite | Vulnerability coverage, compliance requirements |
 | Defect Tracking | JIRA, Bugzilla, Azure DevOps | Workflow customization, reporting, integration |
 | CI/CD Integration | Jenkins, GitHub Actions, Azure Pipelines | Ecosystem fit, pipeline complexity |
 
@@ -575,6 +585,8 @@ Uses optimistic (O), most likely (M), and pessimistic (P) estimates:
 
 ### Sample Test Plan Outline (IEEE 829 Standard)
 
+*IEEE 829 has since been superseded by ISO/IEC/IEEE 29119-3; the outline below follows the classic 829 structure most teams still use. Part 10 covers both.*
+
 ```
 TEST PLAN DOCUMENT
 ==================
@@ -609,7 +621,7 @@ TEST PLAN DOCUMENT
    - Automated regression using Selenium + TestNG
    - API testing using RestAssured
    - Performance testing using JMeter (500 concurrent users)
-   - Security testing using OWASP ZAP
+   - Security testing using ZAP
 
 7. Pass/Fail Criteria
    - Pass: Expected result matches actual result
@@ -658,18 +670,28 @@ TEST PLAN DOCUMENT
 
 ```mermaid
 flowchart TD
-    A["Receive Phase 1\nDeliverables"] --> B["Define Test\nScope & Strategy"]
-    B --> C["Estimate Effort\n(FPA/WBS/PERT)"]
-    C --> D["Plan Resources\n& Team Structure"]
-    D --> E["Select Tools\n& Infrastructure"]
-    E --> F["Identify Risks\n& Mitigation"]
-    F --> G["Define Schedule\n& Milestones"]
-    G --> H["Draft Test Plan\nDocument"]
-    H --> I["Review with\nStakeholders"]
+    A["Receive Phase 1<br/>Deliverables"] --> B["Define Test<br/>Scope & Strategy"]
+    B --> C["Estimate Effort<br/>(FPA/WBS/PERT)"]
+    C --> D["Plan Resources<br/>& Team Structure"]
+    D --> E["Select Tools<br/>& Infrastructure"]
+    E --> F["Identify Risks<br/>& Mitigation"]
+    F --> G["Define Schedule<br/>& Milestones"]
+    G --> H["Draft Test Plan<br/>Document"]
+    H --> I["Review with<br/>Stakeholders"]
     I --> J{"Approved?"}
-    J -- No --> K["Incorporate\nFeedback"]
+    J -- No --> K["Incorporate<br/>Feedback"]
     K --> H
-    J -- Yes --> L["Baseline Test Plan\n→ Move to Phase 3"]
+    J -- Yes --> L["Baseline Test Plan<br/>→ Move to Phase 3"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,F,G,H,I,K step
+    class J decision
+    class L good
 ```
 
 ### Real-World Example: Test Planning for an E-Commerce Platform
@@ -819,14 +841,25 @@ Test cases go through a formal review process:
 
 ```mermaid
 flowchart LR
-    A["Author writes\ntest cases"] --> B["Peer Review\n(another QA)"]
-    B --> C{"Issues\nFound?"}
-    C -- Yes --> D["Rework\nby Author"]
+    A["Author writes<br/>test cases"] --> B["Peer Review<br/>(another QA)"]
+    B --> C{"Issues<br/>Found?"}
+    C -- Yes --> D["Rework<br/>by Author"]
     D --> B
-    C -- No --> E["Test Lead\nReview"]
+    C -- No --> E["Test Lead<br/>Review"]
     E --> F{"Approved?"}
     F -- No --> D
-    F -- Yes --> G["Baseline\nTest Cases"]
+    F -- Yes --> G["Baseline<br/>Test Cases"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,E step
+    class C,F decision
+    class D bad
+    class G good
 ```
 
 **Review checklist:**
@@ -948,17 +981,28 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    A["Receive Approved\nTest Plan + RTM"] --> B["Select Test\nDesign Techniques"]
-    B --> C["Write Test Cases\nfor Each Requirement"]
-    C --> D["Identify and Prepare\nTest Data"]
-    D --> E["Develop Automation\nScripts (if applicable)"]
-    E --> F["Peer Review\nTest Cases"]
-    F --> G{"Review\nPassed?"}
-    G -- No --> H["Rework and\nUpdate"]
+    A["Receive Approved<br/>Test Plan + RTM"] --> B["Select Test<br/>Design Techniques"]
+    B --> C["Write Test Cases<br/>for Each Requirement"]
+    C --> D["Identify and Prepare<br/>Test Data"]
+    D --> E["Develop Automation<br/>Scripts (if applicable)"]
+    E --> F["Peer Review<br/>Test Cases"]
+    F --> G{"Review<br/>Passed?"}
+    G -- No --> H["Rework and<br/>Update"]
     H --> F
-    G -- Yes --> I["Test Lead\nApproval"]
-    I --> J["Update RTM with\nTest Case Mapping"]
-    J --> K["Baseline Test Cases\n→ Move to Phase 4"]
+    G -- Yes --> I["Test Lead<br/>Approval"]
+    I --> J["Update RTM with<br/>Test Case Mapping"]
+    J --> K["Baseline Test Cases<br/>→ Move to Phase 4"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,F,I,J step
+    class G decision
+    class H bad
+    class K good
 ```
 
 ### Real-World Example: Writing Test Cases for a Login Module
@@ -1204,17 +1248,27 @@ Before declaring the environment ready, a **smoke test** is performed to verify 
 
 ```mermaid
 flowchart TD
-    A["Receive Environment\nRequirements from Test Plan"] --> B["Request Infrastructure\n(Hardware/VMs/Cloud)"]
-    B --> C["Install and Configure\nSoftware Stack"]
+    A["Receive Environment<br/>Requirements from Test Plan"] --> B["Request Infrastructure<br/>(Hardware/VMs/Cloud)"]
+    B --> C["Install and Configure<br/>Software Stack"]
     C --> D["Set Up Test Data"]
-    D --> E["Configure Test Tools\nand Frameworks"]
-    E --> F["Set Up Third-Party\nIntegrations (Sandbox/Mock)"]
+    D --> E["Configure Test Tools<br/>and Frameworks"]
+    E --> F["Set Up Third-Party<br/>Integrations (Sandbox/Mock)"]
     F --> G["Run Smoke Test"]
-    G --> H{"Smoke Test\nPassed?"}
-    H -- No --> I["Debug and Fix\nEnvironment Issues"]
+    G --> H{"Smoke Test<br/>Passed?"}
+    H -- No --> I["Debug and Fix<br/>Environment Issues"]
     I --> G
-    H -- Yes --> J["Complete Environment\nReadiness Checklist"]
-    J --> K["Get Sign-off\n→ Move to Phase 5"]
+    H -- Yes --> J["Complete Environment<br/>Readiness Checklist"]
+    J --> K["Get Sign-off<br/>→ Move to Phase 5"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,D,E,F,G,I,J step
+    class H decision
+    class K good
 ```
 
 ### Real-World Example: Setting Up Test Environment for a Healthcare Application
@@ -1433,14 +1487,25 @@ When developers fix a defect, testers **retest** to verify:
 
 ```mermaid
 flowchart LR
-    A["Defect Marked\nas 'Fixed'"] --> B["Tester Picks Up\nfor Retest"]
-    B --> C["Execute Original\nTest Case"]
-    C --> D{"Defect\nFixed?"}
-    D -- Yes --> E["Mark Defect\nas 'Verified'"]
-    D -- No --> F["Reopen Defect\nwith Comments"]
+    A["Defect Marked<br/>as 'Fixed'"] --> B["Tester Picks Up<br/>for Retest"]
+    B --> C["Execute Original<br/>Test Case"]
+    C --> D{"Defect<br/>Fixed?"}
+    D -- Yes --> E["Mark Defect<br/>as 'Verified'"]
+    D -- No --> F["Reopen Defect<br/>with Comments"]
     F --> G["Dev Re-fixes"]
     G --> B
-    E --> H["Include in\nRegression Suite"]
+    E --> H["Include in<br/>Regression Suite"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,C,E,G step
+    class D decision
+    class F bad
+    class H good
 ```
 
 #### 5. Regression Testing
@@ -1523,23 +1588,33 @@ Day 7:  ██████████████████████100%  
 
 ```mermaid
 flowchart TD
-    A["Receive Build for\nTesting"] --> B["Run Smoke\nTest"]
-    B --> C{"Smoke Test\nPassed?"}
-    C -- No --> D["Reject Build\nNotify Dev Team"]
+    A["Receive Build for<br/>Testing"] --> B["Run Smoke<br/>Test"]
+    B --> C{"Smoke Test<br/>Passed?"}
+    C -- No --> D["Reject Build<br/>Notify Dev Team"]
     D --> A
-    C -- Yes --> E["Execute Test Cases\n(Priority Order)"]
-    E --> F["Record Results\n(Pass/Fail/Blocked)"]
-    F --> G["Log Defects for\nFailed Test Cases"]
-    G --> H["Generate Daily\nStatus Report"]
-    H --> I{"All Test Cases\nExecuted?"}
+    C -- Yes --> E["Execute Test Cases<br/>(Priority Order)"]
+    E --> F["Record Results<br/>(Pass/Fail/Blocked)"]
+    F --> G["Log Defects for<br/>Failed Test Cases"]
+    G --> H["Generate Daily<br/>Status Report"]
+    H --> I{"All Test Cases<br/>Executed?"}
     I -- No --> E
-    I -- Yes --> J["Dev Fixes\nDefects"]
-    J --> K["Retest Fixed\nDefects"]
-    K --> L["Regression\nTesting"]
-    L --> M{"Exit Criteria\nMet?"}
-    M -- No --> N["Additional Test\nCycle (Cycle 2+)"]
+    I -- Yes --> J["Dev Fixes<br/>Defects"]
+    J --> K["Retest Fixed<br/>Defects"]
+    K --> L["Regression<br/>Testing"]
+    L --> M{"Exit Criteria<br/>Met?"}
+    M -- No --> N["Additional Test<br/>Cycle (Cycle 2+)"]
     N --> E
-    M -- Yes --> O["Prepare Test Execution\nSummary → Move to Phase 6"]
+    M -- Yes --> O["Prepare Test Execution<br/>Summary → Move to Phase 6"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A,B,E,H,J,K,L,N step
+    class C,I,M decision
+    class D,F,G bad
+    class O good
 ```
 
 ### Real-World Example: Test Execution for a Food Delivery App
@@ -1812,16 +1887,26 @@ All test artifacts are archived in the project repository for future reference:
 
 ```mermaid
 flowchart TD
-    A["Test Execution\nComplete"] --> B["Evaluate Test\nCompletion Criteria"]
-    B --> C{"All Exit\nCriteria Met?"}
-    C -- No --> D["Identify Gaps and\nGet Waivers"]
+    A["Test Execution<br/>Complete"] --> B["Evaluate Test<br/>Completion Criteria"]
+    B --> C{"All Exit<br/>Criteria Met?"}
+    C -- No --> D["Identify Gaps and<br/>Get Waivers"]
     D --> C
-    C -- Yes --> E["Prepare Test\nSummary Report"]
-    E --> F["Conduct Lessons\nLearned / Retrospective"]
-    F --> G["Calculate and Report\nQuality Metrics"]
-    G --> H["Archive All\nTest Artifacts"]
-    H --> I["Obtain Stakeholder\nSign-off"]
-    I --> J["Test Cycle\nFormally Closed ✅"]
+    C -- Yes --> E["Prepare Test<br/>Summary Report"]
+    E --> F["Conduct Lessons<br/>Learned / Retrospective"]
+    F --> G["Calculate and Report<br/>Quality Metrics"]
+    G --> H["Archive All<br/>Test Artifacts"]
+    H --> I["Obtain Stakeholder<br/>Sign-off"]
+    I --> J["Test Cycle<br/>Formally Closed ✅"]
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A start
+    class B,D,E,F,G,H,I step
+    class C decision
+    class J good
 ```
 
 ### Real-World Example: Test Closure for a Government Tax Filing Portal
@@ -2410,6 +2495,14 @@ flowchart TB
     Phase3 --> Phase4
     Phase4 --> Phase5
     Phase5 --> Phase6
+
+    classDef start fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef step fill:#e0e7ff,stroke:#4338ca,color:#1e1b4b
+    classDef decision fill:#fef3c7,stroke:#b45309,color:#78350f
+    classDef good fill:#dcfce7,stroke:#15803d,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+    class A1,A2,A3,A4,B1,B2,B3,B4,C1,C2,C3,D1,D2,D3,E1,E2,E3,E4,F1,F2,F3,F4 step
+    class C4,D4 good
 ```
 
 ---

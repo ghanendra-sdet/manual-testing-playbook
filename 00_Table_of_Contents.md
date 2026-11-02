@@ -27,50 +27,50 @@ This guide is structured as a **complete reference manual** covering every aspec
 
 | Part | Title | Key Topics | File |
 |------|-------|------------|------|
-| **1** | [Software Testing Fundamentals](Part_01_Software_Testing_Fundamentals.md) | Testing definition, Objectives, QA vs QC, V&V, Error/Defect/Bug/Failure, 7 ISTQB Principles, Psychology of Testing | ~97 KB |
-| **2** | [Types of Testing — Comprehensive Reference](Part_02_Types_of_Testing.md) | Black/White/Grey Box, Unit/Integration/System/UAT, Functional/Non-Functional, Smoke/Sanity/Regression/Retesting, Performance/Security/Usability, Exploratory/Ad Hoc/Monkey/Fuzz/Mutation/A-B Testing | ~116 KB |
+| **1** | [Software Testing Fundamentals](Part_01_Software_Testing_Fundamentals.md) | Testing definition, Objectives, QA vs QC, V&V, Error/Defect/Bug/Failure, 7 ISTQB Principles, Psychology of Testing | ~125 KB |
+| **2** | [Types of Testing — Comprehensive Reference](Part_02_Types_of_Testing.md) | Black/White/Grey Box, Unit/Integration/System/UAT, Functional/Non-Functional, Smoke/Sanity/Regression/Retesting, Performance/Security/Usability, Exploratory/Ad Hoc/Monkey/Fuzz/Mutation/A-B Testing | ~153 KB |
 
 ### Lifecycle & Process
 
 | Part | Title | Key Topics | File |
 |------|-------|------------|------|
-| **3** | [Software Testing Life Cycle (STLC)](Part_03_STLC.md) | All 6 STLC phases with Entry/Exit Criteria, Activities, Deliverables, Roles, Real-world examples | ~106 KB |
-| **4** | [SDLC Models](Part_04_SDLC_Models.md) | Waterfall, V-Model, Agile, Spiral, Iterative, Incremental, RAD, DevOps — with comparisons | ~91 KB |
+| **3** | [Software Testing Life Cycle (STLC)](Part_03_STLC.md) | All 6 STLC phases with Entry/Exit Criteria, Activities, Deliverables, Roles, Real-world examples | ~133 KB |
+| **4** | [SDLC Models](Part_04_SDLC_Models.md) | Waterfall, V-Model, Agile, Spiral, Iterative, Incremental, RAD, DevOps — with comparisons | ~120 KB |
 
 ### Test Design & Development
 
 | Part | Title | Key Topics | File |
 |------|-------|------------|------|
-| **5** | [Test Design Techniques](Part_05_Test_Design_Techniques.md) | EP, BVA, Decision Tables, State Transition, Error Guessing, Use Case Testing — all with worked examples | ~92 KB |
-| **6** | [Test Case Development](Part_06_Test_Case_Development.md) | Test Case format & templates, Scenario vs Case, RTM, Review process, Prioritization, Data management | ~72 KB |
+| **5** | [Test Design Techniques](Part_05_Test_Design_Techniques.md) | EP, BVA, Decision Tables, State Transition, Error Guessing, Use Case Testing — all with worked examples | ~127 KB |
+| **6** | [Test Case Development](Part_06_Test_Case_Development.md) | Test Case format & templates, Scenario vs Case, RTM, Review process, Prioritization, Data management | ~107 KB |
 
 ### Defect Management & Tools
 
 | Part | Title | Key Topics | File |
 |------|-------|------------|------|
-| **7** | [Defect/Bug Life Cycle](Part_07_Defect_Bug_Life_Cycle.md) | All 15 defect states, Severity vs Priority matrix, Bug report templates, Defect metrics, Triage process | ~108 KB |
-| **8** | [JIRA for Test Management](Part_08_JIRA_Test_Management.md) | JIRA concepts, Workflows, Bug reporting, Dashboards, JQL for testers, Xray/Zephyr integration, Best practices | ~80 KB |
+| **7** | [Defect/Bug Life Cycle](Part_07_Defect_Bug_Life_Cycle.md) | All 15 defect states, Severity vs Priority matrix, Bug report templates, Defect metrics, Triage process | ~133 KB |
+| **8** | [JIRA for Test Management](Part_08_JIRA_Test_Management.md) | JIRA concepts, Workflows, Bug reporting, Dashboards, JQL for testers, Xray/Zephyr integration, Best practices | ~113 KB |
 
 ### Agile & Planning
 
 | Part | Title | Key Topics | File |
 |------|-------|------------|------|
-| **9** | [Agile Testing](Part_09_Agile_Testing.md) | Agile Manifesto, Testing Quadrants, Sprint lifecycle, User Stories, TDD/BDD, Continuous Testing, Metrics | ~114 KB |
-| **10** | [Test Planning & Documentation](Part_10_Test_Planning_Documentation.md) | Test Plan (IEEE 829), Test Strategy, Estimation techniques, Risk-based testing, Schedule & Resource planning | ~87 KB |
+| **9** | [Agile Testing](Part_09_Agile_Testing.md) | Agile Manifesto, Testing Quadrants, Sprint lifecycle, User Stories, TDD/BDD, Continuous Testing, Metrics | ~148 KB |
+| **10** | [Test Planning & Documentation](Part_10_Test_Planning_Documentation.md) | Test Plan (IEEE 829), Test Strategy, Estimation techniques, Risk-based testing, Schedule & Resource planning | ~115 KB |
 
 ### Execution, Reporting & Modern Practices
 
 | Part | Title | Key Topics | File |
 |------|-------|------------|------|
-| **11** | [Test Execution & Reporting](Part_11_Test_Execution_Reporting.md) | Execution process, Status reports, Test Summary Report, Metrics & KPIs, Go/No-Go decision, Closure activities | ~82 KB |
-| **12** | [QA Best Practices & Modern Trends (2025)](Part_12_QA_Best_Practices_Modern_Trends.md) | Shift-Left/Right, SBTM, AI in Testing, API/Performance/Security basics, DevOps testing, Career growth | ~96 KB |
-| **13** | [Tools & Resources (India-focused)](Resources.md) | Quick reference of popular tools: project, test, CI, performance, security | ~8 KB |
+| **11** | [Test Execution & Reporting](Part_11_Test_Execution_Reporting.md) | Execution process, Status reports, Test Summary Report, Metrics & KPIs, Go/No-Go decision, Closure activities | ~115 KB |
+| **12** | [QA Best Practices & Modern Trends](Part_12_QA_Best_Practices_Modern_Trends.md) | Shift-Left/Right, SBTM, AI in Testing, API/Performance/Security basics, DevOps testing, Career growth | ~138 KB |
+| **13** | [Tools & Resources (India-focused)](Resources.md) | Quick reference of popular tools: project, test, CI, performance, security | ~4 KB |
 
 ### Quick Reference & Cheat Sheets
 
 | Guide | Title | Key Topics | File |
 |------|-------|------------|------|
-| ★ | [Testing Types Comparison Guide](Testing_Types_Comparison_Guide.md) | Smoke, Sanity, Regression, Retesting, System, Integration, E2E, UAT, API, UI, and Exploratory testing — side-by-side comparison table (When/Who/Purpose/How/Real Examples), the confusing pairs untangled, recommended execution sequence, and flow + frequency diagrams | ~15 KB |
+| ★ | [Testing Types Comparison Guide](Testing_Types_Comparison_Guide.md) | Smoke, Sanity, Regression, Retesting, System, Integration, E2E, UAT, API, UI, and Exploratory testing — side-by-side comparison table (When/Who/Purpose/How/Real Examples), the confusing pairs untangled, recommended execution sequence, and flow + frequency diagrams | ~23 KB |
 
 ---
 
